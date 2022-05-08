@@ -62,7 +62,7 @@ export default function Collections() {
           collections
         }
       });
-      window.location = '/';
+      alert("Collections Updated!");
     } catch(e) {
       setError(e.toString());
     }

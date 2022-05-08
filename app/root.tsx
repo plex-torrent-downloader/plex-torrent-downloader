@@ -32,12 +32,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   });
   return json({
-    settingsExist
+    settingsExist,
+    url: request.url
   });
 };
 
 export default function App() {
-  const {settingsExist} = useLoaderData();
+  const {settingsExist, url} = useLoaderData();
+
+  function getClassName(contains: string):string {
+    return url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
+  }
   return (
     <html lang="en" className="h-full">
       <head>
@@ -54,23 +59,23 @@ export default function App() {
 
               <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 {settingsExist ? <>
-                    <li><a href="/search" className="nav-link px-2 text-secondary">Search</a></li>
-                    <li><a href="/setup" className="nav-link px-2 text-secondary">Settings</a></li>
-                    <li><a href="/collections" className="nav-link px-2 text-secondary">Collections</a></li>
+                    <li><a href="/search" className={getClassName('search')}>Search</a></li>
+                    <li><a href="/setup" className={getClassName('setup')}>Settings</a></li>
+                    <li><a href="/collections" className={getClassName('collections')}>Collections</a></li>
                   </> : <>
                     <li><a href="/setup" className="nav-link px-2 text-secondary">First Time Setup</a></li>
                 </>}
               </ul>
 
-              <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-                <input type="search" className="form-control form-control-dark" placeholder="Search..."
-                       aria-label="Search" />
-              </form>
-
-              <div className="text-end">
-                <button type="button" className="btn btn-outline-light me-2">Login</button>
-                <button type="button" className="btn btn-warning">Sign-up</button>
-              </div>
+              {settingsExist && <>
+                <form method="GET" action="/search">
+                  <input type="search" name="q" className="form-control form-control-dark" placeholder="Search..."
+                         aria-label="Search" />
+                </form>
+                <div className="text-end">
+                  <button type="button" className="btn btn-warning">Search</button>
+                </div>
+              </>}
             </div>
           </div>
         </header>
