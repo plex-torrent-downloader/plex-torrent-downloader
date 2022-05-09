@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import cheerio from "cheerio";
+import os from "os";
 
 export interface Torrent {
     name: string;
@@ -10,7 +11,13 @@ export interface Torrent {
 
 async function tpb(term: string):Promise<Torrent[]> {
     const browser = await puppeteer.launch({
-        headless: true
+        headless: true,
+        executablePath: os.platform() === 'linux' ? '/usr/bin/chromium-browser' : undefined,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        defaultViewport: {
+            width:1000,
+            height:1000
+        }
     });
     try {
         const page = await browser.newPage();
