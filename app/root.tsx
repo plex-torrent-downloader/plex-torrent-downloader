@@ -44,7 +44,7 @@ export default function App() {
     return url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
   }
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full bg-dark">
       <head>
         <Meta />
         <Links />
@@ -67,7 +67,7 @@ export default function App() {
                 </>}
               </ul>
 
-              {settingsExist && <>
+              {!!settingsExist && <>
                 <form method="GET" action="/search">
                   <input type="search" name="q" className="form-control form-control-dark" placeholder="Search..."
                          aria-label="Search" />

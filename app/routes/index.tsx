@@ -3,6 +3,7 @@ import { redirect } from "@remix-run/node";
 import {json, LoaderFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
 import {db} from '../db.server';
+import webtorrent from "~/webtorrent.server";
 import ControlPanel from "~/components/ControlPanel";
 
 type LoaderData = {
@@ -18,13 +19,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!settings) {
     throw redirect("/setup", 302);
   }
+  throw redirect('/search', 302);
   return json({
-    settings
+    settings,
+    progress: webtorrent.progress
   });
 };
 
 export default function Index() {
-  const settings:LoaderData = useLoaderData();
+  const {settings, progress} = useLoaderData();
   return <ControlPanel name="HOME" subtext="Please come back later">
     <h4>Please come back later</h4>
   </ControlPanel>

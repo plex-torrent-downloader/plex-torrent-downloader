@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import cheerio from "cheerio";
 
-interface Torrent {
+export interface Torrent {
     name: string;
     seeders: number;
     hash: string;

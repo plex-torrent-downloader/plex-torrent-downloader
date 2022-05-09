@@ -4,7 +4,7 @@ interface Props {
     itemName: string;
     query?: string;
     action?: string;
-    onSearch: (query: string) => void;
+    onSearch?: (query: string) => void;
     children: any;
 }
 
@@ -18,7 +18,7 @@ export default function SearchPanel(props: Props) {
             return;
         }
     }
-    return <div className="container bg-dark text-white">
+    return <div className="container-fluid bg-dark text-white">
         <div className="row">
             <div className="col-lg-12 text-center">
                 <form onSubmit={submit} action={props.action} className="row">
