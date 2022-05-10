@@ -15,10 +15,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  if (!q || q === '') {
-    return json({results: null});
-  }
-  const results = await tpb(q);
+  const results = q && q.length ? await tpb(q) : [];
   const collections = await db.collections.findMany();
   const settings = await db.settings.findUnique({where: {id : 1}});
   return json({
@@ -30,16 +27,26 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Search() {
-  const {results, q} = useLoaderData();
+  const loaderData = useLoaderData();
   const [selection, setSelection] = useState<Torrent>(null);
 
   function download(e, torrent: Torrent) {
     e.preventDefault();
     setSelection(torrent);
   }
+
+  function useHash(){
+    setSelection({
+      name: 'Torrent using infohash',
+      seeders: 0,
+      hash: '',
+      fileSize: 'Unknown',
+    });
+  }
   return <>
-    {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} />}
-    <SearchPanel itemName="torrents" query={q} action="/search">
+    {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
+    <button className="btn btn-xl w-100 btn-success" onClick={useHash}>[ + ] Add Infohash</button>
+    <SearchPanel itemName="torrents" query={loaderData.q} action="/search">
       <div className="col-lg-12">
         <table className="table text-white">
           <thead>
@@ -52,7 +59,7 @@ export default function Search() {
           </thead>
           <tbody>
           {
-              results && results.map((result: Torrent) => {
+              loaderData.results && loaderData.results.map((result: Torrent) => {
                 return <tr>
                   <td>{result.name}</td>
                   <td>{result.seeders}</td>
@@ -64,7 +71,7 @@ export default function Search() {
               })
           }
           {
-              !results && <tr>
+              !loaderData.results && <tr>
                 <td colSpan={4}>
                   <h5 className="text-center">No Results Available</h5>
                 </td>

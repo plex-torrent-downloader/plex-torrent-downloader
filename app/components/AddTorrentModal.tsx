@@ -2,84 +2,87 @@ import {useState} from "react";
 import {Torrent} from "~/tpb.server";
 import {useLoaderData} from "@remix-run/react";
 import axios from "axios";
+import Modal from "~/components/Modal";
+import {Collections, Settings} from "@prisma/client";
 
 interface Props {
     torrent: Torrent;
-    onClose?: () => any;
+    onClose: () => any;
     children?: any;
+    collections: Collections[],
+    settings: Settings
 }
 
 export default function AddTorrentModal(props: Props) {
-    const {collections, settings} = useLoaderData();
     const {torrent} = props;
-    const [collection, setCollection] = useState<number>(null);
-    const path = collection ? collections[collection].location.replace("[content_root]", settings.fileSystemRoot).replace('//', '/') : null;
+    const [collection, setCollection] = useState<any>(null);
+    const [showSuccess, setShowSuccess] = useState<boolean>(false);
+    const [hash, setHash] = useState<string>(props.torrent.hash);
+    const path = collection ? props.collections[collection].location.replace("[content_root]", props.settings.fileSystemRoot).replace('//', '/') : null;
 
     async function submit():Promise<any> {
         await axios({
             method: 'POST',
             url: '/add',
             data: {
-                hash: props.torrent.hash,
+                hash,
                 path
             }
         });
-        if (props.onClose) {
-            props.onClose();
-        }
+        setShowSuccess(true);
     }
-    return <div className="modal" id="exampleModal"  role="dialog" style={{display: 'block'}}>
-        <div className="modal-dialog" role="document">
-            <div className="modal-content" style={{width: '750px'}}>
-                <div className="modal-header">
-                    <h5 className="modal-title">Download {torrent.name.substr(0, 45) + '...'}</h5>
-                    <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={e => props.onClose()}>
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    <h5>Please Review the following torrent download:</h5>
-                    <table className="table w-100">
-                        <tbody>
-                            <tr>
-                                <td>Name</td>
-                                <td>{torrent.name}</td>
-                            </tr>
-                            <tr>
-                                <td>Size</td>
-                                <td>{torrent.fileSize}</td>
-                            </tr>
-                            <tr>
-                                <td>Seeders</td>
-                                <td>{torrent.seeders}</td>
-                            </tr>
-                            <tr>
-                                <td>Infohash</td>
-                                <td>{torrent.hash}</td>
-                            </tr>
-                            <tr>
-                                <td>Download To:</td>
-                                <td>
-                                    <select className="w-100" value={collection} onChange={e => setCollection(e.target.value)}>
-                                        <option selected={true} disabled={true}>Select an Option</option>
-                                        {collections.map((collection, index) => <option value={index}>{collection.name}</option>)}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Path on disk:</td>
-                                <td>
-                                    {path}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={e => props.onClose()}>Cancel</button>
-                    <button type="button" className="btn btn-success" disabled={!collection} onClick={submit}>Start Download</button>
-                </div>
-            </div>
-        </div>
-    </div>;
+
+    if (showSuccess) {
+        return <Modal title="Success" onClose={() => props.onClose()}>
+            <h5>The torrent is now downloading in the background.</h5>
+        </Modal>
+    }
+    return <Modal title={`Download ${torrent.name.substr(0, 45)}...`} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
+        {
+            label: 'Start Download',
+            action: async () => {
+                await submit();
+            },
+            class: 'btn btn-success'
+        }
+    ]}>
+        <h5>Please Review the following torrent download:</h5>
+        <table className="table w-100">
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td>{torrent.name}</td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td>{torrent.fileSize}</td>
+            </tr>
+            <tr>
+                <td>Seeders</td>
+                <td>{torrent.seeders}</td>
+            </tr>
+            <tr>
+                <td>Infohash</td>
+                <td>
+                    <input className="w-100" type="text" value={hash} onChange={e => setHash(e.target.value)} />
+                </td>
+            </tr>
+            <tr>
+                <td>Download To:</td>
+                <td>
+                    <select className="w-100" value={collection ?? undefined} onChange={e => setCollection(e.target.value)}>
+                        <option selected={true} disabled={true}>Select an Option</option>
+                        {props.collections && props.collections.map((collection, index) => <option key={index} value={index}>{collection.name}</option>)}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Path on disk:</td>
+                <td>
+                    {path}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </Modal>;
 }
