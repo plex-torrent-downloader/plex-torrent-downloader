@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {Form} from "@remix-run/react";
 
 interface Props {
     itemName: string;
@@ -21,10 +22,10 @@ export default function SearchPanel(props: Props) {
     return <div className="container-fluid bg-dark text-white">
         <div className="row">
             <div className="col-lg-12 text-center">
-                <form onSubmit={submit} action={props.action} className="row">
+                <Form onSubmit={submit} action={props.action} className="row">
                     <input type="text" name="q" className="col-lg-9" placeholder={`Search ${props.itemName}`} value={q} onChange={e => setQ(e.target.value)} />
                     <input type="submit" value={`Search ${props.itemName}`} className="btn btn-primary col-lg-3" />
-                </form>
+                </Form>
             </div>
         </div>
         <div className="row">

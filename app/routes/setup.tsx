@@ -1,4 +1,4 @@
-import {useLoaderData} from "@remix-run/react";
+import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
 import {db} from '../db.server';
@@ -47,9 +47,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Index() {
   const settings:LoaderData = useLoaderData();
-  const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
+  const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '')
   return <ControlPanel name="Initial Setup" subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
-    <form method="POST">
+    <Form method="post">
       <table className="table text-white">
         <thead>
           <tr>
@@ -71,6 +71,6 @@ export default function Index() {
           </tr>
         </tbody>
       </table>
-    </form>
+    </Form>
   </ControlPanel>
 }

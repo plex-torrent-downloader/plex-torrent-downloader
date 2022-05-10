@@ -45,17 +45,17 @@ export default function Search() {
   }
   return <>
     {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
-    <button className="btn btn-xl w-100 btn-success" onClick={useHash}>[ + ] Add Infohash</button>
     <SearchPanel itemName="torrents" query={loaderData.q} action="/search">
+      <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={useHash}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
         <table className="table text-white">
           <thead>
-          <tr>
+          {!!loaderData?.results?.length && <tr>
             <th>Name</th>
             <th style={{width: '25px'}}>Seeders</th>
             <th style={{width: '25px'}}>Size</th>
             <th style={{width: '30px'}}>Download</th>
-          </tr>
+          </tr>}
           </thead>
           <tbody>
           {
@@ -70,15 +70,13 @@ export default function Search() {
                 </tr>
               })
           }
-          {
-              !loaderData.results && <tr>
-                <td colSpan={4}>
-                  <h5 className="text-center">No Results Available</h5>
-                </td>
-              </tr>
-          }
           </tbody>
         </table>
+        {
+            !loaderData.results || !loaderData.results.length && <>
+              <span className="text-center w-100">No Results to display</span>
+            </>
+        }
       </div>
     </SearchPanel>
   </>;

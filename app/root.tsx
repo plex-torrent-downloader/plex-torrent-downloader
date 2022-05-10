@@ -3,6 +3,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import {
+  Form,
   Links,
   LiveReload,
   Meta,
@@ -14,6 +15,7 @@ import {
 import bootstrap from "./styles/bootstrap.css";
 import {json, LoaderFunction, redirect} from "@remix-run/node";
 import {db} from "~/db.server";
+import {useState} from "react";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: bootstrap }];
@@ -26,6 +28,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
   const settingsExist = await db.settings.count({
     where: {
       id : 1
@@ -33,12 +37,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
   return json({
     settingsExist,
-    url: request.url
+    url: request.url,
+    q
   });
 };
 
 export default function App() {
-  const {settingsExist, url} = useLoaderData();
+  const {settingsExist, url, q} = useLoaderData();
+  const [query, setQuery] = useState<string>(q || '');
 
   function getClassName(contains: string):string {
     return url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
@@ -68,10 +74,10 @@ export default function App() {
               </ul>
 
               {!!settingsExist && <>
-                <form method="GET" action="/search">
-                  <input type="search" name="q" className="form-control form-control-dark" placeholder="Search..."
+                <Form method="get" action="/search">
+                  <input type="search" value={query} onChange={e => setQuery(e.target.value)} name="q" className="form-control form-control-dark" placeholder="Search..."
                          aria-label="Search" />
-                </form>
+                </Form>
                 <div className="text-end">
                   <button type="button" className="btn btn-warning">Search</button>
                 </div>

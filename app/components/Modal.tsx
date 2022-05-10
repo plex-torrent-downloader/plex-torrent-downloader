@@ -1,11 +1,8 @@
 import {useState} from "react";
-import {useLoaderData} from "@remix-run/react";
-import axios from "axios";
 
 interface Buttons {
     label: string;
     action: () => any;
-    disabled?: boolean;
     class: string;
 }
 
@@ -18,7 +15,7 @@ interface Props {
 }
 
 export default function Modal(props: Props) {
-    return <div className="modal" id="modal"  role="dialog" style={{display: 'block'}}>
+    return <div className="modal text-black" id="modal"  role="dialog" style={{display: 'block'}}>
         <div className="modal-dialog" role="document">
             <div className="modal-content" style={{width: '750px'}}>
                 <div className="modal-header">

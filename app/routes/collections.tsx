@@ -1,4 +1,4 @@
-import {useLoaderData} from "@remix-run/react";
+import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
 import { Collections } from '@prisma/client';
 import {db} from '../db.server';
@@ -6,6 +6,7 @@ import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
+import Modal from '../components/Modal';
 
 export const action = async ({request}) => {
   const formData = await request.json();
@@ -51,6 +52,7 @@ export default function Collections() {
   const initData = loader && loader.length ? loader : [{name: 'Movies', location: '[content_root]/movies'}];
   const [collections, setCollections] = useState<Collection[]>(initData);
   const [error, setError] = useState<string>(null);
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
   async function submit(e) {
     e.preventDefault();
@@ -62,7 +64,7 @@ export default function Collections() {
           collections
         }
       });
-      alert("Collections Updated!");
+      setShowSuccess(true);
     } catch(e) {
       setError(e.toString());
     }
@@ -103,10 +105,24 @@ export default function Collections() {
   }
 
   return <ControlPanel name="Collections" subtext="Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'">
-    {error && <div className="bg-danger">
-      Error: {error}
-    </div>}
-    <form method="POST" onSubmit={submit}>
+    {error && <Modal title="Error" onClose={() => {setError(null)}}>
+      <h5>An Error happened:</h5>
+      <span>{error}</span>
+      <br />
+      <span>Are you sure that all paths are correct?</span>
+    </Modal>}
+    {showSuccess && <Modal title="Collections Updated" onClose={() => {setShowSuccess(false)}} buttons={[
+        {
+          label: 'Continue',
+          action() {
+            window.location.href = '/';
+          },
+          class: 'btn btn-primary'
+        }
+    ]}>
+      <h5>Collections saved successfully</h5>
+    </Modal>}
+    <Form method="post" onSubmit={submit}>
       <table className="table text-white">
         <thead>
           <tr>
@@ -137,6 +153,6 @@ export default function Collections() {
           </tr>
         </tbody>
       </table>
-    </form>
+    </Form>
   </ControlPanel>
 }
