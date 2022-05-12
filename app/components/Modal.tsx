@@ -1,5 +1,3 @@
-import {useState} from "react";
-
 interface Buttons {
     label: string;
     action: () => any;

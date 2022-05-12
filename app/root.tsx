@@ -11,7 +11,7 @@ import {
   Scripts,
   ScrollRestoration, useLoaderData,
 } from "@remix-run/react";
-
+import torrentsManager from "~/torrents.server";
 import bootstrap from "./styles/bootstrap.css";
 import {json, LoaderFunction, redirect} from "@remix-run/node";
 import {db} from "~/db.server";
@@ -38,12 +38,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({
     settingsExist,
     url: request.url,
-    q
+    q,
+    torrents: torrentsManager.getSerialized() 
   });
 };
 
 export default function App() {
-  const {settingsExist, url, q} = useLoaderData();
+  const {settingsExist, url, q, torrents} = useLoaderData();
   const [query, setQuery] = useState<string>(q || '');
 
   function getClassName(contains: string):string {
@@ -65,6 +66,7 @@ export default function App() {
 
               <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 {settingsExist ? <>
+                    <li><a href="/queue" className={getClassName('queue')}>Download Queue ({torrents.length})</a></li>
                     <li><a href="/search" className={getClassName('search')}>Search</a></li>
                     <li><a href="/setup" className={getClassName('setup')}>Settings</a></li>
                     <li><a href="/collections" className={getClassName('collections')}>Collections</a></li>

@@ -33,8 +33,16 @@ export default function AddTorrentModal(props: Props) {
     }
 
     if (showSuccess) {
-        return <Modal title="Success" onClose={() => props.onClose()}>
-            <h5>The torrent is now downloading in the background.</h5>
+        return <Modal title="Success" onClose={() => props.onClose()} buttons={[
+            {
+                label: "Open Download Queue",
+                class: "btn btn-success",
+                action(){
+                    window.location.href = "/queue";
+                }
+            }
+        ]}>
+            <h5>The torrent is now downloading.</h5>
         </Modal>
     }
     return <Modal title={`Download ${torrent.name.substr(0, 45)}...`} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
