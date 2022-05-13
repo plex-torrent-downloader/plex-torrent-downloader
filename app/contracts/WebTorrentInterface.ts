@@ -7,4 +7,5 @@ export interface WebTorrent {
     numPeers: number;
     path: string;
     done: boolean;
+    class: string;
 }

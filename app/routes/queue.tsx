@@ -57,76 +57,80 @@ export default function Queue() {
        setError(e);
      }
    }
-  return  <SearchPanel itemName="Download Queue" query={''} action="/">
-    {
-        error && <Modal title="Error" onClose={() => {return setError(null)}}>
-          {error.toString()}
-        </Modal>
-    }
-    {
-        confirmDelete && <Modal title="Are you sure you want to delete this torrent?" onClose={() => setConfirmDelete(null)} buttons={
-          [
-            {
-              label: 'Stop Downloading',
-              action: async () => {
-                await remove(false);
-                setConfirmDelete(null);
-              },
-              class: 'btn btn-primary'
-            },
-            {
-              label: 'Delete',
-              action: async () => {
-                await remove(true);
-                setConfirmDelete(null);
-              },
-              class: 'btn btn-danger'
-            }
-          ]}>
-          Please confirm you want to stop downloading this torrent or delete it.
-        </Modal>
-    }
-    <div className="col-lg-12">
-      <table className="table text-white">
-        <thead>
-        {!!torrents.length && <tr>
-          <th>Name</th>
-          <th>Progress</th>
-          <th>Download Speed</th>
-          <th>Upload Speed</th>
-          <th>Path</th>
-          <th>Peers</th>
-        </tr>}
-        </thead>
-        <tbody>
+  return  <div className="container-fluid bg-dark">
+    <div className="row">
+      <div className="col-lg-12 text-white">
         {
-            torrents.map((result: WebTorrent) => {
-              return <tr>
-                <td>
-                  {result.name}
-                  <br />
-                  {result.hash}
-                </td>
-                <td>{result.progress}</td>
-                <td>{formatSizeUnits(result.downloadSpeed)}</td>
-                <td>{formatSizeUnits(result.uploadSpeed)}</td>
-                <td>{result.path}</td>
-                <td>{result.numPeers}</td>
-                <td>
-                  <button className="btn btn-danger" onClick={e => setConfirmDelete(result)}>Cancel Download</button>
-                </td>
-              </tr>
-            })
+            error && <Modal title="Error" onClose={() => {return setError(null)}}>
+              {error.toString()}
+            </Modal>
         }
-        </tbody>
-      </table>
-      {
-          !torrents.length && <>
-            <span className="text-center w-100">No torrents are downloading right now</span>
-          </>
-      }
+        {
+            confirmDelete && <Modal title="Are you sure you want to delete this torrent?" onClose={() => setConfirmDelete(null)} buttons={
+              [
+                {
+                  label: 'Stop Downloading',
+                  action: async () => {
+                    await remove(false);
+                    setConfirmDelete(null);
+                  },
+                  class: 'btn btn-primary'
+                },
+                {
+                  label: 'Delete',
+                  action: async () => {
+                    await remove(true);
+                    setConfirmDelete(null);
+                  },
+                  class: 'btn btn-danger'
+                }
+              ]}>
+              Please confirm you want to stop downloading this torrent or delete it.
+            </Modal>
+        }
+        <div className="col-lg-12">
+          <table className="table text-white">
+            <thead>
+            {!!torrents.length && <tr>
+              <th>Name</th>
+              <th>Progress</th>
+              <th>Download Speed</th>
+              <th>Upload Speed</th>
+              <th>Path</th>
+              <th>Peers</th>
+            </tr>}
+            </thead>
+            <tbody>
+            {
+              torrents.map((result: WebTorrent) => {
+                return <tr className={result.class}>
+                  <td>
+                    {result.name}
+                    <br />
+                    {result.hash}
+                  </td>
+                  <td>{result.progress}</td>
+                  <td>{formatSizeUnits(result.downloadSpeed)}</td>
+                  <td>{formatSizeUnits(result.uploadSpeed)}</td>
+                  <td>{result.path}</td>
+                  <td>{result.numPeers}</td>
+                  <td>
+                    <button className="btn btn-danger" onClick={e => setConfirmDelete(result)}>{result.done ? 'Delete' : 'Cancel'}</button>
+                  </td>
+                </tr>
+              })
+            }
+            </tbody>
+          </table>
+          {
+              !torrents.length && <>
+                <span className="text-center w-100">No torrents are downloading right now</span>
+              </>
+          }
+        </div>
+      </div>
     </div>
-  </SearchPanel>
+  </div>
 }
 
 function formatSizeUnits(bytes)

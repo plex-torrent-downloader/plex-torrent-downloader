@@ -30,16 +30,26 @@ class Search {
     private async saveResults(q: string, results: Torrent[]):Promise<SearchResults[]> {
         return db.$transaction([
             ...results.map((t: Torrent) => {
-                return db.searchResults.create({
-                    data: {
+                return db.searchResults.upsert({
+                    where:  {
+                        hash: t.hash
+                    },
+                    create: {
                         searchTerm: q,
                         name: t.name,
                         hash: t.hash,
                         fileSize: t.fileSize,
                         seeders: +t.seeders,
-                        leechers: +t.leechers
+                        leechers: +t.leechers,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    update: {
+                        seeders: +t.seeders,
+                        leechers: +t.leechers,
+                        updatedAt: new Date()
                     }
-                })
+                });
             })
         ]);
     }

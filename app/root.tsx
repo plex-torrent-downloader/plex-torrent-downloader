@@ -3,7 +3,6 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import {
-  Form,
   Links,
   LiveReload,
   Meta,
@@ -13,9 +12,8 @@ import {
 } from "@remix-run/react";
 import torrentsManager from "~/torrents.server";
 import bootstrap from "./styles/bootstrap.css";
-import {json, LoaderFunction, redirect} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import {db} from "~/db.server";
-import {useState} from "react";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: bootstrap }];
@@ -39,13 +37,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     settingsExist,
     url: request.url,
     q,
-    torrents: torrentsManager.getSerialized() 
+    torrents: torrentsManager.getSerialized()
   });
 };
 
 export default function App() {
   const {settingsExist, url, q, torrents} = useLoaderData();
-  const [query, setQuery] = useState<string>(q || '');
 
   function getClassName(contains: string):string {
     return url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
@@ -74,16 +71,6 @@ export default function App() {
                     <li><a href="/setup" className="nav-link px-2 text-secondary">First Time Setup</a></li>
                 </>}
               </ul>
-
-              {!!settingsExist && <>
-                <Form method="get" action="/search">
-                  <input type="search" value={query} onChange={e => setQuery(e.target.value)} name="q" className="form-control form-control-dark" placeholder="Search..."
-                         aria-label="Search" />
-                </Form>
-                <div className="text-end">
-                  <button type="button" className="btn btn-warning">Search</button>
-                </div>
-              </>}
             </div>
           </div>
         </header>

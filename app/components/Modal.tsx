@@ -14,8 +14,8 @@ interface Props {
 
 export default function Modal(props: Props) {
     return <div className="modal text-black" id="modal"  role="dialog" style={{display: 'block'}}>
-        <div className="modal-dialog" role="document">
-            <div className="modal-content" style={{width: '750px'}}>
+        <div className="modal-dialog w-100" role="document">
+            <div className="modal-content">
                 <div className="modal-header">
                     <h5 className="modal-title">{props.title}</h5>
                     <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={e => props.onClose()}>

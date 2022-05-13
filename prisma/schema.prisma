@@ -30,7 +30,7 @@ model SearchResults {
   id         Int      @id @default(autoincrement())
   searchTerm String   @map("search_term")
   name       String
-  hash       String
+  hash       String   @unique
   seeders    Int?
   leechers   Int
   fileSize   String
