@@ -29,17 +29,9 @@ export const action = async ({request}) => {
     throw new Error("Please check the download path. The location cannot be found.");
   }
 
-  webtorrent.add(`magnet:?xt=urn:btih:${formData.hash}`, { path: formData.path }, function (torrent) {
-    console.log('torrent', torrent);
-    torrentManager.addTorrent(torrent);
+  webtorrent.add(`magnet:?xt=urn:btih:${formData.hash}`, { path: formData.path }, async (torrent) => {
+    await torrentManager.addTorrent(torrent, formData.path);
   })
 
   return json({success: true});
 };
-
-export default function Index() {
-  const settings:LoaderData = useLoaderData();
-  return <ControlPanel name="Add Route" subtext="Please come back later">
-    <h4>Please come back later</h4>
-  </ControlPanel>
-}

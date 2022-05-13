@@ -1,12 +1,38 @@
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
+import {db} from './db.server';
+import {async} from "rxjs";
 
 class torrentsManager {
     private torrents: any[] = [];
     getTorrents(){
         return this.torrents;
     }
-    addTorrent(torrent){
+    async addTorrent(torrent, path: string){
         this.torrents.push(torrent);
+        const {id} = await db.downloaded.upsert({
+            where: {
+                hash: torrent.infoHash
+            },
+            create: {
+                name: torrent.name,
+                hash: torrent.infoHash,
+                pathOnDisk: path
+            },
+            update: {
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        });
+        torrent.on('done', async () => {
+            await db.downloaded.update({
+                data: {
+                    completedAt: new Date()
+                },
+                where: {
+                    id
+                }
+            })
+        });
     }
     async removeTorrent(hash: string):Promise<void> {
         const torrent = this.torrents.find(t => t.infoHash === hash);
@@ -26,6 +52,14 @@ class torrentsManager {
 
         torrent.destroy({destroyStore: true});
         this.torrents.splice(this.torrents.indexOf(torrent), 1);
+        await db.downloaded.update({
+            data: {
+                deletedAt: new Date()
+            },
+            where: {
+                hash
+            }
+        });
     }
     private serialize(torrent: any):WebTorrent {
         return {

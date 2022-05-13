@@ -30,7 +30,7 @@ model SearchResults {
   id         Int      @id @default(autoincrement())
   searchTerm String   @map("search_term")
   name       String
-  hash       String
+  hash       String   @unique()
   seeders    Int?
   leechers   Int
   fileSize   String
@@ -38,4 +38,17 @@ model SearchResults {
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("search_results")
+}
+
+model Downloaded {
+  id          Int       @id @default(autoincrement())
+  name        String
+  hash        String    @unique
+  pathOnDisk  String    @map("path_on_disk")
+  completedAt DateTime? @map("completed_at")
+  deletedAt   DateTime? @map("deleted_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("downloaded")
 }
