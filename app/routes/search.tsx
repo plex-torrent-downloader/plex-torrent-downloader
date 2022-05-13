@@ -1,21 +1,17 @@
 import {useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
-import { Settings } from '@prisma/client';
 import {tpb} from '../tpb.server';
 import SearchPanel from "~/components/SearchPanel";
 import {useState} from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
 import {Torrent} from "../tpb.server";
 import {db} from "~/db.server";
-
-type LoaderData = {
-  settings?: Settings;
-};
+import searchServer from "~/search.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const results = q && q.length ? await tpb(q) : [];
+  const results = q && q.length ? await searchServer.search(q) : [];
   const collections = await db.collections.findMany();
   const settings = await db.settings.findUnique({where: {id : 1}});
   return json({
@@ -39,6 +35,7 @@ export default function Search() {
     setSelection({
       name: 'Torrent using infohash',
       seeders: 0,
+      leechers: 0,
       hash: '',
       fileSize: 'Unknown',
     });

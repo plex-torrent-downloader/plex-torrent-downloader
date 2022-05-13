@@ -5,6 +5,7 @@ import os from "os";
 export interface Torrent {
     name: string;
     seeders: number;
+    leechers: number;
     hash: string;
     fileSize: string;
 }
@@ -28,6 +29,7 @@ async function tpb(term: string):Promise<Torrent[]> {
             return {
                 name: $('span.item-title', this).text(),
                 seeders: +$('span.item-seed', this).text(),
+                leechers: +$('span.item-leach', this).text(),
                 hash: $('.item-icons a', this).attr('href').substr(20, 40),
                 fileSize: $('.item-size', this).text()
             };

@@ -25,3 +25,17 @@ model Collections {
 
   @@map("collections")
 }
+
+model SearchResults {
+  id         Int      @id @default(autoincrement())
+  searchTerm String   @map("search_term")
+  name       String
+  hash       String
+  seeders    Int?
+  leechers   Int
+  fileSize   String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("search_results")
+}
