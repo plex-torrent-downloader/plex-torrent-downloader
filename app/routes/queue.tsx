@@ -128,6 +128,9 @@ export default function Queue() {
               </>
           }
         </div>
+        <div className="col-lg-12">
+          <a href="/history" className="small text-white">Download History &gt;</a>
+        </div>
       </div>
     </div>
   </div>

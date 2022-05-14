@@ -19,6 +19,8 @@ class torrentsManager {
                 pathOnDisk: path
             },
             update: {
+                deletedAt: null,
+                completedAt: null,
                 createdAt: new Date(),
                 updatedAt: new Date()
             }
@@ -26,7 +28,8 @@ class torrentsManager {
         torrent.on('done', async () => {
             await db.downloaded.update({
                 data: {
-                    completedAt: new Date()
+                    completedAt: new Date(),
+                    deletedAt: null
                 },
                 where: {
                     id
