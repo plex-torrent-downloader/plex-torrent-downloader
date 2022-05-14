@@ -42,6 +42,7 @@ class torrentsManager {
         }
 
         torrent.destroy();
+        this.torrents.splice(this.torrents.indexOf(torrent), 1);
     }
     async deleteTorrent(hash: string):Promise<void> {
         const torrent = this.torrents.find(t => t.infoHash === hash);
@@ -70,7 +71,8 @@ class torrentsManager {
             progress: (torrent.progress * 100).toFixed(1) + '%',
             numPeers: torrent.numPeers,
             path: torrent.path,
-            done: !!torrent.done
+            done: !!torrent.done,
+            class: (torrent.done ? 'table-success' : 'table-danger')
         }
     }
     getSerialized() {

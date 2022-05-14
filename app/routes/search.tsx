@@ -45,7 +45,7 @@ export default function Search() {
     <SearchPanel itemName="torrents" query={loaderData.q} action="/search">
       <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={useHash}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
-        <table className="table text-white">
+        <table className="table text-white table-sm">
           <thead>
           {!!loaderData?.results?.length && <tr>
             <th>Name</th>
