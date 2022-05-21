@@ -39,13 +39,13 @@ export default function History() {
       });
       torrent.completedAt = null;
       torrent.deletedAt = null;
-      setAlertMessage("Torrent is now downloading");
+      setAlertMessage("The torrent is queued to download or reseed. It may take some time before the torrent shows up in your download manager.");
     } catch(e) {
       setError(e.toString());
     }
   }
 
-  function getStatus(downloaded: Downloaded): string {
+  function getTimestampStatus(downloaded: Downloaded): string {
     if (downloaded.deletedAt) {
       return 'Deleted ' + moment(downloaded.deletedAt).fromNow();
     }
@@ -55,14 +55,34 @@ export default function History() {
     return 'Downloading';
   }
 
-  function getRowClass(downloaded: Downloaded): string {
-    if (downloaded.deletedAt) {
-      return 'table-danger';
+  function getStatus(downloaded: Downloaded): string {
+    if (downloaded.completedAt && downloaded.deletedAt) {
+      if (downloaded.completedAt > downloaded.deletedAt) {
+        return 'completed';
+      }
+      if (downloaded.completedAt < downloaded.deletedAt) {
+        return 'deleted';
+      }
     }
     if (downloaded.completedAt) {
-      return 'table-success'
+      return 'completed';
     }
-    return 'table-warning';
+    if (downloaded.deletedAt) {
+      return 'deleted';
+    }
+    return 'downloading';
+  }
+
+  function getRowClass(downloaded: Downloaded): string {
+    switch(getStatus(downloaded)) {
+      case 'completed':
+        return 'table-success';
+      case 'deleted':
+        return 'table-danger';
+      case 'downloading':
+      default:
+        return 'table-warning';
+    }
   }
 
   return <>
@@ -78,7 +98,7 @@ export default function History() {
             <th>Hash</th>
             <th>Path on Disk</th>
             <th>Status</th>
-            <th>Downloaded</th>
+            <th>Created At</th>
             <th>Actions</th>
           </tr>}
           </thead>
@@ -89,12 +109,11 @@ export default function History() {
                   <td>{result.name}</td>
                   <td>{result.hash}</td>
                   <td>{result.pathOnDisk}</td>
-                  <td>{getStatus(result)}</td>
-                  <td>Downloaded {moment(result.createdAt).fromNow()}</td>
+                  <td>{getTimestampStatus(result)}</td>
+                  <td>Created {moment(result.createdAt).fromNow()}</td>
                   <td>
-                    {!!result.completedAt && +moment(result.completedAt) < +moment().subtract(1, 'day') && !result.deletedAt && <button className="btn btn-primary" onClick={e => reseed(e, result)}>Re-Seed</button>}
-                    {!!result.deletedAt && <button className="btn btn-info" onClick={e => reseed(e, result)}>Restart Download</button>}
-                    {!result.deletedAt && !result.completedAt && <button className="btn btn-info" onClick={() => {window.location.href = "/queue"}}>Manage Download</button>}
+                    {getStatus(result) === 'completed' && <button className="btn btn-primary" onClick={e => reseed(e, result)}>Re-Seed</button>}
+                    {getStatus(result) === 'deleted' && <button className="btn btn-success" onClick={e => reseed(e, result)}>Restart Download</button>}
                   </td>
                 </tr>
               })
