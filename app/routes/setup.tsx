@@ -64,6 +64,12 @@ export default function Index() {
               <input type="text" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
             </td>
           </tr>
+          {settings.settings && <tr>
+            <td>Hard Reset</td>
+            <td>
+              <a href="/reset" className="text-danger">Hard Reset</a>
+            </td>
+          </tr>}
           <tr>
             <td colSpan={2}>
               <input type="submit" value="Update Settings" className="btn btn-primary w-100" />
