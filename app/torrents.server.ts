@@ -20,7 +20,7 @@ class torrentsManager {
             },
             update: {
                 deletedAt: null,
-                completedAt: null,
+                completedAt: torrent.progress ? new Date() : null,
                 createdAt: new Date(),
                 updatedAt: new Date()
             }
