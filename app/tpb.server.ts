@@ -1,6 +1,5 @@
-import puppeteer from "puppeteer";
+import axios from "axios";
 import cheerio from "cheerio";
-import os from "os";
 
 export interface Torrent {
     name: string;
@@ -8,37 +7,32 @@ export interface Torrent {
     leechers: number;
     hash: string;
     fileSize: string;
+    link?: string;
 }
 
 async function tpb(term: string):Promise<Torrent[]> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: os.platform() === 'linux' ? '/usr/bin/chromium-browser' : undefined,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        defaultViewport: {
-            width:1000,
-            height:1000
+    const {data} = await axios(`https://www.1377x.to/search/${encodeURIComponent(term)}/1/`, {
+        headers: {
+            'user-agent': 'Mozilla/5.0 (Macintosh; M1 Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36'
         }
     });
-    try {
-        const page = await browser.newPage();
-        await page.goto('https://thepiratebay.org/search.php?q=' + encodeURIComponent(term) + '&all=on&search=Pirate+Search&page=0&orderby=');
-        let bodyHTML = await page.evaluate(() =>  document.documentElement.outerHTML);
-        const $ = cheerio.load(bodyHTML);
-        const entries = $('.list-entry').map(function() {
-            return {
-                name: $('span.item-title', this).text(),
-                seeders: +$('span.item-seed', this).text(),
-                leechers: +$('span.item-leach', this).text(),
-                hash: $('.item-icons a', this).attr('href').substr(20, 40),
-                fileSize: $('.item-size', this).text()
-            };
-        }).toArray();
-        return entries;
-    } catch(e) {
-        console.error(e);
-    } finally {
-        await browser.close();
+    let $ = cheerio.load(data);
+    const entries = $('table tr').map(function() {
+        return {
+            name: $('td.name a:last-child', this).text().trim(),
+            link: 'https://www.1377x.to/' + $('td.name a:last-child', this).attr('href'),
+            seeders: +$('td.seeds', this).text(),
+            leechers: +$('td.leeches', this).text(),
+            hash: null,
+            fileSize: $('td.size', this).text()
+        };
+    }).toArray();
+    for (let result of entries) {
+        const response = await axios(result.link);
+        $ = cheerio.load(response.data);
+        result.hash = $('.infohash-box').text().split(':').pop().trim();
     }
+    entries.splice(0, 1);
+    return entries;
 }
 export { tpb };
