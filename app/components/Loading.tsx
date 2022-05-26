@@ -1,0 +1,82 @@
+export default function Loading() {
+    return <>
+        <style jsx>{`
+        .loader {
+            background: rgba(0, 0, 0, .7);
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+            position: fixed;
+            right: 0;
+            top: 0;;
+            transition: opacity 1.5s, visibility 0s 1.5s;
+            z-index: 9999;
+        }
+        
+        .loader-ring {
+            animation: rotate 1.2s ease-in-out infinite;
+            border: 6px solid #FFF;
+            height: 100px;
+            left: 50%;
+            margin: -50px 0 0 -50px;
+            position: absolute;
+            top: 50%;
+            width: 100px
+        }
+        
+        .loader-ring:nth-child(1) {
+            animation-delay: 0s
+            border-color: rgb(33,37,41);
+        }
+        
+        .loader-ring:nth-child(2) {
+            border-color: #FFF;
+            animation-delay: -.3s
+        }
+        
+        .loader-ring:nth-child(3) {
+            border-color: rgb(33,37,41);
+            animation-delay: -.6s
+        }
+        
+        .loader-ring:nth-child(4) {
+            border-color: #FFF;
+            animation-delay: -.9s
+        }
+        
+        @keyframes rotate {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(45deg) translateZ(0);
+                border-radius: 100px;
+            }
+        
+            50% {
+                opacity: 1;
+            }
+        
+            100% {
+                opacity: 0;
+                transform: scale(1) rotate(135deg) translateZ(0);
+                border-radius: 0px;
+            }
+        }
+        
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+        
+            100% {
+                opacity: 0;
+            }
+        }
+      `}</style>
+        <div className={`loader`}>
+            <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
+        </div>
+    </>
+}

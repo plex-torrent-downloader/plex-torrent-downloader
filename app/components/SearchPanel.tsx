@@ -1,5 +1,6 @@
 import {useState} from "react";
-import {Form} from "@remix-run/react";
+import {Form, useTransition} from "@remix-run/react";
+import Loading from "~/components/Loading";
 
 interface Props {
     itemName: string;
@@ -11,6 +12,7 @@ interface Props {
 
 export default function SearchPanel(props: Props) {
     const [q, setQ] = useState<string>(props.query || '');
+    const {state} = useTransition();
 
     function submit(e) {
         if (e.onSearch) {
@@ -29,7 +31,8 @@ export default function SearchPanel(props: Props) {
             </div>
         </div>
         <div className="row">
-            {props.children}
+            {state === "submitting" && <Loading />}
+            {state !== "submitting" && props.children}
         </div>
     </div>
 }
