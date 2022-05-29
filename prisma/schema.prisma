@@ -8,10 +8,11 @@ generator client {
 }
 
 model Settings {
-  id             Int      @id @default(autoincrement())
-  fileSystemRoot String   @map("file_system_root")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+  id                 Int      @id @default(autoincrement())
+  fileSystemRoot     String   @map("file_system_root")
+  cacheSearchResults Boolean  @default(true) @map("cache_search_results")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("settings")
 }
@@ -30,7 +31,7 @@ model SearchResults {
   id         Int      @id @default(autoincrement())
   searchTerm String   @map("search_term")
   name       String
-  hash       String   @unique
+  hash       String
   seeders    Int?
   leechers   Int
   fileSize   String

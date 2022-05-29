@@ -19,16 +19,16 @@ export const action = async ({request}) => {
   } catch(e) {
     throw new Error("FS Location not found!");
   }
-  const record = await db.settings.upsert({
+  const setObject = {
+    fileSystemRoot,
+    cacheSearchResults: !!formData.get('cacheSearchResults')
+  }
+  await db.settings.upsert({
     where: {
       id : 1
     },
-    create: {
-      fileSystemRoot
-    },
-    update: {
-      fileSystemRoot
-    }
+    create: setObject,
+    update: setObject
   });
 
   throw redirect('/collections', 302);
@@ -47,7 +47,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Index() {
   const settings:LoaderData = useLoaderData();
-  const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '')
+  const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
+  const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? false);
   return <ControlPanel name="Initial Setup" subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     <Form method="post">
       <table className="table text-white">
@@ -62,6 +63,12 @@ export default function Index() {
             <td>Plex Content Root</td>
             <td>
               <input type="text" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
+            </td>
+          </tr>
+          <tr>
+            <td>Cache Search Results</td>
+            <td>
+              <input type="checkbox" name="cacheSearchResults" checked={cacheSearchResults} onChange={(e) => setCacheSearchResults(!cacheSearchResults)} />
             </td>
           </tr>
           {settings.settings && <tr>

@@ -3,13 +3,17 @@ import {Torrent, tpb} from './tpb.server';
 import {SearchResults} from '@prisma/client';
 
 class Search {
-    public async search(q: string):Promise<SearchResults[]> {
-        let findInDb;
-        if (findInDb = await this.findInDb(q)) {
-            return findInDb;
+    public async search(q: string):Promise<Partial<SearchResults>[]> {
+        const {cacheSearchResults} = await db.settings.findUnique({where: {id : 1}});
+        if (cacheSearchResults) {
+            let findInDb;
+            if (findInDb = await this.findInDb(q)) {
+                return findInDb;
+            }
+            const results = await tpb(q);
+            return await this.saveResults(q, results);
         }
-        const results = await tpb(q);
-        return await this.saveResults(q, results);
+        return await tpb(q);
     }
 
     private async findInDb(q: string):Promise<SearchResults[]> {
@@ -30,11 +34,8 @@ class Search {
     private async saveResults(q: string, results: Torrent[]):Promise<SearchResults[]> {
         return db.$transaction([
             ...results.map((t: Torrent) => {
-                return db.searchResults.upsert({
-                    where:  {
-                        hash: t.hash
-                    },
-                    create: {
+                return db.searchResults.create({
+                    data: {
                         searchTerm: q,
                         name: t.name,
                         hash: t.hash,
@@ -42,11 +43,6 @@ class Search {
                         seeders: +t.seeders,
                         leechers: +t.leechers,
                         createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
-                    update: {
-                        seeders: +t.seeders,
-                        leechers: +t.leechers,
                         updatedAt: new Date()
                     }
                 });
