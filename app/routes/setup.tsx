@@ -21,7 +21,8 @@ export const action = async ({request}) => {
   }
   const setObject = {
     fileSystemRoot,
-    cacheSearchResults: !!formData.get('cacheSearchResults')
+    cacheSearchResults: !!formData.get('cacheSearchResults'),
+    saveDownloadHistory: !!formData.get('saveDownloadHistory')
   }
   await db.settings.upsert({
     where: {
@@ -48,7 +49,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Index() {
   const settings:LoaderData = useLoaderData();
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
-  const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? false);
+  const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
+  const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
   return <ControlPanel name="Initial Setup" subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     <Form method="post">
       <table className="table text-white">
@@ -69,6 +71,12 @@ export default function Index() {
             <td>Cache Search Results</td>
             <td>
               <input type="checkbox" name="cacheSearchResults" checked={cacheSearchResults} onChange={(e) => setCacheSearchResults(!cacheSearchResults)} />
+            </td>
+          </tr>
+          <tr>
+            <td>Save Download History</td>
+            <td>
+              <input type="checkbox" name="saveDownloadHistory" checked={saveDownloadHistory} onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)} />
             </td>
           </tr>
           {settings.settings && <tr>

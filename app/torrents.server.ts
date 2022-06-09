@@ -1,6 +1,5 @@
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {db} from './db.server';
-import {async} from "rxjs";
 
 class torrentsManager {
     private torrents: any[] = [];
@@ -9,6 +8,12 @@ class torrentsManager {
     }
     async addTorrent(torrent, path: string){
         this.torrents.push(torrent);
+        const {saveDownloadHistory} = await db.settings.findUnique({
+            where: {id: 1}
+        });
+        if (!saveDownloadHistory) {
+            return;
+        }
         const {id} = await db.downloaded.upsert({
             where: {
                 hash: torrent.infoHash

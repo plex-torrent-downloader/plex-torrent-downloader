@@ -8,11 +8,12 @@ generator client {
 }
 
 model Settings {
-  id                 Int      @id @default(autoincrement())
-  fileSystemRoot     String   @map("file_system_root")
-  cacheSearchResults Boolean  @default(true) @map("cache_search_results")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  id                  Int      @id @default(autoincrement())
+  fileSystemRoot      String   @map("file_system_root")
+  cacheSearchResults  Boolean  @default(true) @map("cache_search_results")
+  saveDownloadHistory Boolean  @default(true) @map("save_download_history")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("settings")
 }
