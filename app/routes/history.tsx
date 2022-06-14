@@ -1,5 +1,5 @@
 import {useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
+import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import {useState} from "react";
 import {db} from "~/db.server";
 import {Downloaded} from '@prisma/client';
@@ -10,6 +10,12 @@ import axios from "axios";
 interface LoaderData {
   downloaded: Downloaded[];
 }
+
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  title: "Download History",
+  viewport: "width=device-width,initial-scale=1",
+});
 
 export const loader: LoaderFunction = async ({ request }) => {
   const downloaded = await db.downloaded.findMany({
@@ -107,7 +113,11 @@ export default function History() {
               downloaded && downloaded.map((result: Downloaded) => {
                 return <tr className={getRowClass(result)}>
                   <td>{result.name}</td>
-                  <td>{result.hash}</td>
+                  <td>
+                    <small>
+                      <a className="text-muted" href={`/search?hash=${result.hash}`}>{result.hash.substr(0, 5)}...</a>
+                    </small>
+                  </td>
                   <td>{result.pathOnDisk}</td>
                   <td>{getTimestampStatus(result)}</td>
                   <td>Created {moment(result.createdAt).fromNow()}</td>

@@ -1,5 +1,5 @@
-import {Form, useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
+import {Form} from "@remix-run/react";
+import {json} from "@remix-run/node";
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";

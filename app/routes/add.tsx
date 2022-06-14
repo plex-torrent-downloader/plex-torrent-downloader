@@ -1,9 +1,5 @@
-import {useLoaderData} from "@remix-run/react";
-import { redirect } from "@remix-run/node";
 import {json, LoaderFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
-import {db} from '../db.server';
-import ControlPanel from "~/components/ControlPanel";
 import webtorrent from '../webtorrent.server';
 import fs from '../fs.server';
 import torrentManager from "~/torrents.server";
@@ -31,7 +27,7 @@ export const action = async ({request}) => {
 
   webtorrent.add(`magnet:?xt=urn:btih:${formData.hash}`, { path: formData.path }, async (torrent) => {
     await torrentManager.addTorrent(torrent, formData.path);
-  })
+  });
 
   return json({success: true});
 };

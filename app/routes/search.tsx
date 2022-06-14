@@ -1,22 +1,29 @@
 import {useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
-import {tpb} from '../tpb.server';
+import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import SearchPanel from "~/components/SearchPanel";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
 import {Torrent} from "../tpb.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
 
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  title: "Search",
+  viewport: "width=device-width,initial-scale=1",
+});
+
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
-  const q = url.searchParams.get("q");
+  const q = url.searchParams.get('q');
+  const hash = url.searchParams.get('hash');
   const results = q && q.length ? await searchServer.search(q) : [];
   const collections = await db.collections.findMany();
   const settings = await db.settings.findUnique({where: {id : 1}});
   return json({
     results,
     q,
+    hash,
     collections,
     settings
   });
@@ -31,15 +38,22 @@ export default function Search() {
     setSelection(torrent);
   }
 
-  function useHash(){
+  function useHash(hash: string = ''){
     setSelection({
       name: 'Torrent using infohash',
       seeders: 0,
       leechers: 0,
-      hash: '',
+      hash,
       fileSize: 'Unknown',
     });
   }
+
+  useEffect(() => {
+    if (loaderData.hash) {
+      useHash(loaderData.hash);
+    }
+  }, [loaderData.hash]);
+
   return <>
     {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
     <SearchPanel itemName="torrents" query={loaderData.q} action="/search">

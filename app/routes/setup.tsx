@@ -1,5 +1,5 @@
 import {Form, useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
+import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
@@ -10,6 +10,12 @@ import fs from '../fs.server';
 type LoaderData = {
   settings?: Settings;
 };
+
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  title: "Setup",
+  viewport: "width=device-width,initial-scale=1",
+});
 
 export const action = async ({request}) => {
   const formData = await request.formData();

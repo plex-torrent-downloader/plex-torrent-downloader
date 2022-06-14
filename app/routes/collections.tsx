@@ -1,5 +1,5 @@
 import {Form, useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
+import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import { Collections } from '@prisma/client';
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
@@ -7,6 +7,12 @@ import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
+
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  title: "Collections",
+  viewport: "width=device-width,initial-scale=1",
+});
 
 export const action = async ({request}) => {
   const formData = await request.json();

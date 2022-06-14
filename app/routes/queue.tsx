@@ -1,37 +1,20 @@
 import {useLoaderData, useNavigate} from "@remix-run/react";
-import {json, LoaderFunction} from "@remix-run/node";
-import SearchPanel from "~/components/SearchPanel";
+import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {useEffect, useState} from "react";
 import Modal from "~/components/Modal";
 import axios from "axios";
 import torrentsManager from '../torrents.server';
 
+export const meta: MetaFunction = () => ({
+  charset: "utf-8",
+  title: "Download Queue",
+  viewport: "width=device-width,initial-scale=1",
+});
+
 export const loader: LoaderFunction = async ({ request }) => {
   return json({
     torrents: torrentsManager.getSerialized()
-    //  torrents: [
-    //    {
-    //      name: 'ubuntu-19.04-desktop-amd64.iso',
-    //      hash: 'd540fc48eb12f2833163eed6421d449dd8f1ce1f',
-    //      downloadSpeed: 209701.7142857143,
-    //      uploadSpeed: 4010.8571428571427,
-    //      progress: '50.0%',
-    //      numPeers: 23,
-    //      path: '/Users/adam/Desktop',
-    //      done: false
-    //    },
-    //    {
-    //      name: 'ubuntu-19.04-desktop-amd64.iso',
-    //      hash: 'd540fc48eb12f2833163eed6421d449dd8f1ce1f',
-    //      downloadSpeed: 209701.7142857143,
-    //      uploadSpeed: 4010.8571428571427,
-    //      progress: '50.0%',
-    //      numPeers: 23,
-    //      path: '/Users/adam/Desktop',
-    //      done: false
-    //    }
-    //  ]
   });
 };
 
@@ -107,7 +90,9 @@ export default function Queue() {
                   <td>
                     {result.name}
                     <br />
-                    {result.hash}
+                    <small>
+                      <a className="text-muted" href={`/search?hash=${result.hash}`}>{result.hash.substr(0, 5)}...</a>
+                    </small>
                   </td>
                   <td>{result.progress}</td>
                   <td>{formatSizeUnits(result.downloadSpeed)}</td>
