@@ -10,6 +10,7 @@ generator client {
 model Settings {
   id                  Int      @id @default(autoincrement())
   fileSystemRoot      String   @map("file_system_root")
+  searchEngine        String   @default("1377x.to") @map("search_engine")
   cacheSearchResults  Boolean  @default(true) @map("cache_search_results")
   saveDownloadHistory Boolean  @default(true) @map("save_download_history")
   createdAt           DateTime @default(now()) @map("created_at")
@@ -20,7 +21,7 @@ model Settings {
 
 model Collections {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   location  String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -29,15 +30,16 @@ model Collections {
 }
 
 model SearchResults {
-  id         Int      @id @default(autoincrement())
-  searchTerm String   @map("search_term")
-  name       String
-  hash       String
-  seeders    Int?
-  leechers   Int
-  fileSize   String
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  searchTerm   String   @map("search_term")
+  searchEngine String?   @map("search_engine")
+  name         String
+  hash         String
+  seeders      Int?
+  leechers     Int
+  fileSize     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("search_results")
 }

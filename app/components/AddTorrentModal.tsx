@@ -1,6 +1,5 @@
 import {useState} from "react";
-import {Torrent} from "~/tpb.server";
-import {useLoaderData} from "@remix-run/react";
+import {Torrent} from "~/search.server";
 import axios from "axios";
 import Modal from "~/components/Modal";
 import {Collections, Settings} from "@prisma/client";
@@ -45,6 +44,7 @@ export default function AddTorrentModal(props: Props) {
             <h5>The torrent is now downloading.</h5>
         </Modal>
     }
+
     return <Modal title={`Download ${torrent.name.substr(0, 45)}...`} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
         {
             label: 'Start Download',

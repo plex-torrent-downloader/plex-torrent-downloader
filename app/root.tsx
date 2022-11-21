@@ -18,11 +18,13 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: bootstrap }];
 };
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Plex Torrent Downloader",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: MetaFunction = ({data, parentsData}) => {
+    return {
+      charset: "utf-8",
+      title: "Plex Torrent Downloader",
+      viewport: "width=device-width,initial-scale=1",
+    };
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);

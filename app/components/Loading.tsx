@@ -1,4 +1,5 @@
 export default function Loading() {
+    // @ts-ignore
     return <>
         <style jsx>{`
         .loader {

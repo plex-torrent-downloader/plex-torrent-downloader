@@ -5,8 +5,8 @@ async function spawn(cmd: string, args: any[]):Promise<any> {
     let stdout = '';
     let stderr = '';
     const pc = cp.spawn(cmd, args);
-    pc.stdout.on('data', (bit: buffer) => stdout += bit.toString());
-    pc.stderr.on('data', (bit: buffer) => stderr += bit.toString());
+    pc.stdout.on('data', (bit: Buffer) => stdout += bit.toString());
+    pc.stderr.on('data', (bit: Buffer) => stderr += bit.toString());
     return new Promise((resolve, reject) => {
         pc.on("exit", (code: number) => {
             if (code) {

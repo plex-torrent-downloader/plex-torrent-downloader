@@ -3,7 +3,7 @@ import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import SearchPanel from "~/components/SearchPanel";
 import {useEffect, useState} from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
-import {Torrent} from "../tpb.server";
+import {Torrent} from "../search.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
 
@@ -58,7 +58,7 @@ export default function Search() {
 
   return <>
     {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
-    <SearchPanel itemName="torrents" query={loaderData.q} action="/search">
+    <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
       <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={() => useHash('')}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
         <table className="table text-white table-sm">

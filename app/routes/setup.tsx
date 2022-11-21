@@ -28,7 +28,8 @@ export const action = async ({request}) => {
   const setObject = {
     fileSystemRoot,
     cacheSearchResults: !!formData.get('cacheSearchResults'),
-    saveDownloadHistory: !!formData.get('saveDownloadHistory')
+    saveDownloadHistory: !!formData.get('saveDownloadHistory'),
+    searchEngine: formData.get('searchEngine')
   }
   await db.settings.upsert({
     where: {
@@ -57,6 +58,7 @@ export default function Index() {
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
+  const [searchEngine, setSearchEngine] = useState<string>(settings.settings.searchEngine ?? '');
   return <ControlPanel name="Initial Setup" subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     <Form method="post">
       <table className="table text-white">
@@ -70,7 +72,16 @@ export default function Index() {
           <tr>
             <td>Plex Content Root</td>
             <td>
-              <input type="text" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
+              <input type="text" className="form-control" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
+            </td>
+          </tr>
+          <tr>
+            <td>Search Engine</td>
+            <td>
+              <select name="searchEngine" className="form-control" value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
+                <option>1377x.to</option>
+                <option>nyaa.si</option>
+              </select>
             </td>
           </tr>
           <tr>

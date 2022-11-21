@@ -1,16 +1,8 @@
 import axios from "axios";
 import cheerio from "cheerio";
+import {Torrent} from "~/search.server";
 
-export interface Torrent {
-    name: string;
-    seeders: number;
-    leechers: number;
-    hash: string;
-    fileSize: string;
-    link?: string;
-}
-
-async function tpb(term: string):Promise<Torrent[]> {
+export default async function search(term: string):Promise<Torrent[]> {
     const {data} = await axios(`https://www.1377x.to/search/${encodeURIComponent(term)}/1/`, {
         headers: {
             'user-agent': 'Mozilla/5.0 (Macintosh; M1 Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36'
@@ -35,4 +27,3 @@ async function tpb(term: string):Promise<Torrent[]> {
     entries.splice(0, 1);
     return entries;
 }
-export { tpb };
