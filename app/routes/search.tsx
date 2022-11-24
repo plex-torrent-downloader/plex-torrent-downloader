@@ -6,6 +6,7 @@ import AddTorrentModal from "~/components/AddTorrentModal";
 import {Torrent} from "../search.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
+import styles from '../styles/loading.css';
 
 export const meta: MetaFunction = ({data}) => {
   return {
@@ -13,6 +14,11 @@ export const meta: MetaFunction = ({data}) => {
     title: data?.q ?`Searching ${data.q}` : 'Search',
     viewport: "width=device-width,initial-scale=1",
   };
+}
+
+
+export function links() {
+  return [{ rel: "stylesheet", href: styles }];
 }
 
 export const loader: LoaderFunction = async ({ request }) => {

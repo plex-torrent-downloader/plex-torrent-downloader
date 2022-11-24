@@ -11,7 +11,6 @@ export default async function search(term: string):Promise<Torrent[]> {
     let $ = cheerio.load(data);
     const entries = $('tr.default').map(function() {
         const hashUrl = $('td:nth-child(3) a:last-child', this).attr('href');
-        console.log({hashUrl});
         return {
             name: $('td:nth-child(2) a:last-child', this).text().trim(),
             link: null,

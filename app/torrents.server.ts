@@ -1,13 +1,14 @@
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {db} from './db.server';
+import webtorrent from "~/webtorrent.server";
+import {Torrent} from "webtorrent";
 
 class torrentsManager {
-    private torrents: any[] = [];
-    getTorrents(){
-        return this.torrents;
+    get torrents():Torrent[] {
+        return webtorrent.torrents;
     }
+
     async addTorrent(torrent, path: string){
-        this.torrents.push(torrent);
         const {saveDownloadHistory} = await db.settings.findUnique({
             where: {id: 1}
         });
@@ -30,6 +31,7 @@ class torrentsManager {
                 updatedAt: new Date()
             }
         });
+
         torrent.on('done', async () => {
             await db.downloaded.update({
                 data: {
@@ -50,7 +52,6 @@ class torrentsManager {
         }
 
         torrent.destroy();
-        this.torrents.splice(this.torrents.indexOf(torrent), 1);
     }
     async deleteTorrent(hash: string):Promise<void> {
         const torrent = this.torrents.find(t => t.infoHash === hash);
