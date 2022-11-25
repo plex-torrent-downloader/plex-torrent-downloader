@@ -5,10 +5,13 @@ import {
 } from "@remix-run/react";
 
 export default function Document({children}) {
-    const {settingsExist, url, torrents} = useLoaderData();
+    const loaderData = useLoaderData();
 
     function getClassName(contains: string):string {
-        return url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
+        if (!loaderData?.url) {
+            return '';
+        }
+        return loaderData?.url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
     }
     return (
         <html lang="en" className="h-full bg-dark">
@@ -25,8 +28,8 @@ export default function Document({children}) {
                     </a>
 
                     <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                        {settingsExist ? <>
-                            <li><a href="/queue" className={getClassName('queue')}>Download Queue ({torrents.length})</a></li>
+                        {loaderData?.settings ? <>
+                            <li><a href="/queue" className={getClassName('queue')}>Download Queue ({loaderData?.torrents?.length || 0})</a></li>
                             <li><a href="/search" className={getClassName('search')}>Search</a></li>
                             <li><a href="/setup" className={getClassName('setup')}>Settings</a></li>
                             <li><a href="/collections" className={getClassName('collections')}>Collections</a></li>

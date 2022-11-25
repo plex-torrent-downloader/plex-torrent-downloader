@@ -27,14 +27,19 @@ class Search {
     }
 
     private async searchThroughEngine(q: string, engine: string):Promise<Torrent[]> {
-        switch (engine) {
+        let results: Torrent[] = [];
+        switch (engine.trim()) {
             case "1377x.to":
-                return await search1377(q);
+                results = await search1377(q);
+                break;
             case "nyaa.si":
-                return await searchNyaaSe(q);
+                results = await searchNyaaSe(q);
+                break;
             default:
                 throw new Error(`Invalid Search Engine: ${engine}`);
         }
+
+        return results.sort((a, b) => a.seeders < b.seeders ? 1 : -1);
     }
 
     private async findInDb(q: string, searchEngine: string):Promise<SearchResults[]> {

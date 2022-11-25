@@ -29,13 +29,13 @@ export const meta: MetaFunction = ({data, parentsData}) => {
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const settingsExist = await db.settings.count({
+  const settings = await db.settings.findUnique({
     where: {
       id : 1
     }
   });
   return json({
-    settingsExist,
+    settings,
     url: request.url,
     q,
     torrents: torrentsManager.getSerialized()

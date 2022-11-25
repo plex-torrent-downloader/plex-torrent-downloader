@@ -31,7 +31,7 @@ export const action = async ({request}) => {
     saveDownloadHistory: !!formData.get('saveDownloadHistory'),
     searchEngine: formData.get('searchEngine')
   }
-  await db.settings.upsert({
+  const settings = await db.settings.upsert({
     where: {
       id : 1
     },
@@ -39,7 +39,11 @@ export const action = async ({request}) => {
     update: setObject
   });
 
-  throw redirect('/collections', 302);
+  if (!(await db.collections.count())) {
+    throw redirect('/collections', 302);
+  }
+
+  return json({settings});
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -58,8 +62,11 @@ export default function Index() {
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
-  const [searchEngine, setSearchEngine] = useState<string>(settings.settings.searchEngine ?? '');
-  return <ControlPanel name="Initial Setup" subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
+  const [searchEngine, setSearchEngine] = useState<string>(settings.settings?.searchEngine ?? '');
+  return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
+    {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
+      Settings Updated!
+    </div>}
     <Form method="post">
       <table className="table text-white">
         <thead>
