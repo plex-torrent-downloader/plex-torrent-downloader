@@ -7,6 +7,7 @@ import {Torrent} from "../search.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
 import styles from '../styles/loading.css';
+import {Collections, SearchResults, Settings} from "@prisma/client";
 
 export const meta: MetaFunction = ({data}) => {
   return {
@@ -21,11 +22,19 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
+interface LoaderData {
+  results: SearchResults[];
+  q: string;
+  hash: string;
+  collections: Collections[];
+  settings: Settings;
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
   const hash = url.searchParams.get('hash');
-  const results = q && q.length ? await searchServer.search(q) : [];
+  const results = q ? await searchServer.search(q) : [];
   const collections = await db.collections.findMany();
   const settings = await db.settings.findUnique({where: {id : 1}});
   return json({
@@ -38,7 +47,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Search() {
-  const loaderData = useLoaderData();
+  const loaderData:LoaderData = useLoaderData();
   const [selection, setSelection] = useState<Torrent>(null);
 
   function download(e, torrent: Torrent) {
@@ -78,7 +87,7 @@ export default function Search() {
           </thead>
           <tbody>
           {
-              loaderData.results && loaderData.results.map((result: Torrent) => {
+              loaderData.results && loaderData.results.map((result: SearchResults) => {
                 return <tr>
                   <td>{result.name}</td>
                   <td>{result.seeders}</td>

@@ -13,7 +13,7 @@ export interface Torrent {
 }
 
 class Search {
-    public async search(q: string):Promise<Partial<SearchResults>[]> {
+    public async search(q: string):Promise<SearchResults[]> {
         const {cacheSearchResults, searchEngine} = await db.settings.findUnique({where: {id : 1}});
         if (cacheSearchResults) {
             let findInDb;
@@ -26,7 +26,7 @@ class Search {
         return await this.searchThroughEngine(q, searchEngine);
     }
 
-    private async searchThroughEngine(q: string, engine: string):Promise<Torrent[]> {
+    private async searchThroughEngine(q: string, engine: string):Promise<SearchResults[]> {
         let results: Torrent[] = [];
         switch (engine.trim()) {
             case "1377x.to":
@@ -39,7 +39,9 @@ class Search {
                 throw new Error(`Invalid Search Engine: ${engine}`);
         }
 
-        return results.sort((a, b) => a.seeders < b.seeders ? 1 : -1);
+        return results
+            .sort((a, b) => a.seeders < b.seeders ? 1 : -1)
+            .map((t:Torrent):SearchResults => this.torrent2SearchResult(t, engine));
     }
 
     private async findInDb(q: string, searchEngine: string):Promise<SearchResults[]> {
@@ -76,5 +78,20 @@ class Search {
             })
         ]);
     }
-}
+
+    private torrent2SearchResult(torrent: Torrent, searchEngine: string = ''): SearchResults {
+        return {
+            id: 123,
+            searchTerm: torrent.name,
+            searchEngine,
+            name: torrent.name,
+            hash: torrent.hash,
+            seeders: torrent.seeders,
+            leechers: torrent.leechers,
+            fileSize: torrent.fileSize,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }
+    }
+ }
 export default new Search();
