@@ -14,10 +14,11 @@ export interface Torrent {
 
 class Search {
     public async search(q: string):Promise<SearchResults[]> {
+        await this.saveSearch(q);
         const {cacheSearchResults, searchEngine} = await db.settings.findUnique({where: {id : 1}});
         if (cacheSearchResults) {
-            let findInDb;
-            if (findInDb = await this.findInDb(q, searchEngine)) {
+            let findInDb  = await this.findInDb(q, searchEngine);
+            if (findInDb) {
                 return findInDb;
             }
             const results = await this.searchThroughEngine(q, searchEngine);
@@ -92,6 +93,15 @@ class Search {
             createdAt: new Date(),
             updatedAt: new Date(),
         }
+    }
+
+    private async saveSearch(searchTerm: string):Promise<void> {
+        const o = {searchTerm};
+        await db.recentSearches.upsert({
+            where: o,
+            create: o,
+            update: o
+        });
     }
  }
 export default new Search();

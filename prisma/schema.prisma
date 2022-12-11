@@ -44,6 +44,15 @@ model SearchResults {
   @@map("search_results")
 }
 
+model RecentSearches {
+  id           Int      @id @default(autoincrement())
+  searchTerm   String   @map("search_term") @unique
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("recent_searches")
+}
+
 model Downloaded {
   id          Int       @id @default(autoincrement())
   name        String

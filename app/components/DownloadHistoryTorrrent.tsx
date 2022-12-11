@@ -1,5 +1,6 @@
 import GenericTorrent, {Action} from "~/components/GenericTorrent";
 import {Downloaded} from "@prisma/client";
+import moment from "moment";
 
 export interface Props {
     torrent: Downloaded;
@@ -14,6 +15,7 @@ export default function DownloadHistoryTorrrent(props: Props) {
         background={getRowColor(torrent)}
         status={getStatus(torrent)}
         actions={props.actions}
+        timestamp={moment(props.torrent.createdAt)}
     />
 }
 

@@ -5,6 +5,12 @@
   width: 100%;
   color: #FFF;
   overflow: hidden;
+  cursor: pointer;
+  opacity: .85;
+}
+
+.torrent:hover {
+  opacity: 1;
 }
 
 .torrent.searchResult {

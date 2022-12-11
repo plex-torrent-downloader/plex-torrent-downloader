@@ -7,9 +7,10 @@ import {Torrent} from "../search.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
 import loadingStyles from '../styles/loading.css';
-import {Collections, SearchResults, Settings} from "@prisma/client";
+import {Collections, SearchResults, Settings, RecentSearches} from "@prisma/client";
 import SearchTorrent from "~/components/SearchTorrent";
 import torrentStyles from  '../styles/torrent.css';
+import moment from "moment";
 
 export function links() {
   return [
@@ -28,6 +29,7 @@ export const meta: MetaFunction = ({data}) => {
 
 interface LoaderData {
   results: SearchResults[];
+  recentSearches: RecentSearches[];
   q: string;
   hash: string;
   collections: Collections[];
@@ -40,9 +42,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   const hash = url.searchParams.get('hash');
   const results = q ? await searchServer.search(q) : [];
   const collections = await db.collections.findMany();
+  let recentSearches: RecentSearches[];
+  if (!q) {
+    recentSearches = await db.recentSearches.findMany({
+      orderBy: {updatedAt: 'desc'},
+      skip: 0,
+      take: 5
+    });
+  } else {
+    recentSearches = [];
+  }
   const settings = await db.settings.findUnique({where: {id : 1}});
   return json({
     results,
+    recentSearches,
     q,
     hash,
     collections,
@@ -83,7 +96,15 @@ export default function Search() {
         }
         {
             !loaderData.results || !loaderData.results.length && <>
-              <span className="text-center w-100">No Results to display</span>
+              {loaderData.recentSearches.length && <div className="row">
+                <div className="col-lg-6 offset-2">
+                  <span className="text-center w-100">{loaderData.recentSearches.length ? 'Recent Searches:' : 'No Results to display'}</span>
+                </div>
+                {loaderData.recentSearches.map((rs: RecentSearches) => <div className="col-lg-6 offset-2">
+                  <a href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}>{rs.searchTerm}</a>
+                  <span className="text-muted"> | {moment(rs.updatedAt).fromNow()}</span><br />
+                </div>)}
+              </div>}
             </>
         }
         <br />

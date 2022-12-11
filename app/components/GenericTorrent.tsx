@@ -1,5 +1,6 @@
 import {useState} from "react";
 import Modal from "~/components/Modal";
+import {Moment} from "moment";
 
 export interface Action {
     name: string;
@@ -13,6 +14,7 @@ export interface Props {
     seeders?: number;
     leechers?: number;
     downloadSpeed?: number;
+    timestamp?: Moment;
     uploadSpeed?: number;
     background?: string;
     progress?: number;
@@ -44,11 +46,13 @@ export default function GenericTorrent(props: Props) {
         seeders,
         progress,
         downloadSpeed,
+        uploadSpeed,
         peers,
         actions,
         size,
         isSearchResult,
-        background
+        background,
+        timestamp
     } = props;
 
     if (!name) {
@@ -80,15 +84,17 @@ export default function GenericTorrent(props: Props) {
         <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} style={background ? {background} : {}} onClick={e => click()}>
             <span className="name">{name.substring(0, 50)}...</span>
             <span className="shelf">
-            {status && <span className="status">{status}</span>}
-            {peers && peers > 0 && <span className="peers">| {peers} Peers</span>}
-        </span>
+                {status && <span className="status">{status}</span>}
+                {!!(peers && peers > 0) && <span className="peers">| {peers} Peers</span>}
+            </span>
             <span className="shelf2">
-            {size && <span className="size">Size: {size}</span>}
-            {seeders && <span className="seeders">Seeders: {seeders}</span>}
-            {downloadSpeed && <span className="dl">Speed: {formatSizeUnits(downloadSpeed)}</span>}
-        </span>
-        {!isNaN(progress) && <div className="progress" style={{width: `${progress}%`}}></div>}
-        </div>
-    </>
+                {size && <span className="size">Size: {size}</span>}
+                {seeders && <span className="seeders">Seeders: {seeders}</span>}
+                {downloadSpeed && <span className="dl">D/L Speed: {formatSizeUnits(downloadSpeed)}</span>}
+                {uploadSpeed && <span className="dl">U/L Speed: {formatSizeUnits(uploadSpeed)}</span>}
+                {timestamp && <span title={timestamp.format('MMMM Do YYYY, hh:mm A')}>{timestamp.fromNow()}</span>}
+            </span>
+            {!isNaN(progress) && <div className="progress" style={{width: `${progress}%`}}></div>}
+            </div>
+        </>
 }
