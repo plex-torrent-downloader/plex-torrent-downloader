@@ -1,4 +1,4 @@
-import {Form} from "@remix-run/react";
+import {Form, useLoaderData} from "@remix-run/react";
 import {json} from "@remix-run/node";
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
@@ -20,6 +20,9 @@ export const action = async ({request}) => {
   if (formData.clearHistory) {
     await db.$executeRaw`DROP TABLE downloaded;`;
   }
+  if (formData.clearRecentSearches) {
+    await db.$executeRaw`DROP TABLE recent_searches;`;
+  }
   try {
     await spawn('prisma', ['db', 'push']);
   } catch (e) {
@@ -28,12 +31,30 @@ export const action = async ({request}) => {
   return json({success: true});
 };
 
+interface LoaderData {
+  collectionsCount: number;
+  historyCount: number;
+  searchCount: number;
+  recentSearchesCount: number;
+}
+
+export const loader = async ({request}) => {
+  return json({
+    collectionsCount: (await db.collections.count()),
+    historyCount: (await db.downloaded.count()),
+    searchCount: (await db.searchResults.count()),
+    recentSearchesCount: (await db.recentSearches.count())
+  });
+};
+
 export default function Index() {
+  const loaderData:LoaderData = useLoaderData();
   const [loading, setLoading] = useState<boolean>(false);
   const [clearSettings, setClearSettings] = useState<boolean>(true);
   const [clearCollections, setClearCollections] = useState<boolean>(true);
   const [clearHistory, setClearHistory] = useState<boolean>(true);
   const [clearCache, setClearCache] = useState<boolean>(true);
+  const [clearRecentSearches, setClearRecentSearches] = useState<boolean>(true);
 
   async function submit(e) {
     e.preventDefault();
@@ -52,7 +73,8 @@ export default function Index() {
           clearSettings,
           clearCollections,
           clearHistory,
-          clearCache
+          clearCache,
+          clearRecentSearches
         }
       });
       window.location.href = '/';
@@ -77,10 +99,11 @@ export default function Index() {
               <h4>System Reset in progress.. Please Wait...</h4>
             </td>
           </tr> : <>
-            <ResetRow value={clearSettings} setter={setClearSettings}>Reset Settings</ResetRow>
-            <ResetRow value={clearCollections} setter={setClearCollections}>Reset Collections</ResetRow>
-            <ResetRow value={clearCache} setter={setClearCache}>Clear Cache</ResetRow>
-            <ResetRow value={clearHistory} setter={setClearHistory}>Clear Download History</ResetRow>
+            <ResetRow value={clearSettings} setter={setClearSettings}>Settings</ResetRow>
+            <ResetRow value={clearCollections} setter={setClearCollections} count={loaderData.collectionsCount}>Collections</ResetRow>
+            <ResetRow value={clearCache} setter={setClearCache} count={loaderData.searchCount}>Cache</ResetRow>
+            <ResetRow value={clearHistory} setter={setClearHistory} count={loaderData.historyCount}>Download History</ResetRow>
+            <ResetRow value={clearRecentSearches} setter={setClearRecentSearches} count={loaderData.recentSearchesCount}>Recent Searches</ResetRow>
           </>}
           <tr>
             <td>
@@ -93,12 +116,13 @@ export default function Index() {
   </ControlPanel>
 }
 
-function ResetRow({children, value, setter}) {
+function ResetRow({children, value, setter, count}) {
   return <tr>
     <td>
       <label>
         <input type={"checkbox"} checked={value} onChange={() => setter(!value)} />
-        &nbsp;{children}
+        &nbsp;Delete {children}
+        {count && <span> ({count})</span>}
       </label>
     </td>
   </tr>;
