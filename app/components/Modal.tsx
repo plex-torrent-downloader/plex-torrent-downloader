@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Modal(props: Props) {
-    return <div className="modal text-black" id="modal"  role="dialog" style={{display: 'block'}}>
+    return <div className="modal text-black" role="dialog" style={{display: 'block'}}>
         <div className="modal-dialog w-100" role="document">
             <div className="modal-content">
                 <div className="modal-header">

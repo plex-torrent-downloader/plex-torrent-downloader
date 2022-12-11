@@ -14,8 +14,8 @@ export default function SearchTorrent(props: Props) {
         leechers={torrent.leechers}
         size={torrent.fileSize}
         isSearchResult={true}
-        progressStyle={{background: 'linear-gradient(180deg, rgba(7,83,249,0.9682466736694678) 0%, rgba(47,175,255,1) 45%, rgba(7,83,249,1) 100%);'}}
         status={'Available For Download'}
+        background="linear-gradient(180deg, rgba(7,83,249,0.9682466736694678) 0%, rgba(47,175,255,1) 45%, rgba(7,83,249,1) 100%);"
         actions={[
             {name: 'Download', btnClass: 'btn btn-success w-100', action: props.handleDownload},
         ]}

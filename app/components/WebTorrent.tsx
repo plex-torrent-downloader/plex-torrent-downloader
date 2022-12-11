@@ -14,8 +14,9 @@ export default function WebTorrent(props: Props) {
         seeders={torrent.seeders}
         leechers={torrent.leechers}
         progress={torrent.progressPercent}
-        downloadSpeed={torrent.downloadSpeed}
-        uploadSpeed={torrent.uploadSpeed}
+        isSearchResult={false}
+        downloadSpeed={+torrent.downloadSpeed}
+        uploadSpeed={+torrent.uploadSpeed}
         status={torrent?.done ? 'Completed' : 'Downloading'}
         peers={torrent.numPeers}
         actions={[

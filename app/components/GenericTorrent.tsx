@@ -10,8 +10,8 @@ export interface Action {
 export interface Props {
     name: string;
     status?: string;
-    seeders: number;
-    leechers: number;
+    seeders?: number;
+    leechers?: number;
     downloadSpeed?: number;
     uploadSpeed?: number;
     background?: string;
@@ -66,7 +66,7 @@ export default function GenericTorrent(props: Props) {
     }
 
     return <>
-        {showModal && <Modal title={"Torrent Actions"} onClose={e => setShowModal(false)}>
+        {showModal && <Modal title={"Torrent Actions"} onClose={() => setShowModal(false)}>
             <GenericTorrent {...props} actions={[{name: 'fake', action: () => null, btnClass: ''}]} />
             <h2>Select an action:</h2>
             {actions.map((action: Action) => {
@@ -74,10 +74,10 @@ export default function GenericTorrent(props: Props) {
                     action.action();
                     setShowModal(false);
                 };
-                return <button onClick={e => handleClick(e)} className={`${action.btnClass}`}>{action.name}</button>;
+                return <button onClick={() => handleClick()} className={`${action.btnClass}`}>{action.name}</button>;
             })}
         </Modal>}
-        <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} style={background ? {background} : {}} onClick={e => click(e)}>
+        <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} style={background ? {background} : {}} onClick={e => click()}>
             <span className="name">{name.substring(0, 50)}...</span>
             <span className="shelf">
             {status && <span className="status">{status}</span>}

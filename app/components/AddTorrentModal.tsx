@@ -17,7 +17,7 @@ export default function AddTorrentModal(props: Props) {
     const [collection, setCollection] = useState<any>(null);
     const [showSuccess, setShowSuccess] = useState<boolean>(false);
     const [hash, setHash] = useState<string>(props.torrent.hash);
-    const path = collection ? props.collections[collection].location.replace("[content_root]", props.settings.fileSystemRoot).replace('//', '/') : null;
+    const path: string = collection ? props.collections[collection].location.replace("[content_root]", props.settings.fileSystemRoot).replace('//', '/') : null;
 
     async function submit():Promise<any> {
         await axios({
@@ -45,7 +45,7 @@ export default function AddTorrentModal(props: Props) {
         </Modal>
     }
 
-    return <Modal title={`Download ${torrent.name.substr(0, 45)}...`} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
+    return <Modal title={"Start New Download"} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
         {
             label: 'Start Download',
             action: async () => {
@@ -55,11 +55,11 @@ export default function AddTorrentModal(props: Props) {
         }
     ]}>
         <h5>Please Review the following torrent download:</h5>
-        <table className="table w-100">
+        <table className="table">
             <tbody>
             <tr>
                 <td>Name</td>
-                <td>{torrent.name}</td>
+                <td>{torrent.name.substring(0, 30)}...</td>
             </tr>
             <tr>
                 <td>Size</td>
@@ -72,25 +72,31 @@ export default function AddTorrentModal(props: Props) {
             <tr>
                 <td>Infohash</td>
                 <td>
-                    <input className="w-100" type="text" value={hash} onChange={e => setHash(e.target.value)} />
+                    <input className="w-50" type="text" value={hash} onChange={e => setHash(e.target.value)} />
                 </td>
             </tr>
             <tr>
-                <td>Download To:</td>
+                <td>Destination:</td>
                 <td>
-                    <select className="w-100" value={collection ?? undefined} onChange={e => setCollection(e.target.value)}>
+                    <select className="w-50" value={collection ?? undefined} onChange={e => setCollection(e.target.value)}>
                         <option selected={true} disabled={true}>Select an Option</option>
                         {props.collections && props.collections.map((collection, index) => <option key={index} value={index}>{collection.name}</option>)}
                     </select>
                 </td>
             </tr>
             <tr>
-                <td>Path on disk:</td>
+                <td>Path:</td>
                 <td>
                     {path}
                 </td>
             </tr>
             </tbody>
         </table>
+        <pre className="w-100" style={{
+            inlineSize: '100px',
+            overflowWrap: 'break-word'
+        }}>
+            {torrent.name}
+        </pre>
     </Modal>;
 }

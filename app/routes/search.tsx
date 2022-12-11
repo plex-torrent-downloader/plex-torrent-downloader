@@ -54,11 +54,6 @@ export default function Search() {
   const loaderData:LoaderData = useLoaderData();
   const [selection, setSelection] = useState<Torrent>(null);
 
-  function download(e, torrent: Torrent) {
-    e.preventDefault();
-    setSelection(torrent);
-  }
-
   function useHash(hash: string = ''){
     setSelection({
       name: 'Torrent using infohash',
