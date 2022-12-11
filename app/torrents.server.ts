@@ -75,9 +75,12 @@ class torrentsManager {
         return {
             name: torrent.name,
             hash: torrent.infoHash,
+            seeders: torrent.seeders,
+            leechers: torrent.leechers,
             downloadSpeed: torrent.downloadSpeed,
             uploadSpeed: torrent.uploadSpeed,
             progress: (torrent.progress * 100).toFixed(1) + '%',
+            progressPercent: Math.round(torrent.progress * 100),
             numPeers: torrent.numPeers,
             path: torrent.path,
             done: !!torrent.done,

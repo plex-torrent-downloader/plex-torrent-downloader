@@ -5,6 +5,12 @@ import {useEffect, useState} from "react";
 import Modal from "~/components/Modal";
 import axios from "axios";
 import torrentsManager from '../torrents.server';
+import WebTorrentComponent from '../components/WebTorrent';
+import styles from  '../styles/torrent.css';
+
+export function links() {
+  return [{ rel: "stylesheet", href: styles }];
+}
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -20,7 +26,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Queue() {
   const {torrents} = useLoaderData();
-  const [confirmDelete, setConfirmDelete] = useState<WebTorrent>(null);
   const [error, setError] = useState<string | Error>(null);
   let navigate = useNavigate();
    useEffect(() => {
@@ -29,11 +34,11 @@ export default function Queue() {
      }, 1000);
    }, []);
 
-   async function remove(permaDelete: boolean) {
+   async function remove(torrent: WebTorrent, permaDelete: boolean) {
      try {
        await axios({
          method: 'post',
-         url: `/actions/${permaDelete ? 'delete': 'remove'}/${confirmDelete.hash}`,
+         url: `/actions/${permaDelete ? 'delete': 'remove'}/${torrent.hash}`,
          data: {}
        });
      } catch(e) {
@@ -48,65 +53,16 @@ export default function Queue() {
               {error.toString()}
             </Modal>
         }
-        {
-            confirmDelete && <Modal title="Are you sure you want to delete this torrent?" onClose={() => setConfirmDelete(null)} buttons={
-              [
-                {
-                  label: 'Stop Downloading',
-                  action: async () => {
-                    await remove(false);
-                    setConfirmDelete(null);
-                  },
-                  class: 'btn btn-primary'
-                },
-                {
-                  label: 'Delete',
-                  action: async () => {
-                    await remove(true);
-                    setConfirmDelete(null);
-                  },
-                  class: 'btn btn-danger'
-                }
-              ]}>
-              Please confirm you want to stop downloading this torrent or delete it.
-            </Modal>
-        }
         <div className="col-lg-12">
-          <table className="table text-white">
-            <thead>
-            {!!torrents.length && <tr>
-              <th>Name</th>
-              <th>Progress</th>
-              <th>Download Speed</th>
-              <th>Upload Speed</th>
-              <th>Path</th>
-              <th>Peers</th>
-            </tr>}
-            </thead>
-            <tbody>
-            {
-              torrents.map((result: WebTorrent) => {
-                return <tr className={result.class}>
-                  <td>
-                    {result.name}
-                    <br />
-                    <small>
-                      <a className="text-muted" href={`/search?hash=${result.hash}`}>{result.hash.substr(0, 5)}...</a>
-                    </small>
-                  </td>
-                  <td>{result.progress}</td>
-                  <td>{formatSizeUnits(result.downloadSpeed)}</td>
-                  <td>{formatSizeUnits(result.uploadSpeed)}</td>
-                  <td>{result.path}</td>
-                  <td>{result.numPeers}</td>
-                  <td>
-                    <button className="btn btn-danger" onClick={e => setConfirmDelete(result)}>{result.done ? 'Delete' : 'Cancel'}</button>
-                  </td>
-                </tr>
-              })
-            }
-            </tbody>
-          </table>
+          {
+            torrents.map((result: WebTorrent) => {
+              return <WebTorrentComponent torrent={result} onHardDelete={async () => {
+                await remove(result, true);
+              }} onSoftDelete={async () => {
+                await remove(result, false);
+              }}/>
+            })
+          }
           {
               !torrents.length && <>
                 <span className="text-center w-100">No torrents are downloading right now</span>
@@ -119,19 +75,4 @@ export default function Queue() {
       </div>
     </div>
   </div>
-}
-
-function formatSizeUnits(bytes)
-{
-  if ( ( bytes >> 30 ) & 0x3FF )
-    bytes = ( bytes >>> 30 ) + '.' + ( bytes & (3*0x3FF )) + 'GB' ;
-  else if ( ( bytes >> 20 ) & 0x3FF )
-    bytes = ( bytes >>> 20 ) + '.' + ( bytes & (2*0x3FF ) ) + 'MB' ;
-  else if ( ( bytes >> 10 ) & 0x3FF )
-    bytes = ( bytes >>> 10 ) + '.' + ( bytes & (0x3FF ) ) + 'KB' ;
-  else if ( ( bytes >> 1 ) & 0x3FF )
-    bytes = ( bytes >>> 1 ) + 'Bytes' ;
-  else
-    bytes = bytes + 'Byte' ;
-  return bytes ;
 }

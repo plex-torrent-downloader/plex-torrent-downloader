@@ -6,8 +6,17 @@ import AddTorrentModal from "~/components/AddTorrentModal";
 import {Torrent} from "../search.server";
 import {db} from "~/db.server";
 import searchServer from "~/search.server";
-import styles from '../styles/loading.css';
+import loadingStyles from '../styles/loading.css';
 import {Collections, SearchResults, Settings} from "@prisma/client";
+import SearchTorrent from "~/components/SearchTorrent";
+import torrentStyles from  '../styles/torrent.css';
+
+export function links() {
+  return [
+      { rel: "stylesheet", href: loadingStyles },
+      { rel: "stylesheet", href: torrentStyles }
+  ];
+}
 
 export const meta: MetaFunction = ({data}) => {
   return {
@@ -15,11 +24,6 @@ export const meta: MetaFunction = ({data}) => {
     title: data?.q ?`Searching ${data.q}` : 'Search',
     viewport: "width=device-width,initial-scale=1",
   };
-}
-
-
-export function links() {
-  return [{ rel: "stylesheet", href: styles }];
 }
 
 interface LoaderData {
@@ -79,21 +83,15 @@ export default function Search() {
         <table className="table text-white table-sm">
           <thead>
           {!!loaderData?.results?.length && <tr>
-            <th>Name</th>
-            <th style={{width: '25px'}}>Seeders</th>
-            <th style={{width: '25px'}}>Size</th>
-            <th style={{width: '30px'}}>Download</th>
+            <th className="text-center">{loaderData.results.length} Search Results</th>
           </tr>}
           </thead>
           <tbody>
           {
               loaderData.results && loaderData.results.map((result: SearchResults) => {
                 return <tr>
-                  <td>{result.name}</td>
-                  <td>{result.seeders}</td>
-                  <td>{result.fileSize}</td>
                   <td>
-                    <button className="btn btn-primary" onClick={e => download(e, result)}>Download</button>
+                    <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} />
                   </td>
                 </tr>
               })
