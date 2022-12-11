@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Modal from "~/components/Modal";
 
-interface Action {
+export interface Action {
     name: string;
     action: () => any;
     btnClass: string;
@@ -14,7 +14,7 @@ export interface Props {
     leechers: number;
     downloadSpeed?: number;
     uploadSpeed?: number;
-    progressStyle?: object;
+    background?: string;
     progress?: number;
     isSearchResult: boolean;
     peers?: number;
@@ -42,13 +42,13 @@ export default function GenericTorrent(props: Props) {
         name,
         status,
         seeders,
-        leechers,
         progress,
         downloadSpeed,
         peers,
         actions,
         size,
-        isSearchResult
+        isSearchResult,
+        background
     } = props;
 
     if (!name) {
@@ -65,8 +65,6 @@ export default function GenericTorrent(props: Props) {
         setShowModal(true);
     }
 
-    const isMobile = typeof document !== 'undefined' && screen.width < 1000;
-
     return <>
         {showModal && <Modal title={"Torrent Actions"} onClose={e => setShowModal(false)}>
             <GenericTorrent {...props} actions={[{name: 'fake', action: () => null, btnClass: ''}]} />
@@ -79,7 +77,7 @@ export default function GenericTorrent(props: Props) {
                 return <button onClick={e => handleClick(e)} className={`${action.btnClass}`}>{action.name}</button>;
             })}
         </Modal>}
-        <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} onClick={e => click(e)}>
+        <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} style={background ? {background} : {}} onClick={e => click(e)}>
             <span className="name">{name.substring(0, 50)}...</span>
             <span className="shelf">
             {status && <span className="status">{status}</span>}
