@@ -34,6 +34,7 @@ interface LoaderData {
   hash: string;
   collections: Collections[];
   settings: Settings;
+  downloaded: string[];
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -53,13 +54,22 @@ export const loader: LoaderFunction = async ({ request }) => {
     recentSearches = [];
   }
   const settings = await db.settings.findUnique({where: {id : 1}});
+  const downloaded = (await db.downloaded.findMany({
+    select: {hash: true},
+    where: {
+      NOT: [{
+        completedAt: null
+      }]
+    }
+  })).map(r => r.hash);
   return json({
     results,
     recentSearches,
     q,
     hash,
     collections,
-    settings
+    settings,
+    downloaded
   });
 };
 
@@ -91,7 +101,7 @@ export default function Search() {
         <h4 className="m-2">{loaderData.results.length} Search Results</h4>
         {
             loaderData.results && loaderData.results.map((result: SearchResults) => {
-              return <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} />
+              return <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} isDownloaded={loaderData.downloaded.includes(result.hash)} />
             })
         }
         {

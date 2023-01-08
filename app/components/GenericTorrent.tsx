@@ -69,6 +69,8 @@ export default function GenericTorrent(props: Props) {
         setShowModal(true);
     }
 
+    const isMobile = (typeof document !== 'undefined') ? document?.documentElement?.clientWidth < 500 : false;
+
     return <>
         {showModal && <Modal title={"Torrent Actions"} onClose={() => setShowModal(false)}>
             <GenericTorrent {...props} actions={[{name: 'fake', action: () => null, btnClass: ''}]} />
@@ -82,7 +84,7 @@ export default function GenericTorrent(props: Props) {
             })}
         </Modal>}
         <div className={`torrent ` + (isSearchResult ? 'searchResult' : '')} style={background ? {background} : {}} onClick={e => click()}>
-            <span className="name">{name.substring(0, 50)}...</span>
+            <span className="name">{name.substring(0, isMobile ? 35 : 150)}...</span>
             <span className="shelf">
                 {status && <span className="status">{status}</span>}
                 {!!(peers && peers > 0) && <span className="peers">| {peers} Peers</span>}

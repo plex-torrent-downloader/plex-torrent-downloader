@@ -116,7 +116,8 @@ export default function Index() {
   </ControlPanel>
 }
 
-function ResetRow({children, value, setter, count}) {
+function ResetRow(props) {
+  const {children, value, setter, count} = props;
   return <tr>
     <td>
       <label>
