@@ -61,15 +61,18 @@ class torrentsManager {
         }
 
         torrent.destroy({destroyStore: true});
-        this.torrents.splice(this.torrents.indexOf(torrent), 1);
-        await db.downloaded.update({
-            data: {
-                deletedAt: new Date()
-            },
-            where: {
-                hash
-            }
-        });
+        try {
+            await db.downloaded.update({
+                data: {
+                    deletedAt: new Date()
+                },
+                where: {
+                    hash
+                }
+            });
+        } catch(e) {
+            console.warn(e);
+        }
     }
     private serialize(torrent: any):WebTorrent {
         return {
