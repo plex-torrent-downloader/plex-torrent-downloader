@@ -1,6 +1,7 @@
 import axios from "axios";
 import cheerio from "cheerio";
 import {Torrent} from "~/search.server";
+import parallel from 'async/parallel';
 
 export default async function search(term: string):Promise<Torrent[]> {
     const {data} = await axios(`https://www.1377x.to/search/${encodeURIComponent(term)}/1/`, {
@@ -19,11 +20,13 @@ export default async function search(term: string):Promise<Torrent[]> {
             fileSize: $('td.size', this).text()
         };
     }).toArray();
-    for (let result of entries) {
+
+    await parallel(entries.map((result) => async () => {
         const response = await axios(result.link);
         $ = cheerio.load(response.data);
         result.hash = $('.infohash-box').text().split(':').pop().trim();
-    }
+    }));
+
     entries.splice(0, 1);
     return entries;
 }
