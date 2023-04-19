@@ -4,7 +4,7 @@
 [![Collections](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/collections.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/collections.png)
 
 ## Download History
-[![Download History](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/collections.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/download_history.png)
+[![Download History](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/download_history.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/download_history.png)
 
 ## Download Queue
 [![Download Queue](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/downloading.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/downloading.png)
