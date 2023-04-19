@@ -7,6 +7,19 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
  - 1377x.to
  - nyaa.si
 
+### Screenshots
+[![Search Results](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)
+
+[See More Screenshots](https://github.com/plex-torrent-downloader/plex-torrent-downloader/blob/master/screenshots.md)
+
+### Installer Scripts
+
+We currently have an installer script for ubuntu. You can install this on ubuntu by running this command
+
+```
+curl https://raw.githubusercontent.com/plex-torrent-downloader/installers/master/ubuntu-installer.sh | bash
+```
+
 ### Requirements
  - Node.js (v14 or later)
  - npm or yarn
