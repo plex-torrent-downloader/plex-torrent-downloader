@@ -7,6 +7,8 @@ import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
+import RequireAuth from "~/middleware/RequireAuth.server";
+import torrentsManager from "~/torrents.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -42,10 +44,13 @@ export const action = async ({request}) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const collections = await db.collections.findMany();
-  return json({
-    loader: collections
+  const ft = RequireAuth(async ({ request }) => {
+    const collections = await db.collections.findMany();
+    return json({
+      loader: collections
+    });
   });
+  return ft({request});
 };
 
 interface Collection {

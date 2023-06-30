@@ -6,6 +6,8 @@ import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
+import Bcrypt from '../bcrypt.server';
+import RequireAuth from "~/middleware/RequireAuth.server";
 
 type LoaderData = {
   settings?: Settings;
@@ -26,10 +28,12 @@ export const action = async ({request}) => {
     throw new Error("FS Location not found!");
   }
   const setObject = {
+    id: 1,
     fileSystemRoot,
     cacheSearchResults: !!formData.get('cacheSearchResults'),
     saveDownloadHistory: !!formData.get('saveDownloadHistory'),
-    searchEngine: formData.get('searchEngine')
+    searchEngine: formData.get('searchEngine'),
+    password: formData.get('password') === '' ? null : (await Bcrypt.hashPassword(formData.get('password')))
   }
   const settings = await db.settings.upsert({
     where: {
@@ -47,14 +51,10 @@ export const action = async ({request}) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const settings = await db.settings.findUnique({
-    where: {
-      id : 1
-    }
+  const ft = RequireAuth(async ({settings}) => {
+    return json({settings});
   });
-  return json({
-    settings
-  });
+  return ft({request});
 };
 
 export default function Index() {
@@ -63,6 +63,7 @@ export default function Index() {
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
   const [searchEngine, setSearchEngine] = useState<string>(settings.settings?.searchEngine ?? '');
+  const [password, setPassword] = useState<string>(settings.settings?.password ?? '');
   return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
       Settings Updated!
@@ -101,6 +102,12 @@ export default function Index() {
             <td>Save Download History</td>
             <td>
               <input type="checkbox" name="saveDownloadHistory" checked={saveDownloadHistory} onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)} />
+            </td>
+          </tr>
+          <tr>
+            <td>Set a password (optional but recommended)</td>
+            <td>
+              <input type="password" className="form-control" value={password} name="password" onChange={(e) => setPassword(e.target.value)} />
             </td>
           </tr>
           {settings.settings && <tr>

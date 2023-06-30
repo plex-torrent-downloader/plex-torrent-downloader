@@ -3,6 +3,12 @@
 This is a Node.js application that enables downloading torrent files and adding them to a Plex library. 
 The application uses Prisma as an ORM, Remix.js for server-side rendering, and WebTorrent for downloading torrents.
 
+#### Why Should I use this?
+
+ - Prevent Malware by not having to navigate to torrent sites
+ - Keep your NAS organized (if you use collections!)
+ - Designed for binge-watchers
+
 ### Torrent Search Services
  - 1377x.to
  - nyaa.si
