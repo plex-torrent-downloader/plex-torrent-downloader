@@ -9,7 +9,18 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
  - Keep your NAS organized (if you use collections!)
  - Designed for binge-watchers
 
-### Torrent Search Services
+#### Unique Features
+
+ - JWT / Bcrypted Password Auth built in
+ - Download History
+ - Search History, including query history
+ - Ability to manage download locations via collections
+ - Ability to abort torrents, and either keep or delete the downloaded data
+ - Will stream first episode first, second episode second and so on
+ - Search History shows up in search, so you won't download the same thing twice
+ - More to come!
+
+#### Torrent Search Services
  - 1377x.to
  - nyaa.si
 
