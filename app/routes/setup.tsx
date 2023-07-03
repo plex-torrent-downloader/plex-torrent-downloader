@@ -8,6 +8,7 @@ import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import RequireAuth from "~/middleware/RequireAuth.server";
+import jwt from "../jwt.server";
 
 type LoaderData = {
   settings?: Settings;
@@ -20,6 +21,24 @@ export const meta: MetaFunction = () => ({
 });
 
 export const action = async ({request}) => {
+  const settings = await db.settings.findUnique({
+    where: {
+      id: 1
+    }
+  });
+
+  if (settings?.password) {
+    const cookies = request.headers.get('Cookie') || '';
+    const authToken = decodeURIComponent(cookies.split('=').pop());
+    try {
+      if (!jwt.verify(authToken, settings.password)) {
+        throw new Error("Invalid JWT");
+      }
+    } catch(e) {
+      throw new Error("Unauthorized");
+    }
+  }
+
   const formData = await request.formData();
   const fileSystemRoot = formData.get('fileSystemRoot');
   try {
@@ -33,9 +52,9 @@ export const action = async ({request}) => {
     cacheSearchResults: !!formData.get('cacheSearchResults'),
     saveDownloadHistory: !!formData.get('saveDownloadHistory'),
     searchEngine: formData.get('searchEngine'),
-    password: formData.get('password') === '' ? null : (await Bcrypt.hashPassword(formData.get('password')))
+    password: formData.get('password') === '' ? settings?.password : (await Bcrypt.hashPassword(formData.get('password')))
   }
-  const settings = await db.settings.upsert({
+  await db.settings.upsert({
     where: {
       id : 1
     },
@@ -43,11 +62,21 @@ export const action = async ({request}) => {
     update: setObject
   });
 
+  if (formData.get('password') !== '') {
+    const authToken = jwt.sign({}, setObject.password);
+
+    return redirect((await db.collections.count()) ? "/search" : "/collections", {
+      headers: {
+        "Set-Cookie": `auth=${encodeURIComponent(authToken)};`,
+      },
+    });
+  }
+
   if (!(await db.collections.count())) {
     throw redirect('/collections', 302);
   }
 
-  return json({settings});
+  return null;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -63,7 +92,9 @@ export default function Index() {
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
   const [searchEngine, setSearchEngine] = useState<string>(settings.settings?.searchEngine ?? '');
-  const [password, setPassword] = useState<string>(settings.settings?.password ?? '');
+  const [password, setPassword] = useState<string>('');
+
+  const updatePassword = !!settings?.settings?.password;
   return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
       Settings Updated!
@@ -105,8 +136,13 @@ export default function Index() {
             </td>
           </tr>
           <tr>
-            <td>Set a password (optional but recommended)</td>
+            <td>{
+              updatePassword ?
+                  "Update password" :
+                  "Set a password (optional but recommended)"
+            }</td>
             <td>
+              <input type="hidden" value="admin" name="username" />
               <input type="password" className="form-control" value={password} name="password" onChange={(e) => setPassword(e.target.value)} />
             </td>
           </tr>

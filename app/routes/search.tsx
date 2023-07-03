@@ -38,7 +38,7 @@ interface LoaderData {
   downloaded: string[];
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async (input) => {
   const ft = RequireAuth(async ({request, settings}) => {
     const url = new URL(request.url);
     const q = url.searchParams.get('q');
@@ -73,7 +73,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       downloaded
     });
   });
-  return ft({request});
+  return ft(input);
 };
 
 export default function Search() {

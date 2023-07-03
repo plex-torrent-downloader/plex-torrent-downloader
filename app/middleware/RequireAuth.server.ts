@@ -2,7 +2,7 @@ import {json, redirect} from "@remix-run/node";
 import BcryptWrapper from "~/bcrypt.server";
 import { db } from '~/db.server';
 import { Settings } from '@prisma/client';
-import jwt from "jsonwebtoken";
+import jwt from "../jwt.server";
 
 interface PassedOn {
     request: Request;
@@ -20,7 +20,7 @@ export default function RequireAuth(loader) {
         });
 
         if (!settings || !settings.password) {
-            return loader({ request, context, settings });
+            return loader({...input, settings});
         }
 
         const cookies = request.headers.get('Cookie') || '';
@@ -35,7 +35,7 @@ export default function RequireAuth(loader) {
         }
 
         // User is authenticated, call the original loader function
-        return loader({ request, context, settings });
+        return loader({...input, settings});
     };
 }
 

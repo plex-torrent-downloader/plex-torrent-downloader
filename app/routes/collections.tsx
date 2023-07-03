@@ -16,21 +16,23 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export const action = async ({request}) => {
-  const formData = await request.json();
-  const {collections} = formData;
-  const settings = await db.settings.findUnique({where: {id: 1}});
-  for (const collection of collections) {
-    try {
-      await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
-    } catch(e) {
-      return json({
-        error: `Invalid FS location: ${collection.location}`
-      }, 500);
+
+export const action = async (input) => {
+  const ft = RequireAuth(async ({request}) => {
+    const formData = await request.json();
+    const {collections} = formData;
+    const settings = await db.settings.findUnique({where: {id: 1}});
+    for (const collection of collections) {
+      try {
+        await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
+      } catch(e) {
+        return json({
+          error: `Invalid FS location: ${collection.location}`
+        }, 500);
+      }
     }
-  }
-  await db.$transaction([
-    db.collections.deleteMany(),
+    await db.$transaction([
+      db.collections.deleteMany(),
       ...collections.map(collection => {
         return db.collections.create({
           data: {
@@ -39,18 +41,20 @@ export const action = async ({request}) => {
           }
         })
       })
-  ]);
-  return json({});
+    ]);
+    return json({});
+  });
+  return ft(input);
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async (input) => {
   const ft = RequireAuth(async ({ request }) => {
     const collections = await db.collections.findMany();
     return json({
       loader: collections
     });
   });
-  return ft({request});
+  return ft(input);
 };
 
 interface Collection {
