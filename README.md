@@ -46,9 +46,10 @@ curl https://raw.githubusercontent.com/plex-torrent-downloader/installers/master
 - Clone this repository: `git clone git@github.com:plex-torrent-downloader/plex-torrent-downloader.git`
 - CD Into directory `cd plex-torrent-downloader`
 - Install NPM packages `npm i`
-- Build the Database `npx prisma db push`
-- Build the app `npm run build`
-- Start the App `npm run start`
+- Build the Database `npx prisma migrate deploy`
+- To run in dev mode, run `npm run dev`
+- OR to build the app for production `npm run build`
+- then run  `npm run start`
 - Browse to `http://localhost:3000/setup` and configure the app settings
 
 ### Usage
