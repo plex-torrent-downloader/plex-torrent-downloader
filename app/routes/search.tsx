@@ -1,5 +1,5 @@
 import {useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
+import {DataFunctionArgs, json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import SearchPanel from "~/components/SearchPanel";
 import {useEffect, useState} from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
@@ -11,6 +11,7 @@ import {Collections, SearchResults, Settings, RecentSearches} from "@prisma/clie
 import SearchTorrent from "~/components/SearchTorrent";
 import torrentStyles from  '../styles/torrent.css';
 import moment from "moment";
+import RequireAuth from "~/middleware/RequireAuth.server";
 
 export function links() {
   return [
@@ -37,40 +38,42 @@ interface LoaderData {
   downloaded: string[];
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const url = new URL(request.url);
-  const q = url.searchParams.get('q');
-  const hash = url.searchParams.get('hash');
-  const results = q ? await searchServer.search(q) : [];
-  const collections = await db.collections.findMany();
-  let recentSearches: RecentSearches[];
-  if (!q) {
-    recentSearches = await db.recentSearches.findMany({
-      orderBy: {updatedAt: 'desc'},
-      skip: 0,
-      take: 5
-    });
-  } else {
-    recentSearches = [];
-  }
-  const settings = await db.settings.findUnique({where: {id : 1}});
-  const downloaded = (await db.downloaded.findMany({
-    select: {hash: true},
-    where: {
-      NOT: [{
-        completedAt: null
-      }]
+export const loader: LoaderFunction = async (input) => {
+  const ft = RequireAuth(async ({request, settings}) => {
+    const url = new URL(request.url);
+    const q = url.searchParams.get('q');
+    const hash = url.searchParams.get('hash');
+    const results = q ? await searchServer.search(q) : [];
+    const collections = await db.collections.findMany();
+    let recentSearches: RecentSearches[];
+    if (!q) {
+      recentSearches = await db.recentSearches.findMany({
+        orderBy: {updatedAt: 'desc'},
+        skip: 0,
+        take: 5
+      });
+    } else {
+      recentSearches = [];
     }
-  })).map(r => r.hash);
-  return json({
-    results,
-    recentSearches,
-    q,
-    hash,
-    collections,
-    settings,
-    downloaded
+    const downloaded = (await db.downloaded.findMany({
+      select: {hash: true},
+      where: {
+        NOT: [{
+          completedAt: null
+        }]
+      }
+    })).map(r => r.hash);
+    return json({
+      results,
+      recentSearches,
+      q,
+      hash,
+      collections,
+      settings,
+      downloaded
+    });
   });
+  return ft(input);
 };
 
 export default function Search() {

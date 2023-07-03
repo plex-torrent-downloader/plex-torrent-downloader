@@ -54,10 +54,12 @@ export default function App() {
 export function ErrorBoundary({ error }: { error: Error }) {
   return (
       <Document>
-        <div className="error-container">
-          <h1>App Error</h1>
-          <pre>{error.message}</pre>
+        <div className="alert alert-danger" role="alert" style={{backgroundColor: '#dc3545', color: 'white'}}>
+          <h1 className="alert-heading">Application Error</h1>
+          <hr style={{borderTop: '1px solid white'}}/>
+          <pre className="mb-0">{error.message}</pre>
         </div>
       </Document>
   );
 }
+

@@ -1,34 +1,38 @@
 import {Form, useLoaderData} from "@remix-run/react";
-import {json} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import axios from "axios";
 import spawn from "~/spawn.server";
+import RequireAuth from "~/middleware/RequireAuth.server";
 
-export const action = async ({request}) => {
-  const formData = await request.json();
-  if (formData.clearSettings) {
-    await db.$executeRaw`DROP TABLE settings;`;
-  }
-  if (formData.clearCollections) {
-    await db.$executeRaw`DROP TABLE collections;`;
-  }
-  if (formData.clearCache) {
-    await db.$executeRaw`DROP TABLE search_results;`;
-  }
-  if (formData.clearHistory) {
-    await db.$executeRaw`DROP TABLE downloaded;`;
-  }
-  if (formData.clearRecentSearches) {
-    await db.$executeRaw`DROP TABLE recent_searches;`;
-  }
-  try {
-    await spawn('prisma', ['db', 'push']);
-  } catch (e) {
-    throw new Error('There was an error running: prisma db push. Please run this command manually.')
-  }
-  return json({success: true});
+export const action = async (input) => {
+  const ft = RequireAuth(async ({ request }) => {
+    const formData = await request.json();
+    if (formData.clearSettings) {
+      await db.$executeRaw`DROP TABLE settings;`;
+    }
+    if (formData.clearCollections) {
+      await db.$executeRaw`DROP TABLE collections;`;
+    }
+    if (formData.clearCache) {
+      await db.$executeRaw`DROP TABLE search_results;`;
+    }
+    if (formData.clearHistory) {
+      await db.$executeRaw`DROP TABLE downloaded;`;
+    }
+    if (formData.clearRecentSearches) {
+      await db.$executeRaw`DROP TABLE recent_searches;`;
+    }
+    try {
+      await spawn('prisma', ['db', 'push']);
+    } catch (e) {
+      throw new Error('There was an error running: prisma db push. Please run this command manually.')
+    }
+    return json({success: true});
+  });
+  return ft(input);
 };
 
 interface LoaderData {
@@ -38,13 +42,16 @@ interface LoaderData {
   recentSearchesCount: number;
 }
 
-export const loader = async ({request}) => {
-  return json({
-    collectionsCount: (await db.collections.count()),
-    historyCount: (await db.downloaded.count()),
-    searchCount: (await db.searchResults.count()),
-    recentSearchesCount: (await db.recentSearches.count())
+export const loader: LoaderFunction = async (input) => {
+  const ft = RequireAuth(async () => {
+    return json({
+      collectionsCount: (await db.collections.count()),
+      historyCount: (await db.downloaded.count()),
+      searchCount: (await db.searchResults.count()),
+      recentSearchesCount: (await db.recentSearches.count())
+    });
   });
+  return ft(input);
 };
 
 export default function Index() {
