@@ -1,6 +1,5 @@
 import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
-import { Collections } from '@prisma/client';
 import {db} from '../db.server';
 import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
@@ -8,7 +7,6 @@ import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
 import RequireAuth from "~/middleware/RequireAuth.server";
-import torrentsManager from "~/torrents.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

@@ -13,7 +13,7 @@ model Settings {
   searchEngine        String   @default("1377x.to") @map("search_engine")
   cacheSearchResults  Boolean  @default(true) @map("cache_search_results")
   saveDownloadHistory Boolean  @default(true) @map("save_download_history")
-  password			  String?
+  password            String?
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -33,7 +33,7 @@ model Collections {
 model SearchResults {
   id           Int      @id @default(autoincrement())
   searchTerm   String   @map("search_term")
-  searchEngine String?   @map("search_engine")
+  searchEngine String?  @map("search_engine")
   name         String
   hash         String
   seeders      Int?
@@ -46,10 +46,10 @@ model SearchResults {
 }
 
 model RecentSearches {
-  id           Int      @id @default(autoincrement())
-  searchTerm   String   @map("search_term") @unique
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  id         Int      @id @default(autoincrement())
+  searchTerm String   @unique @map("search_term")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("recent_searches")
 }

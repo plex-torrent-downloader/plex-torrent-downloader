@@ -1,5 +1,4 @@
 import {json, redirect} from "@remix-run/node";
-import BcryptWrapper from "~/bcrypt.server";
 import { db } from '~/db.server';
 import { Settings } from '@prisma/client';
 import jwt from "../jwt.server";
