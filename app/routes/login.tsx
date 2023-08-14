@@ -31,7 +31,7 @@ export const action = async ({request}) => {
     return null;
   }
 
-  const authToken = jwt.sign({}, settings?.password);
+  const authToken = jwt.sign({}, settings?.password, { expiresIn: '1w' });
 
   return redirect("/search", {
     headers: {

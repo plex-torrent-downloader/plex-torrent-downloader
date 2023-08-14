@@ -33,10 +33,21 @@ export default function RequireAuth(loader) {
             return unauthorizedResponse();
         }
 
-        // User is authenticated, call the original loader function
-        return loader({...input, settings});
+        const newToken = jwt.sign({}, settings.password, { expiresIn: '1w' });
+
+        const originalResponse = await loader({...input, settings});
+
+        const headers = new Headers(originalResponse.headers);
+        headers.append('Set-Cookie', `auth=${encodeURIComponent(newToken)}`);
+
+        return new Response(originalResponse.body, {
+            status: originalResponse.status,
+            statusText: originalResponse.statusText,
+            headers: headers
+        });
     };
 }
+
 
 function unauthorizedResponse() {
     throw redirect("/login", 302);

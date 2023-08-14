@@ -63,7 +63,7 @@ export const action = async ({request}) => {
   });
 
   if (formData.get('password') !== '') {
-    const authToken = jwt.sign({}, setObject.password);
+    const authToken = jwt.sign({}, setObject.password, { expiresIn: '1w' });
 
     return redirect((await db.collections.count()) ? "/search" : "/collections", {
       headers: {
@@ -86,7 +86,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return ft({request});
 };
 
-export default function Index() {
+export default function Setup() {
   const settings:LoaderData = useLoaderData();
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
@@ -95,6 +95,11 @@ export default function Index() {
   const [password, setPassword] = useState<string>('');
 
   const updatePassword = !!settings?.settings?.password;
+
+  function logout() {
+    document.cookie = "auth=;";
+    window.document.location = '/';
+  }
   return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
     {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
       Settings Updated!
@@ -155,6 +160,13 @@ export default function Index() {
           <tr>
             <td colSpan={2}>
               <input type="submit" value="Update Settings" className="btn btn-primary w-100" />
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={2}>
+              <button type="button" value="Logout" className="btn btn-danger w-100" onClick={logout}>
+                Logout
+              </button>
             </td>
           </tr>
         </tbody>
