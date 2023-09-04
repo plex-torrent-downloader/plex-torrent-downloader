@@ -33,9 +33,12 @@ export const action = async ({request}) => {
 
   const authToken = jwt.sign({}, settings?.password, { expiresIn: '1w' });
 
+  const isSecure = request.protocol === 'https';
+
+  const secureFlag = isSecure ? '; Secure' : '';
   return redirect("/search", {
     headers: {
-      "Set-Cookie": `auth=${encodeURIComponent(authToken)};`,
+      "Set-Cookie": `auth=${encodeURIComponent(authToken)}${secureFlag}; SameSite=Lax; HttpOnly; Path=/`,
     },
   });
 };

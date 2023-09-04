@@ -65,9 +65,12 @@ export const action = async ({request}) => {
   if (formData.get('password') !== '') {
     const authToken = jwt.sign({}, setObject.password, { expiresIn: '1w' });
 
+    const isSecure = request.protocol === 'https';
+
+    const secureFlag = isSecure ? '; Secure' : '';
     return redirect((await db.collections.count()) ? "/search" : "/collections", {
       headers: {
-        "Set-Cookie": `auth=${encodeURIComponent(authToken)};`,
+        "Set-Cookie": `auth=${encodeURIComponent(authToken)}${secureFlag}; SameSite=Lax; Secure; HttpOnly; Path=/`,
       },
     });
   }

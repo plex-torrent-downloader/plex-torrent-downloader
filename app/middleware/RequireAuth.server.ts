@@ -38,7 +38,10 @@ export default function RequireAuth(loader) {
         const originalResponse = await loader({...input, settings});
 
         const headers = new Headers(originalResponse.headers);
-        headers.append('Set-Cookie', `auth=${encodeURIComponent(newToken)}`);
+        const isSecure = request.protocol === 'https';
+
+        const secureFlag = isSecure ? '; Secure' : '';
+        headers.append('Set-Cookie', `auth=${encodeURIComponent(newToken)}${secureFlag}; SameSite=Lax;HttpOnly; Path=/`);
 
         return new Response(originalResponse.body, {
             status: originalResponse.status,
