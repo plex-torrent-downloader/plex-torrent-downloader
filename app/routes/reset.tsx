@@ -55,7 +55,7 @@ export const loader: LoaderFunction = async (input) => {
 };
 
 export default function Index() {
-  const loaderData:LoaderData = useLoaderData();
+  const loaderData = useLoaderData();
   const [loading, setLoading] = useState<boolean>(false);
   const [clearSettings, setClearSettings] = useState<boolean>(true);
   const [clearCollections, setClearCollections] = useState<boolean>(true);

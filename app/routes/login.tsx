@@ -4,11 +4,15 @@ import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import bcrypt from "../bcrypt.server";
 import jwt from '../jwt.server';
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Setup",
-  viewport: "width=device-width,initial-scale=1",
-});
+import {metaV1} from "@remix-run/v1-meta";
+
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Setup",
+    viewport: "width=device-width,initial-scale=1",
+  };
+}
 
 export const action = async ({request}) => {
   const settings = await db.settings.findUnique({

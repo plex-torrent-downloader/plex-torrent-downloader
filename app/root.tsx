@@ -13,17 +13,18 @@ import bootstrap from "./styles/bootstrap.css";
 import {json, LoaderFunction} from "@remix-run/node";
 import {db} from "~/db.server";
 import Document from "~/components/Document";
+import {metaV1} from "@remix-run/v1-meta";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: bootstrap }];
 };
 
-export const meta: MetaFunction = ({data, parentsData}) => {
-    return {
-      charset: "utf-8",
-      title: "Plex Torrent Downloader",
-      viewport: "width=device-width,initial-scale=1",
-    };
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Plex Torrent Downloader",
+    viewport: "width=device-width,initial-scale=1",
+  };
 }
 
 export const loader: LoaderFunction = async ({ request }) => {

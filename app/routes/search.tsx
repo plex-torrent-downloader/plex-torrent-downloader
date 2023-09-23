@@ -12,6 +12,7 @@ import SearchTorrent from "~/components/SearchTorrent";
 import torrentStyles from  '../styles/torrent.css';
 import moment from "moment";
 import RequireAuth from "~/middleware/RequireAuth.server";
+import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
   return [
@@ -20,10 +21,10 @@ export function links() {
   ];
 }
 
-export const meta: MetaFunction = ({data}) => {
+export function meta(args) {
   return {
     charset: "utf-8",
-    title: data?.q ?`Searching ${data.q}` : 'Search',
+    title: "Search Results",
     viewport: "width=device-width,initial-scale=1",
   };
 }
@@ -77,7 +78,7 @@ export const loader: LoaderFunction = async (input) => {
 };
 
 export default function Search() {
-  const loaderData:LoaderData = useLoaderData();
+  const loaderData = useLoaderData();
   const [selection, setSelection] = useState<Torrent>(null);
 
   function useHash(hash: string = ''){

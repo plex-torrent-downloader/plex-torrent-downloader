@@ -11,6 +11,7 @@ import torrentStyles from  '../styles/torrent.css';
 import {getStatus} from "~/components/DownloadHistoryTorrrent";
 import RequireAuth from "~/middleware/RequireAuth.server";
 import torrentsManager from "~/torrents.server";
+import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
   return [
@@ -22,11 +23,13 @@ interface LoaderData {
   downloaded: Downloaded[];
 }
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Download History",
-  viewport: "width=device-width,initial-scale=1",
-});
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Download History",
+    viewport: "width=device-width,initial-scale=1",
+  };
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const ft = RequireAuth(async ({ request }) => {
@@ -44,7 +47,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 
 export default function History() {
-  const {downloaded} = useLoaderData<LoaderData>();
+  const {downloaded} = useLoaderData();
   const [alertMessage, setAlertMessage] = useState<string>(null);
   const [error, setError] = useState<string>(null);
 

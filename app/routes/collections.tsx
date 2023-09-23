@@ -7,12 +7,15 @@ import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
 import RequireAuth from "~/middleware/RequireAuth.server";
+import {metaV1} from "@remix-run/v1-meta";
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Collections",
-  viewport: "width=device-width,initial-scale=1",
-});
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Collections",
+    viewport: "width=device-width,initial-scale=1",
+  };
+}
 
 
 export const action = async (input) => {
