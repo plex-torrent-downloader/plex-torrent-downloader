@@ -1,5 +1,5 @@
 import {useLoaderData, useNavigate} from "@remix-run/react";
-import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {useEffect, useState} from "react";
 import Modal from "~/components/Modal";
@@ -8,16 +8,19 @@ import torrentsManager from '../torrents.server';
 import WebTorrentComponent from '../components/WebTorrent';
 import styles from  '../styles/torrent.css';
 import RequireAuth from "~/middleware/RequireAuth.server";
+import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Download Queue",
-  viewport: "width=device-width,initial-scale=1",
-});
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Download Queue",
+    viewport: "width=device-width,initial-scale=1",
+  };
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const ft = RequireAuth(async ({ request }) => {

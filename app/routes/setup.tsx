@@ -9,16 +9,19 @@ import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import RequireAuth from "~/middleware/RequireAuth.server";
 import jwt from "../jwt.server";
+import { metaV1 } from "@remix-run/v1-meta";
 
 type LoaderData = {
   settings?: Settings;
 };
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Setup",
-  viewport: "width=device-width,initial-scale=1",
-});
+export function meta(args) {
+  return {
+    charset: "utf-8",
+    title: "Setup",
+    viewport: "width=device-width,initial-scale=1",
+  };
+}
 
 export const action = async ({request}) => {
   const settings = await db.settings.findUnique({
@@ -90,7 +93,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Setup() {
-  const settings:LoaderData = useLoaderData();
+  const settings = useLoaderData<LoaderData>();
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);

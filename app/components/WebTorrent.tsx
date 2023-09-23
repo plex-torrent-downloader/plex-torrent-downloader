@@ -7,7 +7,7 @@ export interface Props {
     onHardDelete: () => any;
 }
 
-export default function WebTorrent(props: Props) {
+export default function WT(props: Props) {
     const torrent = props.torrent;
     return <GenericTorrent
         name={torrent.name}
