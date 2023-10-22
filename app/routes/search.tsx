@@ -46,15 +46,13 @@ export const loader: LoaderFunction = async (input) => {
     const hash = url.searchParams.get('hash');
     const results = q ? await searchServer.search(q) : [];
     const collections = await db.collections.findMany();
-    let recentSearches: RecentSearches[];
+    let recentSearches: RecentSearches[] = [];
     if (!q) {
       recentSearches = await db.recentSearches.findMany({
         orderBy: {updatedAt: 'desc'},
         skip: 0,
-        take: 5
+        take: 10
       });
-    } else {
-      recentSearches = [];
     }
     const downloaded = (await db.downloaded.findMany({
       select: {hash: true},
