@@ -6,7 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "postinstall": "remix setup node",
-    "build": "run-s build:*",
+    "build": "npx node-sass ./app/styles/scss/torrentdownloader.scss ./app/styles/bootstrap.css && run-s build:*",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
     "dev": "remix dev -c 'node ./server.js'",
