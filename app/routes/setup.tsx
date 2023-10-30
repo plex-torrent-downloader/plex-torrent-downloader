@@ -106,10 +106,108 @@ export default function Setup() {
     document.cookie = "auth=;";
     window.document.location = '/';
   }
+
+  return <Form method="post">
+    <div className="container-fluid">
+
+      <h1 className="h3 mb-1 text-gray-800">{settings?.settings ? "Settings" : "Initial Setup"}</h1>
+      <p className="mb-4">Please select the location of your content root, for example, the filesystem path to your external HDD.</p>
+
+      {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
+        Settings Updated!
+      </div>}
+
+      <div className="row">
+        <div className="col-lg-6">
+          <div className="card position-relative">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">System Settings</h6>
+            </div>
+            <div className="card-body">
+              <table className="table">
+                <tr>
+                  <td>Plex Content Root</td>
+                  <td>
+                    <input type="text" className="form-control" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Save Download History</td>
+                  <td>
+                    <input type="checkbox" name="saveDownloadHistory" checked={saveDownloadHistory} onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)} />
+                  </td>
+                </tr>
+                <tr>
+                  <td>{
+                    updatePassword ?
+                        "Update password" :
+                        "Set a password (optional but recommended)"
+                  }</td>
+                  <td>
+                    <input type="hidden" value="admin" name="username" />
+                    <input type="password" className="form-control" value={password} name="password" onChange={(e) => setPassword(e.target.value)} />
+                  </td>
+                </tr>
+                {settings.settings && <tr>
+                  <td>Hard Reset</td>
+                  <td>
+                    <a href="/reset" className="text-danger">Hard Reset</a>
+                  </td>
+                </tr>}
+                <tr>
+                  <td colSpan={2}>
+                    <button type="button" value="Logout" className="btn btn-danger w-100" onClick={() => logout()}>
+                      Logout
+                    </button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="card position-relative">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">Search Settings</h6>
+            </div>
+            <div className="card-body">
+              <table className="table">
+                <tr>
+                  <td>Search Engine</td>
+                  <td>
+                    <select name="searchEngine" className="form-control" value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
+                      <option>1377x.to</option>
+                      <option>nyaa.si</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Cache Search Results</td>
+                  <td>
+                    <input type="checkbox" name="cacheSearchResults" checked={cacheSearchResults} onChange={(e) => setCacheSearchResults(!cacheSearchResults)} />
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div className="card position-relative mt-4">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">Save Settings</h6>
+            </div>
+            <div className="card-body">
+              <button className="btn btn-primary w-100">Save Settings</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </Form>;
+
   return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
-    {+new Date(settings.settings?.updatedAt) > (+ new Date) - 1000 && <div className="alert alert-success" role="alert">
-      Settings Updated!
-    </div>}
+
     <Form method="post">
       <table className="table text-white">
         <thead>
@@ -119,60 +217,10 @@ export default function Setup() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Plex Content Root</td>
-            <td>
-              <input type="text" className="form-control" name="fileSystemRoot" value={fileSystemRoot} onChange={(e) => setFileSystemRoot(e.target.value)} />
-            </td>
-          </tr>
-          <tr>
-            <td>Search Engine</td>
-            <td>
-              <select name="searchEngine" className="form-control" value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
-                <option>1377x.to</option>
-                <option>nyaa.si</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td>Cache Search Results</td>
-            <td>
-              <input type="checkbox" name="cacheSearchResults" checked={cacheSearchResults} onChange={(e) => setCacheSearchResults(!cacheSearchResults)} />
-            </td>
-          </tr>
-          <tr>
-            <td>Save Download History</td>
-            <td>
-              <input type="checkbox" name="saveDownloadHistory" checked={saveDownloadHistory} onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)} />
-            </td>
-          </tr>
-          <tr>
-            <td>{
-              updatePassword ?
-                  "Update password" :
-                  "Set a password (optional but recommended)"
-            }</td>
-            <td>
-              <input type="hidden" value="admin" name="username" />
-              <input type="password" className="form-control" value={password} name="password" onChange={(e) => setPassword(e.target.value)} />
-            </td>
-          </tr>
-          {settings.settings && <tr>
-            <td>Hard Reset</td>
-            <td>
-              <a href="/reset" className="text-danger">Hard Reset</a>
-            </td>
-          </tr>}
+
           <tr>
             <td colSpan={2}>
               <input type="submit" value="Update Settings" className="btn btn-primary w-100" />
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <button type="button" value="Logout" className="btn btn-danger w-100" onClick={logout}>
-                Logout
-              </button>
             </td>
           </tr>
         </tbody>
