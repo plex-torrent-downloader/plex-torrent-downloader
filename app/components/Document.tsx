@@ -1,20 +1,26 @@
 import {
+    Form,
     Links,
     Meta,
     useLoaderData,
 } from "@remix-run/react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 export default function Document({children}) {
     const loaderData = useLoaderData();
     const [expanded, setExpanded] = useState<boolean>(true);
 
+    useEffect(() => {
+        setExpanded(window.innerWidth < 1000);
+    }, []);
+
     function getClassName(contains: string):string {
         if (!loaderData?.url) {
             return '';
         }
-        return loaderData?.url.includes(contains) ? 'nav-link px-2 text-primary active' : 'nav-link px-2 text-secondary';
+        return loaderData?.url.includes(contains) ? "nav-item" : "nav-item active";
     }
+
     return (
         <html lang="en" className="h-full bg-dark">
         <head>
@@ -29,10 +35,10 @@ export default function Document({children}) {
                 >
                     <a
                         className="sidebar-brand d-flex align-items-center justify-content-center"
-                        href="index.html"
+                        href="/"
                     >
                         <div className="sidebar-brand-icon rotate-n-15">
-                            <i className="fas fa-laugh-wink" />
+                            <i className="fas fa-download" />
                         </div>
                         <div className="sidebar-brand-text mx-3">
                             Plex Torrent Downloader
@@ -41,15 +47,15 @@ export default function Document({children}) {
                     <hr className="sidebar-divider my-0" />
                     {loaderData?.settings ? (
                         <>
-                            <li className="nav-item active">
+                            <li className={getClassName('/queue')}>
                                 <a className="nav-link" href="/queue">
                                     <i className="fas fa-fw fa-download" />
-                                    <span>Download Queue ({loaderData?.torrents?.length || 0})</span>
+                                    <span>Queue ({loaderData?.torrents?.length || 0})</span>
                                 </a>
                             </li>
                             <hr className="sidebar-divider" />
 
-                            <li className="nav-item">
+                            <li className={getClassName('/search')}>
                                 <a className="nav-link" href="/search">
                                     <i className="fas fa-fw fa-search" />
                                     <span>Search</span>
@@ -57,7 +63,7 @@ export default function Document({children}) {
                             </li>
                             <hr className="sidebar-divider" />
 
-                            <li className="nav-item">
+                            <li className={getClassName('/setup')}>
                                 <a className="nav-link" href="/setup">
                                     <i className="fas fa-fw fa-cog" />
                                     <span>Settings</span>
@@ -65,17 +71,16 @@ export default function Document({children}) {
                             </li>
                             <hr className="sidebar-divider" />
 
-                            <li className="nav-item">
+                            <li className={getClassName('/collections')}>
                                 <a className="nav-link" href="/collections">
                                     <i className="fas fa-fw fa-th-large" />
                                     <span>Collections</span>
                                 </a>
                             </li>
-                            <hr className="sidebar-divider" />
                         </>
                     ) : (
                         <>
-                            <li className="nav-item">
+                            <li className={getClassName('/setup')}>
                                 <a className="nav-link" href="/setup">
                                     <i className="fas fa-fw fa-play-circle" />
                                     <span>First Time Setup</span>
@@ -84,16 +89,15 @@ export default function Document({children}) {
                             <hr className="sidebar-divider" />
                         </>
                     )}
-
-                    <hr className="sidebar-divider d-none d-md-block" />
+                    <hr className="sidebar-divider" />
                     <div className="text-center d-none d-md-inline">
                         <button className="rounded-circle border-0" id="sidebarToggle" onClick={e => setExpanded(!expanded)} />
                     </div>
                 </ul>
+
                 <div id="content-wrapper" className="d-flex flex-column">
                     <div id="content">
                         <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                            {/* Sidebar Toggle (Topbar) */}
                             <button
                                 id="sidebarToggleTop"
                                 className="btn btn-link d-md-none rounded-circle mr-3"
@@ -101,23 +105,23 @@ export default function Document({children}) {
                             >
                                 <i className="fa fa-bars" />
                             </button>
-                            {/* Topbar Search */}
-                            <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <Form className="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET" action="/search">
                                 <div className="input-group">
                                     <input
                                         type="text"
                                         className="form-control bg-light border-0 small"
-                                        placeholder="Search for..."
+                                        placeholder={`Search ${loaderData?.settings?.searchEngine}`}
                                         aria-label="Search"
+                                        name="q"
                                         aria-describedby="basic-addon2"
                                     />
                                     <div className="input-group-append">
-                                        <button className="btn btn-primary" type="button">
+                                        <button className="btn btn-primary">
                                             <i className="fas fa-search fa-sm" />
                                         </button>
                                     </div>
                                 </div>
-                            </form>
+                            </Form>
                         </nav>
                         {children}
                     </div>

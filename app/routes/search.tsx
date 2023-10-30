@@ -97,7 +97,7 @@ export default function Search() {
 
   return <>
     {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
-    <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
+    {loaderData.results.length ? <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
       <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={() => useHash('')}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
         <h4 className="m-2">{loaderData.results.length} Search Results</h4>
@@ -106,22 +106,27 @@ export default function Search() {
               return <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} isDownloaded={loaderData.downloaded.includes(result.hash)} />
             })
         }
-        {
-            !loaderData.results || !loaderData.results.length && <>
-              {loaderData.recentSearches.length && <div className="row">
-                <div className="col-lg-6 offset-2">
-                  <span className="text-center w-100">{loaderData.recentSearches.length ? 'Recent Searches:' : 'No Results to display'}</span>
-                </div>
+
+        <br />
+        <br />
+      </div>
+    </SearchPanel> : <></>}
+    {
+        !loaderData.results || !loaderData.results.length && <>
+          {loaderData.recentSearches.length && <div className="container-fluid">
+            <div className="card shadow mb-4">
+              <div className="card-header py-3">
+                <h6 className="m-0 font-weight-bold text-primary">Recent Searches</h6>
+              </div>
+              <div className="card-body">
                 {loaderData.recentSearches.map((rs: RecentSearches) => <div className="col-lg-6 offset-2">
                   <a href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}>{rs.searchTerm}</a>
                   <span className="text-muted"> | {moment(rs.updatedAt).fromNow()}</span><br />
                 </div>)}
-              </div>}
-            </>
-        }
-        <br />
-        <br />
-      </div>
-    </SearchPanel>
+              </div>
+            </div>
+          </div> }
+        </>
+    }
   </>;
 }
