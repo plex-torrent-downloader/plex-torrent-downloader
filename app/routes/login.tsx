@@ -1,12 +1,10 @@
-import {json, MetaFunction, redirect} from "@remix-run/node";
 import {db} from '../db.server';
-import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import bcrypt from "../bcrypt.server";
 import jwt from '../jwt.server';
-import {metaV1} from "@remix-run/v1-meta";
+import {redirect} from "@remix-run/node";
 
-export function meta(args) {
+export function meta() {
   return {
     charset: "utf-8",
     title: "Setup",
@@ -80,7 +78,6 @@ export default function Login() {
     <div className="col-xl-10 col-lg-12 col-md-9">
       <div className="card o-hidden border-0 shadow-lg my-5">
         <div className="card-body p-0">
-          {/* Nested Row within Card Body */}
           <div className="row">
             <div className="col-lg-6 d-none d-lg-block bg-login-image" />
             <div className="col-lg-6">
@@ -127,7 +124,6 @@ export default function Login() {
                   </div>
                   <input type="submit"
                          value="Login"
-                         href="index.html"
                          className="btn btn-primary btn-user btn-block"/>
                   <hr />
                 </form>
@@ -139,46 +135,5 @@ export default function Login() {
       </div>
     </div>
   </div>
-
-
-  return (
-      <ControlPanel name="Login" subtext="Please Login">
-        <form method="post" action="/login">
-          <table className="table text-white">
-            <tbody>
-            <tr>
-              <td>Username</td>
-              <td>
-                <input
-                    type="text"
-                    className="form-control"
-                    name="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Password</td>
-              <td>
-                <input
-                    type="password"
-                    className="form-control"
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={2}>
-                <input type="submit" value="Log in" className="btn btn-primary w-100" />
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </form>
-      </ControlPanel>
-  );
 }
 
