@@ -2,13 +2,15 @@ import {
     Form,
     Links,
     Meta,
-    useLoaderData,
+    useLoaderData, useLocation,
 } from "@remix-run/react";
 import {useEffect, useState} from "react";
 
 export default function Document({children}) {
+    const location = useLocation();
     const loaderData = useLoaderData();
     const [expanded, setExpanded] = useState<boolean>(true);
+    const currentUrl = location.pathname;
 
     useEffect(() => {
         setExpanded(window.innerWidth < 1000);
@@ -19,6 +21,18 @@ export default function Document({children}) {
             return '';
         }
         return loaderData?.url.includes(contains) ? "nav-item" : "nav-item active";
+    }
+
+    if (currentUrl === '/login') {
+        return <html lang="en" className="h-full bg-dark">
+        <head>
+            <Meta />
+            <Links />
+        </head>
+        <body className="bg-gradient-primary">
+        {children}
+        </body>
+        </html>
     }
 
     return (
