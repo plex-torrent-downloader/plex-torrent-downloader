@@ -52,34 +52,32 @@ export default function Queue() {
        setError(e);
      }
    }
-  return  <div className="container-fluid bg-dark">
-    <div className="row">
-      <div className="col-lg-12 text-white">
-        {
-            error && <Modal title="Error" onClose={() => {return setError(null)}}>
-              {error.toString()}
-            </Modal>
-        }
-        <div className="col-lg-12">
-          {
-            torrents.map((result: WebTorrent) => {
-              return <WebTorrentComponent torrent={result} onHardDelete={async () => {
-                await remove(result, true);
-              }} onSoftDelete={async () => {
-                await remove(result, false);
-              }}/>
-            })
-          }
-          {
-              !torrents.length && <>
-                <span className="text-center w-100">No torrents are downloading right now</span>
-              </>
-          }
-        </div>
-        <div className="col-lg-12">
-          <a href="/history" className="small text-white">Download History &gt;</a>
-        </div>
-      </div>
-    </div>
-  </div>
+
+   return <div className="container-fluid">
+     <div className="d-sm-flex align-items-center justify-content-between mb-4">
+       <h1 className="h3 mb-0 text-gray-800">Download Queue</h1>
+       <a href="/history" className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm"><i className="fas fa-download fa-sm text-white-50"></i> Download History</a>
+     </div>
+     {
+         error && <Modal title="Error" onClose={() => {return setError(null)}}>
+           {error.toString()}
+         </Modal>
+     }
+     <div className="row">
+       {
+         torrents.map((result: WebTorrent) => {
+           return <WebTorrentComponent torrent={result} onHardDelete={async () => {
+             await remove(result, true);
+           }} onSoftDelete={async () => {
+             await remove(result, false);
+           }}/>
+         })
+       }
+       {
+           !torrents.length && <>
+             <span className="text-center w-100">No torrents are downloading right now</span>
+           </>
+       }
+     </div>
+   </div>
 }

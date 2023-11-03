@@ -12,6 +12,8 @@ import {getStatus} from "~/components/DownloadHistoryTorrrent";
 import RequireAuth from "~/middleware/RequireAuth.server";
 import torrentsManager from "~/torrents.server";
 import {metaV1} from "@remix-run/v1-meta";
+import {WebTorrent} from "~/contracts/WebTorrentInterface";
+import WebTorrentComponent from "~/components/WebTorrent";
 
 export function links() {
   return [
@@ -79,24 +81,30 @@ export default function History() {
     return 'Downloading';
   }
 
-  return <>
+  return <div className="container-fluid">
     {alertMessage && <Modal title="Alert" onClose={() => setAlertMessage(null)}>{alertMessage}</Modal>}
     {error && <Modal title="Error" onClose={()=> setError(null)}>{error}</Modal>}
-    <div className="container-fluid bg-dark text-white">
-      <div className="col-lg-12">
-        <h5 className="text-center">Download History</h5>
-        {
-            downloaded && downloaded.map((result: Downloaded) => {
-              return <DownloadHistoryTorrrent torrent={result} actions={[
-                {name: (getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download'), action() {reseed(result)}, btnClass: ' btn btn-xl w-100 btn-primary'},
-                {name: 'Delete History Item', action() {alert("Sorry, try again later")}, btnClass: ' btn btn-xl w-100 btn-danger'}
-              ]}/>;
-            })
-        }
-        {
-            !downloaded || !downloaded.length && <span className="text-center w-100">No Results to display</span>
-        }
-      </div>
+    <div className="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 className="h3 mb-0 text-gray-800">Download History</h1>
+      <a href="/queue" className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm"><i className="fas fa-download fa-sm text-white-50"></i> Download Queue</a>
     </div>
-  </>
+    {
+        error && <Modal title="Error" onClose={() => {return setError(null)}}>
+          {error.toString()}
+        </Modal>
+    }
+    <div className="row">
+      {
+          downloaded && downloaded.map((result: Downloaded) => {
+            return <DownloadHistoryTorrrent torrent={result} actions={[
+              {name: (getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download'), action() {reseed(result)}, btnClass: ' btn btn-xl w-100 btn-primary'},
+              {name: 'Delete History Item', action() {alert("Sorry, try again later")}, btnClass: ' btn btn-xl w-100 btn-danger'}
+            ]}/>;
+          })
+      }
+      {
+          !downloaded || !downloaded.length && <span className="text-center w-100">No Results to display</span>
+      }
+    </div>
+  </div>
 }
