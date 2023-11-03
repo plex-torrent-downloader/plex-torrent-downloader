@@ -1,15 +1,13 @@
 import {Form, useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
 import {db} from '../db.server';
-import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import RequireAuth from "~/middleware/RequireAuth.server";
 import jwt from "../jwt.server";
-import { metaV1 } from "@remix-run/v1-meta";
 
 type LoaderData = {
   settings?: Settings;
@@ -151,13 +149,21 @@ export default function Setup() {
                 {settings.settings && <tr>
                   <td>Hard Reset</td>
                   <td>
-                    <a href="/reset" className="text-danger">Hard Reset</a>
+                    <a href="/reset" className="btn btn-danger btn-icon-split" onClick={() => logout()}>
+                      <span className="icon text-white-50">
+                          <i className="fa-solid fa-power-off"></i>
+                      </span>
+                      <span className="text">Hard Reset</span>
+                    </a>
                   </td>
                 </tr>}
                 <tr>
                   <td colSpan={2}>
-                    <button type="button" value="Logout" className="btn btn-danger w-100" onClick={() => logout()}>
-                      Logout
+                    <button type="submit" className="btn btn-danger btn-icon-split" onClick={() => logout()}>
+                      <span className="icon text-white-50">
+                          <i className="fa-solid fa-right-from-bracket"></i>
+                      </span>
+                      <span className="text">Logout</span>
                     </button>
                   </td>
                 </tr>
@@ -196,7 +202,12 @@ export default function Setup() {
               <h6 className="m-0 font-weight-bold text-primary">Save Settings</h6>
             </div>
             <div className="card-body">
-              <button className="btn btn-primary w-100">Save Settings</button>
+              <button type="submit" className="btn btn-primary btn-icon-split">
+                <span className="icon text-white-50">
+                    <i className="fas fa-save"></i>
+                </span>
+                <span className="text">Save Settings</span>
+              </button>
             </div>
           </div>
         </div>
@@ -205,26 +216,4 @@ export default function Setup() {
 
     </div>
   </Form>;
-
-  return <ControlPanel name={settings?.settings ? "Settings" : "Initial Setup"} subtext="Please select the location of your content root, for example, the filesystem path to your external HDD.">
-
-    <Form method="post">
-      <table className="table text-white">
-        <thead>
-          <tr>
-            <th>Setting</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <tr>
-            <td colSpan={2}>
-              <input type="submit" value="Update Settings" className="btn btn-primary w-100" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </Form>
-  </ControlPanel>
 }

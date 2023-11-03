@@ -1,7 +1,6 @@
 import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import {db} from '../db.server';
-import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
@@ -86,12 +85,13 @@ export default function Collections() {
     }
   }
 
-  function setDuplcate(e, collection) {
+  function addCollection(e) {
     e.preventDefault();
     setCollections([
-        ...collections,
+      ...collections,
       {
-        ...collection
+        name: '',
+        location: ''
       }
     ]);
   }
@@ -120,14 +120,8 @@ export default function Collections() {
     ]);
   }
 
-  return <ControlPanel name="Collections" subtext="Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'">
-    {error && <Modal title="Error" onClose={() => {setError(null)}}>
-      <h5>An Error happened:</h5>
-      <span>{error}</span>
-      <br />
-      <span>Are you sure that all paths are correct?</span>
-    </Modal>}
-    {showSuccess && <Modal title="Collections Updated" onClose={() => {setShowSuccess(false)}} buttons={[
+  return <>
+      {showSuccess && <Modal title="Collections Updated" onClose={() => {setShowSuccess(false)}} buttons={[
         {
           label: 'Continue',
           action() {
@@ -135,40 +129,69 @@ export default function Collections() {
           },
           class: 'btn btn-primary'
         }
-    ]}>
-      <h5>Collections saved successfully</h5>
-    </Modal>}
-    <Form method="post" onSubmit={submit}>
-      <table className="table text-white">
-        <thead>
-          <tr>
-            <th>Collection Name</th>
-            <th>File Location</th>
-            <th>Manage</th>
-          </tr>
-        </thead>
-        <tbody>
-          {collections.map((collection: Collection, index: number) => {
-            return <tr key={index.toString()}>
-              <td>
-                <input type="text" className="w-100" value={collection.name} onChange={(e) => setNameUpdate(e, index)} />
-              </td>
-              <td>
-                <input type="text" className="w-100" value={collection.location} onChange={(e) => setLocationUpdate(e, index)} />
-              </td>
-              <td>
-                {collections.length > 1 && <button title="Delete" className="btn btn-danger btn-xs" onClick={e => setDelete(e, index)}>[X]</button>}
-                <button role='button' title="Duplicate" onClick={e => setDuplcate(e, collection)} className="btn btn-info btn-xs">[ DUP ]</button>
-              </td>
-            </tr>;
-          })}
-          <tr>
-            <td colSpan={3}>
-              <input type="submit" value="Save Collections" className="btn btn-primary w-100" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      ]}>
+        <h5>Collections saved successfully</h5>
+      </Modal>}
+      <Form method="post" onSubmit={submit}>
+      {error && <Modal title="Error" onClose={() => {setError(null)}}>
+        <h5>An Error happened:</h5>
+        <span>{error}</span>
+        <br />
+        <span>Are you sure that all paths are correct?</span>
+      </Modal>}
+      <div className="container-fluid">
+        <h1 className="h3 mb-1 text-gray-800">Collections</h1>
+        <p className="mb-4">Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'</p>
+      </div>
+
+      <div className="row">
+        <div className="col-lg-6">
+          <div className="card position-relative">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">Collections</h6>
+            </div>
+            <div className="card-body text-right">
+              <table className="table">
+                {collections.map((collection: Collection, index: number) => {
+                  return <tr key={index.toString()}>
+                    <td>
+                      <input type="text" className="w-100" value={collection.name} placeholder="Collection Name" onChange={(e) => setNameUpdate(e, index)} />
+                    </td>
+                    <td>
+                      <input type="text" className="w-100" value={collection.location} placeholder="Filesystem Path" onChange={(e) => setLocationUpdate(e, index)} />
+                    </td>
+                    <td>
+                      {collections.length > 1 && <a href="#" className="btn btn-danger btn-circle" onClick={e => setDelete(e, index)} title="Remove Collection">
+                        <i className="fas fa-trash"></i>
+                      </a>}
+                    </td>
+                  </tr>;
+                })}
+              </table>
+              <a onClick={addCollection} className="btn btn-success btn-circle btn-lg" title="Add collection">
+                <i className="fas fa-plus"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-lg-6">
+          <div className="card position-relative">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">Tools</h6>
+            </div>
+            <div className="card-body">
+              <button type="submit" className="btn btn-primary btn-icon-split">
+                  <span className="icon text-white-50">
+                      <i className="fas fa-save"></i>
+                  </span>
+                <span className="text">Save Collections</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </Form>
-  </ControlPanel>
+  </>
 }

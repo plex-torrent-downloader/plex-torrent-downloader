@@ -1,7 +1,6 @@
 import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
 import {db} from '../db.server';
-import ControlPanel from "~/components/ControlPanel";
 import {useState} from "react";
 import axios from "axios";
 import spawn from "~/spawn.server";
@@ -92,46 +91,47 @@ export default function Index() {
       setLoading(false);
     }
   }
-  return <ControlPanel name="Hard Reset" subtext="Please select which settings to delete.">
+
+  function ResetRow(props) {
+    const {children, value, setter, count} = props;
+    return <label onClick={() => setter(!value)} className="w-100 cursor-pointer">
+      <i className={`fa-regular ${value ? 'fa-square-check' : 'fa-square'} fa-2x cursor-pointer`}></i>
+      <span className="text-large">&nbsp;Delete {children}</span>
+      {count > 0 && <span> ({count})</span>}
+    </label>
+  }
+
+  return <>
     <Form method="post" onSubmit={submit}>
-      <table className="table text-white">
-        <thead>
-          <tr>
-            <th>Setting</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? <tr>
-            <td>
-              <h4>System Reset in progress.. Please Wait...</h4>
-            </td>
-          </tr> : <>
-            <ResetRow value={clearSettings} setter={setClearSettings}>Settings</ResetRow>
-            <ResetRow value={clearCollections} setter={setClearCollections} count={loaderData.collectionsCount}>Collections</ResetRow>
-            <ResetRow value={clearCache} setter={setClearCache} count={loaderData.searchCount}>Cache</ResetRow>
-            <ResetRow value={clearHistory} setter={setClearHistory} count={loaderData.historyCount}>Download History</ResetRow>
-            <ResetRow value={clearRecentSearches} setter={setClearRecentSearches} count={loaderData.recentSearchesCount}>Recent Searches</ResetRow>
-          </>}
-          <tr>
-            <td>
-              <input disabled={loading} type="submit" value="Delete Settings" className="btn btn-danger w-100" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="container-fluid">
+        <h1 className="h3 mb-1 text-gray-800">Hard Reset</h1>
+        <p className="mb-4">Select which settings to delete, then prisma will re-create them</p>
+      </div>
+
+      <div className="row">
+        <div className="col-lg-6">
+          <div className="card position-relative">
+            <div className="card-header py-3">
+              <h6 className="m-0 font-weight-bold text-primary">Hard Reset Settings</h6>
+            </div>
+            <div className="card-body">
+              <ResetRow value={clearSettings} setter={setClearSettings}>Settings</ResetRow>
+              <ResetRow value={clearCollections} setter={setClearCollections} count={loaderData.collectionsCount}>Collections</ResetRow>
+              <ResetRow value={clearCache} setter={setClearCache} count={loaderData.searchCount}>Cache</ResetRow>
+              <ResetRow value={clearHistory} setter={setClearHistory} count={loaderData.historyCount}>Download History</ResetRow>
+              <ResetRow value={clearRecentSearches} setter={setClearRecentSearches} count={loaderData.recentSearchesCount}>Recent Searches</ResetRow>
+              <a className="btn btn-danger btn-icon-split" onClick={submit}>
+                <span className="icon text-white-50">
+                    <i className="fas fa-trash"></i>
+                </span>
+                <span className="text">Delete Settings</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </Form>
-  </ControlPanel>
+  </>
 }
 
-function ResetRow(props) {
-  const {children, value, setter, count} = props;
-  return <tr>
-    <td>
-      <label>
-        <input type={"checkbox"} checked={value} onChange={() => setter(!value)} />
-        &nbsp;Delete {children}
-        {count && <span> ({count})</span>}
-      </label>
-    </td>
-  </tr>;
-}
