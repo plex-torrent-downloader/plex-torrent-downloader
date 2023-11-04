@@ -1,4 +1,4 @@
-import {useLoaderData} from "@remix-run/react";
+import {useLoaderData, useSearchParams} from "@remix-run/react";
 import {DataFunctionArgs, json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import SearchPanel from "~/components/SearchPanel";
 import {useEffect, useState} from "react";
@@ -46,14 +46,11 @@ export const loader: LoaderFunction = async (input) => {
     const hash = url.searchParams.get('hash');
     const results = q ? await searchServer.search(q) : [];
     const collections = await db.collections.findMany();
-    let recentSearches: RecentSearches[] = [];
-    if (!q) {
-      recentSearches = await db.recentSearches.findMany({
-        orderBy: {updatedAt: 'desc'},
-        skip: 0,
-        take: 10
-      });
-    }
+    const recentSearches: RecentSearches[] = await db.recentSearches.findMany({
+      orderBy: {updatedAt: 'desc'},
+      skip: 0,
+      take: 10
+    });
     const downloaded = (await db.downloaded.findMany({
       select: {hash: true},
       where: {
@@ -78,6 +75,9 @@ export const loader: LoaderFunction = async (input) => {
 export default function Search() {
   const loaderData = useLoaderData();
   const [selection, setSelection] = useState<Torrent>(null);
+  const [searchParams] = useSearchParams();
+  const q = searchParams.get('q') || '';
+  const hash = searchParams.get('hash');
 
   function useHash(hash: string = ''){
     setSelection({
@@ -90,17 +90,17 @@ export default function Search() {
   }
 
   useEffect(() => {
-    if (loaderData.hash) {
-      useHash(loaderData.hash);
+    if (hash) {
+      useHash(hash);
     }
-  }, [loaderData.hash]);
+  }, [hash]);
 
   return <>
     {!!selection && <AddTorrentModal torrent={selection} onClose={() => setSelection(null)} collections={loaderData.collections} settings={loaderData.settings} />}
-    {loaderData.results.length ? <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
+    <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
       <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={() => useHash('')}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
-        <h4 className="m-2">{loaderData.results.length} Search Results</h4>
+        <h4 className="m-2">{loaderData.results.length > 1 ? `${loaderData.results.length} Search Results` : `No results for ${q}`}</h4>
         {
             loaderData.results && loaderData.results.map((result: SearchResults) => {
               return <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} isDownloaded={loaderData.downloaded.includes(result.hash)} />
@@ -110,23 +110,19 @@ export default function Search() {
         <br />
         <br />
       </div>
-    </SearchPanel> : <></>}
-    {
-        !loaderData.results || !loaderData.results.length && <>
-          {loaderData.recentSearches.length && <div className="container-fluid">
-            <div className="card shadow mb-4">
-              <div className="card-header py-3">
-                <h6 className="m-0 font-weight-bold text-primary">Recent Searches</h6>
-              </div>
-              <div className="card-body">
-                {loaderData.recentSearches.map((rs: RecentSearches) => <div className="col-lg-6 offset-2">
-                  <a href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}>{rs.searchTerm}</a>
-                  <span className="text-muted"> | {moment(rs.updatedAt).fromNow()}</span><br />
-                </div>)}
-              </div>
-            </div>
-          </div> }
-        </>
-    }
+    </SearchPanel>
+    <div className="container-fluid mb-5">
+      <div className="card shadow mb-4">
+        <div className="card-header py-3">
+          <h6 className="m-0 font-weight-bold text-primary">Recent Searches</h6>
+        </div>
+        <div className="card-body">
+          {loaderData.recentSearches.map((rs: RecentSearches) => <div className="col-lg-6 offset-2">
+            <a href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}>{rs.searchTerm}</a>
+            <span className="text-muted"> | {moment(rs.updatedAt).fromNow()}</span><br />
+          </div>)}
+        </div>
+      </div>
+    </div>
   </>;
 }

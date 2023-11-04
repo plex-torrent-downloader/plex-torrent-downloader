@@ -2,19 +2,17 @@ import {
     Form,
     Links,
     Meta,
-    useLoaderData, useLocation,
+    useLoaderData, useLocation, useSearchParams,
 } from "@remix-run/react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 export default function Document({children}) {
     const location = useLocation();
     const loaderData = useLoaderData();
+    const [searchParams] = useSearchParams();
     const [expanded, setExpanded] = useState<boolean>(true);
+    const [query, setQuery] = useState<string>(searchParams.get('q') || '');
     const currentUrl = location.pathname;
-
-    useEffect(() => {
-        setExpanded(window.innerWidth < 1000);
-    }, []);
 
     function getClassName(contains: string):string {
         if (!loaderData?.url) {
@@ -51,7 +49,7 @@ export default function Document({children}) {
                         className="sidebar-brand d-flex align-items-center justify-content-center"
                         href="/"
                     >
-                        <div className="sidebar-brand-icon rotate-n-15">
+                        <div className="sidebar-brand-icon rotate-n-15" title="Plex Torrent Downloader">
                             <i className="fas fa-download" />
                         </div>
                         <div className="sidebar-brand-text mx-3">
@@ -128,6 +126,8 @@ export default function Document({children}) {
                                         aria-label="Search"
                                         name="q"
                                         aria-describedby="basic-addon2"
+                                        value={query}
+                                        onChange={e => setQuery(e.target.value)}
                                     />
                                     <div className="input-group-append">
                                         <button className="btn btn-primary">
