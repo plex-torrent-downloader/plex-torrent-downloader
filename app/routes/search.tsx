@@ -100,7 +100,7 @@ export default function Search() {
     <SearchPanel itemName={loaderData.settings.searchEngine} query={loaderData.q} action="/search">
       <button className="btn btn-xl w-10 btn-success fixed-bottom" onClick={() => useHash('')}>[ + ] Add Infohash</button>
       <div className="col-lg-12">
-        <h4 className="m-2">{loaderData.results.length > 1 ? `${loaderData.results.length} Search Results` : `No results for ${q}`}</h4>
+        <h4 className="m-2">{loaderData.results.length ? `${loaderData.results.length} Search Results` : `No results for ${q}`}</h4>
         {
             loaderData.results && loaderData.results.map((result: SearchResults) => {
               return <SearchTorrent torrent={result} handleDownload={() => {setSelection(result)}} isDownloaded={loaderData.downloaded.includes(result.hash)} />
