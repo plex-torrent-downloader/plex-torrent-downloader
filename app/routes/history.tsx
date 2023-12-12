@@ -1,4 +1,4 @@
-import {useLoaderData} from "@remix-run/react";
+import {useLoaderData, useNavigate} from "@remix-run/react";
 import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import {useState} from "react";
 import {db} from "~/db.server";
@@ -10,10 +10,6 @@ import DownloadHistoryTorrrent from "~/components/DownloadHistoryTorrrent";
 import torrentStyles from  '../styles/torrent.css';
 import {getStatus} from "~/components/DownloadHistoryTorrrent";
 import RequireAuth from "~/middleware/RequireAuth.server";
-import torrentsManager from "~/torrents.server";
-import {metaV1} from "@remix-run/v1-meta";
-import {WebTorrent} from "~/contracts/WebTorrentInterface";
-import WebTorrentComponent from "~/components/WebTorrent";
 
 export function links() {
   return [
@@ -52,6 +48,7 @@ export default function History() {
   const {downloaded} = useLoaderData();
   const [alertMessage, setAlertMessage] = useState<string>(null);
   const [error, setError] = useState<string>(null);
+  let navigate = useNavigate();
 
   async function reseed(torrent: Downloaded) {
     try {
@@ -81,6 +78,16 @@ export default function History() {
     return 'Downloading';
   }
 
+  async function deleteHistoryItem(result) {
+    try {
+      await axios.delete('/actions/delete/download-history-item/' + (result.id));
+      navigate(".", { replace: true });
+    } catch(e) {
+      console.error(e);
+      alert("Sorry, this item could not be deleted from history. Please try again later.");
+    }
+  }
+
   return <div className="container-fluid">
     {alertMessage && <Modal title="Alert" onClose={() => setAlertMessage(null)}>{alertMessage}</Modal>}
     {error && <Modal title="Error" onClose={()=> setError(null)}>{error}</Modal>}
@@ -98,7 +105,7 @@ export default function History() {
           downloaded && downloaded.map((result: Downloaded) => {
             return <DownloadHistoryTorrrent torrent={result} actions={[
               {name: (getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download'), action() {reseed(result)}, btnClass: ' btn btn-xl w-100 btn-primary'},
-              {name: 'Delete History Item', action() {alert("Sorry, try again later")}, btnClass: ' btn btn-xl w-100 btn-danger'}
+              {name: 'Delete History Item', action() {deleteHistoryItem(result)}, btnClass: ' btn btn-xl w-100 btn-danger'}
             ]}/>;
           })
       }
