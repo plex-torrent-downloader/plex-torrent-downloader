@@ -27,9 +27,7 @@ export const action = async (input) => {
       throw new Error("Please check the download path. The location cannot be found.");
     }
 
-    webtorrent.add(`magnet:?xt=urn:btih:${formData.hash}`, { path: formData.path }, async (torrent) => {
-      await torrentManager.addTorrent(torrent, formData.path);
-    });
+    await torrentManager.addInfohash(formData.hash, formData.path);
 
     return json({success: true});
   });

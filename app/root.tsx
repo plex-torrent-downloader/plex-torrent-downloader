@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     settings,
     url: request.url,
     q,
-    torrents: torrentsManager.getSerialized()
+    torrents: (await torrentsManager.getSerialized())
   });
 };
 

@@ -1,12 +1,13 @@
 {
   "name": "remix-dl-94d4",
   "private": true,
+  "type": "commonjs",
   "description": "",
   "license": "",
   "sideEffects": false,
   "scripts": {
     "postinstall": "remix setup node",
-    "build": "npx node-sass ./app/styles/scss/torrentdownloader.scss ./app/styles/bootstrap.css && run-s build:*",
+    "build": "npx sass ./app/styles/scss/torrentdownloader.scss ./app/styles/bootstrap.css && run-s build:*",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
     "dev": "remix dev -c 'node ./server.js'",
@@ -46,11 +47,11 @@
     "cheerio": "^1.0.0-rc.10",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.3",
-    "node-sass": "^9.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "sass": "^1.79.2",
     "tiny-invariant": "^1.2.0",
-    "webtorrent": "^1.8.16"
+    "webtorrent": "^2.5.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.1.1",

@@ -12,7 +12,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!settings) {
     throw redirect("/setup", 302);
   }
-  throw redirect(torrentsManager.getSerialized().length ? '/queue' : '/search', 302);
+  throw redirect((await torrentsManager.getSerialized()).length ? '/queue' : '/search', 302);
 };
 
 export default function Index() {

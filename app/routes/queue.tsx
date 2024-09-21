@@ -25,7 +25,7 @@ export function meta(args) {
 export const loader: LoaderFunction = async ({ request }) => {
   const ft = RequireAuth(async ({ request }) => {
     return json({
-      torrents: torrentsManager.getSerialized()
+      torrents: await torrentsManager.getSerialized()
     });
   });
   return ft({request});
