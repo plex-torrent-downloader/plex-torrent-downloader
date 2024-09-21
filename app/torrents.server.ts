@@ -5,13 +5,11 @@ import {Torrent} from "webtorrent";
 class torrentsManager {
 
     trackers:string[] = [
+        "http://nyaa.tracker.wf:7777/announce",
         "http://tracker.opentrackr.org:1337/announce",
-        "udp://tracker.opentrackr.org:1337/announce",
         "udp://open.demonii.com:1337/announce",
         "udp://ttk2.nbaonlineservice.com:6969/announce",
-        "udp://open.stealth.si:80/announce",
         "udp://tracker.torrent.eu.org:451/announce",
-        "udp://exodus.desync.com:6969/announce",
         "udp://tracker1.bt.moack.co.kr:80/announce",
         "udp://tracker.tiny-vps.com:6969/announce",
         "udp://tracker.theoks.net:6969/announce",
@@ -99,6 +97,8 @@ class torrentsManager {
         "http://canardscitrons.nohost.me:6969/announce",
         "http://bvarf.tracker.sh:2086/announce",
         "http://bittorrent-tracker.e-n-c-r-y-p-t.net:1337/announce",
+        "udp://open.stealth.si:80/announce",
+        "udp://tracker.opentrackr.org:1337/announce"
     ];
     async torrents():Promise<Torrent[]> {
         return (await webtorrent())?.torrents;
