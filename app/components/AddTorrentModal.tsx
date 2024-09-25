@@ -25,7 +25,8 @@ export default function AddTorrentModal(props: Props) {
             url: '/add',
             data: {
                 hash,
-                path
+                path,
+                magnet: torrent?.magnet
             }
         });
         setShowSuccess(true);

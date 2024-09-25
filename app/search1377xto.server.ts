@@ -17,6 +17,7 @@ export default async function search(term: string):Promise<Torrent[]> {
             seeders: +$('td.seeds', this).text(),
             leechers: +$('td.leeches', this).text(),
             hash: null,
+            magnet: null,
             fileSize: $('td.size', this).text()
         };
     }).toArray();
@@ -25,6 +26,7 @@ export default async function search(term: string):Promise<Torrent[]> {
         const response = await axios(result.link);
         $ = cheerio.load(response.data);
         result.hash = $('.infohash-box').text().split(':').pop().trim();
+        result.magnet = $('.torrentdown1').attr('href');
     }));
 
     entries.splice(0, 1);

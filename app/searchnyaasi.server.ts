@@ -10,13 +10,14 @@ export default async function search(term: string):Promise<Torrent[]> {
     });
     let $ = cheerio.load(data);
     const entries = $('tr.default').map(function() {
-        const hashUrl = $('td:nth-child(3) a:last-child', this).attr('href');
+        const magnet = $('td:nth-child(3) a:last-child', this).attr('href');
         return {
             name: $('td:nth-child(2) a:last-child', this).text().trim(),
             link: null,
             seeders: +$('td:nth-child(6)', this).text().trim(),
             leechers: +$('td:nth-child(7)', this).text().trim(),
-            hash: hashUrl.substr(20, 40),
+            hash: magnet.substr(20, 40),
+            magnet,
             fileSize: $('td:nth-child(4)', this).text().trim(),
         };
     }).toArray();

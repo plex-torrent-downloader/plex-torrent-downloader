@@ -85,6 +85,7 @@ export default function Search() {
       seeders: 0,
       leechers: 0,
       hash,
+      magnet: null,
       fileSize: 'Unknown',
     });
   }

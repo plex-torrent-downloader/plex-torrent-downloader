@@ -27,7 +27,11 @@ export const action = async (input) => {
       throw new Error("Please check the download path. The location cannot be found.");
     }
 
-    await torrentManager.addInfohash(formData.hash, formData.path);
+    if (formData?.magnet) {
+      await torrentManager.addMagnet(formData.magnet, formData.path);
+    } else {
+      await torrentManager.addInfohash(formData.hash, formData.path);
+    }
 
     return json({success: true});
   });

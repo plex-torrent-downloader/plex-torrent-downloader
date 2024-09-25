@@ -36,6 +36,7 @@ model SearchResults {
   searchEngine String?  @map("search_engine")
   name         String
   hash         String
+  magnet       String?
   seeders      Int?
   leechers     Int
   fileSize     String

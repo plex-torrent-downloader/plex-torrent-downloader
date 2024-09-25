@@ -150,9 +150,9 @@ class torrentsManager {
         }
     }
 
-    async addInfohash(infoHash: string, path: string) {
+    async addMagnet(magnet: string, path: string) {
         const wt = await webtorrent();
-        wt.add(`magnet:?xt=urn:btih:${infoHash}?` + this.trackers.map(tracker => `&tr=${encodeURIComponent(tracker)}`).join(''), { path }, (async (torrent) => {
+        wt.add(magnet, { path }, (async (torrent) => {
             const {saveDownloadHistory} = await db.settings.findUnique({
                 where: {id: 1}
             });
@@ -188,6 +188,10 @@ class torrentsManager {
                 })
             });
         }).bind(this));
+    }
+
+    async addInfohash(infoHash: string, path: string) {
+        await this.addMagnet(`magnet:?xt=urn:btih:${infoHash}?` + this.trackers.map(tracker => `&tr=${encodeURIComponent(tracker)}`).join(''), path);
     }
     async getSerialized() {
         return (await this.torrents()).map(this.serialize);

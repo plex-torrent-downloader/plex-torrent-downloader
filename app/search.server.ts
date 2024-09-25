@@ -8,6 +8,7 @@ export interface Torrent {
     seeders: number;
     leechers: number;
     hash: string;
+    magnet: string;
     fileSize: string;
     link?: string;
 }
@@ -69,6 +70,7 @@ class Search {
                         searchEngine,
                         name: t.name,
                         hash: t.hash,
+                        magnet: t.magnet,
                         fileSize: t.fileSize,
                         seeders: +t.seeders,
                         leechers: +t.leechers,
@@ -87,6 +89,7 @@ class Search {
             searchEngine,
             name: torrent.name,
             hash: torrent.hash,
+            magnet: torrent.magnet,
             seeders: torrent.seeders,
             leechers: torrent.leechers,
             fileSize: torrent.fileSize,
