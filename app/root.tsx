@@ -15,6 +15,12 @@ import {db} from "~/db.server";
 import Document from "~/components/Document";
 import {metaV1} from "@remix-run/v1-meta";
 
+// IMPORTANT TO WORK WITH EXPRESS
+if (typeof window !== "undefined") {
+  const hydratedPathname = window.location.pathname;
+  window.__remixContext.url = hydratedPathname;
+}
+
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: bootstrap }];
 };
