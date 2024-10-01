@@ -11,7 +11,6 @@ import {Collections, SearchResults, Settings, RecentSearches} from "@prisma/clie
 import SearchTorrent from "~/components/SearchTorrent";
 import torrentStyles from  '../styles/torrent.css';
 import moment from "moment";
-import RequireAuth from "~/middleware/RequireAuth.server";
 import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
@@ -39,37 +38,35 @@ interface LoaderData {
   downloaded: string[];
 }
 
-export const loader: LoaderFunction = async (input) => {
-  const ft = RequireAuth(async ({request, settings}) => {
-    const url = new URL(request.url);
-    const q = url.searchParams.get('q');
-    const hash = url.searchParams.get('hash');
-    const results = q ? await searchServer.search(q) : [];
-    const collections = await db.collections.findMany();
-    const recentSearches: RecentSearches[] = await db.recentSearches.findMany({
-      orderBy: {updatedAt: 'desc'},
-      skip: 0,
-      take: 10
-    });
-    const downloaded = (await db.downloaded.findMany({
-      select: {hash: true},
-      where: {
-        NOT: [{
-          completedAt: null
-        }]
-      }
-    })).map(r => r.hash);
-    return json({
-      results,
-      recentSearches,
-      q,
-      hash,
-      collections,
-      settings,
-      downloaded
-    });
+export const loader: LoaderFunction = async ({request, context}) => {
+  const {settings} = context;
+  const url = new URL(request.url);
+  const q = url.searchParams.get('q');
+  const hash = url.searchParams.get('hash');
+  const results = q ? await searchServer.search(q) : [];
+  const collections = await db.collections.findMany();
+  const recentSearches: RecentSearches[] = await db.recentSearches.findMany({
+    orderBy: {updatedAt: 'desc'},
+    skip: 0,
+    take: 10
   });
-  return ft(input);
+  const downloaded = (await db.downloaded.findMany({
+    select: {hash: true},
+    where: {
+      NOT: [{
+        completedAt: null
+      }]
+    }
+  })).map(r => r.hash);
+  return json({
+    results,
+    recentSearches,
+    q,
+    hash,
+    collections,
+    settings,
+    downloaded
+  });
 };
 
 export default function Search() {

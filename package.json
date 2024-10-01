@@ -47,6 +47,7 @@
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.10",
+    "cookie-parser": "^1.4.6",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.3",

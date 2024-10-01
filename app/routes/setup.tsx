@@ -6,7 +6,6 @@ import {useState} from "react";
 import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
-import RequireAuth from "~/middleware/RequireAuth.server";
 import jwt from "../jwt.server";
 
 type LoaderData = {
@@ -21,12 +20,8 @@ export function meta(args) {
   };
 }
 
-export const action = async ({request}) => {
-  const settings = await db.settings.findUnique({
-    where: {
-      id: 1
-    }
-  });
+export const action = async ({request, context}) => {
+  const { settings } = context;
 
   if (settings?.password) {
     const cookies = request.headers.get('Cookie') || '';
@@ -83,11 +78,9 @@ export const action = async ({request}) => {
   return null;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const ft = RequireAuth(async ({settings}) => {
-    return json({settings});
-  });
-  return ft({request});
+export const loader: LoaderFunction = async ({ context }) => {
+  const { settings } = context;
+  return json({settings});
 };
 
 export default function Setup() {

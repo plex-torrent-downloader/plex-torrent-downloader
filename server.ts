@@ -1,17 +1,23 @@
-// @ts-nocheck
 import express from 'express';
 import { createRequestHandler } from '@remix-run/express';
-import path from 'path';
 import * as remixBuild from './build';  // Ensure you use the Remix build output
+import auth from './app/middleware/auth.server';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
+app.use(cookieParser());
 app.use(express.static('public'));
+app.use(auth);
 
-// Pass requests to Remix's request handler
 app.all('*', createRequestHandler({
     build: remixBuild,
-    mode: process.env.NODE_ENV
+    mode: process.env.NODE_ENV,
+    getLoadContext(req) {
+        return {
+            settings: (req as any).settings
+        };
+    }
 }));
 
 const port = process.env.PORT || 3000;

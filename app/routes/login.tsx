@@ -12,12 +12,8 @@ export function meta() {
   };
 }
 
-export const action = async ({request}) => {
-  const settings = await db.settings.findUnique({
-    where: {
-      id: 1
-    }
-  });
+export const action = async ({request, context}) => {
+  const { settings } = context;
   const formData = await request.formData();
   const password: string = formData.get('password');
 

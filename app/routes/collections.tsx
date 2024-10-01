@@ -5,7 +5,6 @@ import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
-import RequireAuth from "~/middleware/RequireAuth.server";
 import {metaV1} from "@remix-run/v1-meta";
 
 export function meta(args) {
@@ -17,44 +16,38 @@ export function meta(args) {
 }
 
 
-export const action = async (input) => {
-  const ft = RequireAuth(async ({request}) => {
-    const formData = await request.json();
-    const {collections} = formData;
-    const settings = await db.settings.findUnique({where: {id: 1}});
-    for (const collection of collections) {
-      try {
-        await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
-      } catch(e) {
-        return json({
-          error: `Invalid FS location: ${collection.location}`
-        }, 500);
-      }
+export const action = async ({request, context}) => {
+  const { settings } = context;
+  const formData = await request.json();
+  const {collections} = formData;
+  for (const collection of collections) {
+    try {
+      await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
+    } catch(e) {
+      return json({
+        error: `Invalid FS location: ${collection.location}`
+      }, 500);
     }
-    await db.$transaction([
-      db.collections.deleteMany(),
-      ...collections.map(collection => {
-        return db.collections.create({
-          data: {
-            name: collection.name,
-            location: collection.location
-          }
-        })
+  }
+  await db.$transaction([
+    db.collections.deleteMany(),
+    ...collections.map(collection => {
+      return db.collections.create({
+        data: {
+          name: collection.name,
+          location: collection.location
+        }
       })
-    ]);
-    return json({});
-  });
-  return ft(input);
+    })
+  ]);
+  return json({});
 };
 
 export const loader: LoaderFunction = async (input) => {
-  const ft = RequireAuth(async ({ request }) => {
-    const collections = await db.collections.findMany();
-    return json({
-      loader: collections
-    });
+  const collections = await db.collections.findMany();
+  return json({
+    loader: collections
   });
-  return ft(input);
 };
 
 interface Collection {

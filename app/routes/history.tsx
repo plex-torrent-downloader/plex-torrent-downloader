@@ -9,7 +9,6 @@ import axios from "axios";
 import DownloadHistoryTorrrent from "~/components/DownloadHistoryTorrrent";
 import torrentStyles from  '../styles/torrent.css';
 import {getStatus} from "~/components/DownloadHistoryTorrrent";
-import RequireAuth from "~/middleware/RequireAuth.server";
 
 export function links() {
   return [
@@ -29,17 +28,14 @@ export function meta(args) {
   };
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const ft = RequireAuth(async ({ request }) => {
-    const downloaded = await db.downloaded.findMany({
-      orderBy: [{id: 'desc'}],
-      take: 50
-    });
-    return json({
-      downloaded
-    });
+export const loader: LoaderFunction = async () => {
+  const downloaded = await db.downloaded.findMany({
+    orderBy: [{id: 'desc'}],
+    take: 50
   });
-  return ft({request});
+  return json({
+    downloaded
+  });
 };
 
 
