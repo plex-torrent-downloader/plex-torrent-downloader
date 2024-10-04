@@ -7,9 +7,11 @@ import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import jwt from "../jwt.server";
+import search from '../search.server';
 
 type LoaderData = {
   settings?: Settings;
+  searchEngines: string[];
 };
 
 export function meta(args) {
@@ -80,7 +82,8 @@ export const action = async ({request, context}) => {
 
 export const loader: LoaderFunction = async ({ context }) => {
   const { settings } = context;
-  return json({settings});
+  const searchEngines = search.getSearchEngines();
+  return json({settings, searchEngines});
 };
 
 export default function Setup() {
@@ -176,8 +179,7 @@ export default function Setup() {
                   <td>Search Engine</td>
                   <td>
                     <select name="searchEngine" className="form-control" value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
-                      <option>1377x.to</option>
-                      <option>nyaa.si</option>
+                      {settings.searchEngines.map((engine) => <option key={engine} value={engine}>{engine}</option>)}
                     </select>
                   </td>
                 </tr>

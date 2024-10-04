@@ -3,6 +3,7 @@ import { createRequestHandler } from '@remix-run/express';
 import * as remixBuild from './build';  // Ensure you use the Remix build output
 import auth from './app/middleware/auth.server';
 import cookieParser from 'cookie-parser';
+import './app/scheduler.server';
 
 const app = express();
 

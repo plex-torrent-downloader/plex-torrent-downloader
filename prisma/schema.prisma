@@ -21,11 +21,12 @@ model Settings {
 }
 
 model Collections {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  location  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  location           String
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @default(now()) @updatedAt @map("updated_at")
+  ScheduledDownloads ScheduledDownloads[]
 
   @@map("collections")
 }
@@ -66,4 +67,23 @@ model Downloaded {
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
 
   @@map("downloaded")
+}
+
+model ScheduledDownloads {
+  id             Int       @id @default(autoincrement())
+  searchTerm     String    @map("search_term")
+  engine         String
+  seasonNumber   Int       @map("season_number")
+  episodeNumber  Int       @map("episode_number")
+  isActive       Boolean   @default(true) @map("is_active")
+  dayOfWeek      Int       @map("day_of_week")
+  collectionId   Int       @map("collection_id")
+  lastDownloaded DateTime? @map("last_downloaded")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  collection Collections? @relation(fields: [collectionId], references: [id])
+
+  @@unique([searchTerm, seasonNumber, episodeNumber])
+  @@map("scheduled_downloads")
 }
