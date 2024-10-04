@@ -18,7 +18,7 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
  - Ability to abort torrents, and either keep or delete the downloaded data
  - Will stream first episode first, second episode second and so on
  - Search History shows up in search, so you won't download the same thing twice
- - More to come!
+ - Download Scheduler (Automatic Download new episodes)
 
 #### Torrent Search Services
  - 1377x.to
@@ -38,7 +38,7 @@ curl https://raw.githubusercontent.com/plex-torrent-downloader/installers/master
 ```
 
 ### Requirements
- - Node.js (v14 or later)
+ - Node.js (v18 or later)
  - npm or yarn
 
 ### Get Started 
@@ -47,7 +47,7 @@ curl https://raw.githubusercontent.com/plex-torrent-downloader/installers/master
 - CD Into directory `cd plex-torrent-downloader`
 - Install NPM packages `npm i`
 - Build the Database `npx prisma migrate deploy`
-- To run in dev mode, run `npm run dev`
+- To run for development, `npm run build && npm run start` HMR is temporarily unavailable
 - OR to build the app for production `npm run build`
 - then run  `npm run start`
 - Browse to `http://localhost:3000/setup` and configure the app settings
