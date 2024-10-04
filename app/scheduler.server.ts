@@ -36,17 +36,16 @@ export default new class Scheduler {
             const searchQuery = this.createSearchQuery(result);
             const searchResults = await search.searchThroughEngine(searchQuery, result.engine as SearchEngine);
             if (!searchResults.length) {
-                console.log("no search results found");
                 continue;
             }
             const collection = await db.collections.findUnique({where: {id: result.collectionId}});
             if (!collection) {
-                console.log("no collection found");
                 continue;
             }
             const magnet:string = searchResults[0].magnet;
-            console.log("Downlaoded 1 torrent");
-            torrents.addMagnet(magnet, collection.location);
+            const Settings = await db.settings.findUnique({where: {id: 1}});
+            const pathOnDisk = collection.location.replace('[content_root]', Settings.fileSystemRoot);
+            torrents.addMagnet(magnet, pathOnDisk);
             await db.scheduledDownloads.update({
                 where: {id: result.id},
                 data: {
