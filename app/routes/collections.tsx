@@ -5,7 +5,6 @@ import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
-import RequireAuth from "~/middleware/RequireAuth.server";
 import {metaV1} from "@remix-run/v1-meta";
 
 export function meta(args) {
@@ -17,54 +16,88 @@ export function meta(args) {
 }
 
 
-export const action = async (input) => {
-  const ft = RequireAuth(async ({request}) => {
-    const formData = await request.json();
-    const {collections} = formData;
-    const settings = await db.settings.findUnique({where: {id: 1}});
-    for (const collection of collections) {
-      try {
-        await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
-      } catch(e) {
-        return json({
-          error: `Invalid FS location: ${collection.location}`
-        }, 500);
-      }
+export const action = async ({request, context}) => {
+  const { settings } = context;
+  const formData = await request.json();
+  const { collections } = formData;
+
+  for (const collection of collections) {
+    try {
+      await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
+    } catch(e) {
+      return json({
+        error: `Invalid FS location: ${collection.location}`
+      }, 500);
     }
-    await db.$transaction([
-      db.collections.deleteMany(),
-      ...collections.map(collection => {
-        return db.collections.create({
-          data: {
-            name: collection.name,
-            location: collection.location
+  }
+
+  const existingCollections = await db.collections.findMany();
+  const existingIds = new Set(existingCollections.map(c => c.id));
+
+  const operations = [];
+
+  for (const collection of collections) {
+    if (collection.id && existingIds.has(collection.id)) {
+      operations.push(
+          db.collections.update({
+            where: { id: collection.id },
+            data: {
+              name: collection.name,
+              location: collection.location
+            }
+          })
+      );
+      existingIds.delete(collection.id);
+    } else {
+      // Create new collection
+      operations.push(
+          db.collections.create({
+            data: {
+              name: collection.name,
+              location: collection.location
+            }
+          })
+      );
+    }
+  }
+
+  if (existingIds.size > 0) {
+    operations.push(
+        db.collections.deleteMany({
+          where: {
+            id: {
+              in: Array.from(existingIds)
+            }
           }
         })
-      })
-    ]);
-    return json({});
-  });
-  return ft(input);
+    );
+  }
+
+  await db.$transaction(operations);
+
+  return json({});
 };
 
 export const loader: LoaderFunction = async (input) => {
-  const ft = RequireAuth(async ({ request }) => {
-    const collections = await db.collections.findMany();
-    return json({
-      loader: collections
-    });
+  const collections = await db.collections.findMany();
+  return json({
+    loader: collections
   });
-  return ft(input);
 };
 
 interface Collection {
+  id?: number;
   name: string;
   location: string;
 }
 
 export default function Collections() {
   const {loader} = useLoaderData();
-  const initData = loader && loader.length ? loader : [{name: 'Movies', location: '[content_root]/movies'}];
+  const initData = loader && loader.length ? loader.map(c => ({
+    id: c.id,
+    name: c.name,
+    location: c.location
+  })) : [{name: 'Movies', location: '[content_root]/movies'}];
   const [collections, setCollections] = useState<Collection[]>(initData);
   const [error, setError] = useState<string>(null);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -106,18 +139,22 @@ export default function Collections() {
 
   function setNameUpdate(e, index: number) {
     e.preventDefault();
-    collections[index].name = e.target.value;
-    setCollections([
-      ...collections
-    ]);
+    const updatedCollections = [...collections];
+    updatedCollections[index] = {
+      ...updatedCollections[index],
+      name: e.target.value
+    };
+    setCollections(updatedCollections);
   }
 
   function setLocationUpdate(e, index: number) {
     e.preventDefault();
-    collections[index].location = e.target.value;
-    setCollections([
-      ...collections
-    ]);
+    const updatedCollections = [...collections];
+    updatedCollections[index] = {
+      ...updatedCollections[index],
+      location: e.target.value
+    };
+    setCollections(updatedCollections);
   }
 
   return <>

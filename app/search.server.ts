@@ -3,6 +3,11 @@ import search1377 from './search1377xto.server';
 import searchNyaaSe from './searchnyaasi.server';
 import {SearchResults} from '@prisma/client';
 
+export enum SearchEngine {
+    X1377 = "1377x.to",
+    NYAASI = "nyaa.si"
+}
+
 export interface Torrent {
     name: string;
     seeders: number;
@@ -14,27 +19,27 @@ export interface Torrent {
 }
 
 class Search {
-    public async search(q: string):Promise<SearchResults[]> {
+    public async search(q: string): Promise<SearchResults[]> {
         await this.saveSearch(q);
         const {cacheSearchResults, searchEngine} = await db.settings.findUnique({where: {id : 1}});
         if (cacheSearchResults) {
-            let findInDb  = await this.findInDb(q, searchEngine);
+            let findInDb = await this.findInDb(q, searchEngine as SearchEngine);
             if (findInDb) {
                 return findInDb;
             }
-            const results = await this.searchThroughEngine(q, searchEngine);
-            return await this.saveResults(q, results, searchEngine);
+            const results = await this.searchThroughEngine(q, searchEngine as SearchEngine);
+            return await this.saveResults(q, results, searchEngine as SearchEngine);
         }
-        return await this.searchThroughEngine(q, searchEngine);
+        return await this.searchThroughEngine(q, searchEngine as SearchEngine);
     }
 
-    private async searchThroughEngine(q: string, engine: string):Promise<SearchResults[]> {
+    public async searchThroughEngine(q: string, engine: SearchEngine): Promise<SearchResults[]> {
         let results: Torrent[] = [];
-        switch (engine.trim()) {
-            case "1377x.to":
+        switch (engine) {
+            case SearchEngine.X1377:
                 results = await search1377(q);
                 break;
-            case "nyaa.si":
+            case SearchEngine.NYAASI:
                 results = await searchNyaaSe(q);
                 break;
             default:
@@ -43,10 +48,10 @@ class Search {
 
         return results
             .sort((a, b) => a.seeders < b.seeders ? 1 : -1)
-            .map((t:Torrent):SearchResults => this.torrent2SearchResult(t, engine));
+            .map((t:Torrent): SearchResults => this.torrent2SearchResult(t, engine));
     }
 
-    private async findInDb(q: string, searchEngine: string):Promise<SearchResults[]> {
+    private async findInDb(q: string, searchEngine: SearchEngine): Promise<SearchResults[] | null> {
         const results = await db.searchResults.findMany({
             where: {searchTerm: q, searchEngine},
             orderBy: [
@@ -61,7 +66,7 @@ class Search {
         return results;
     }
 
-    private async saveResults(q: string, results: Torrent[], searchEngine: string):Promise<SearchResults[]> {
+    private async saveResults(q: string, results: Torrent[], searchEngine: SearchEngine): Promise<SearchResults[]> {
         return db.$transaction([
             ...results.map((t: Torrent) => {
                 return db.searchResults.create({
@@ -82,7 +87,7 @@ class Search {
         ]);
     }
 
-    private torrent2SearchResult(torrent: Torrent, searchEngine: string = ''): SearchResults {
+    private torrent2SearchResult(torrent: Torrent, searchEngine: SearchEngine = SearchEngine.X1377): SearchResults {
         return {
             id: 123,
             searchTerm: torrent.name,
@@ -98,7 +103,7 @@ class Search {
         }
     }
 
-    private async saveSearch(searchTerm: string):Promise<void> {
+    private async saveSearch(searchTerm: string): Promise<void> {
         const o = {searchTerm};
         await db.recentSearches.upsert({
             where: o,
@@ -106,5 +111,10 @@ class Search {
             update: o
         });
     }
- }
+
+    public getSearchEngines(): string[] {
+        return Object.values(SearchEngine);
+    }
+}
+
 export default new Search();

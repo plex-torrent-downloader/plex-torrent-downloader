@@ -7,7 +7,6 @@ import axios from "axios";
 import torrentsManager from '../torrents.server';
 import WebTorrentComponent from '../components/WebTorrent';
 import styles from  '../styles/torrent.css';
-import RequireAuth from "~/middleware/RequireAuth.server";
 import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
@@ -23,12 +22,9 @@ export function meta(args) {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const ft = RequireAuth(async ({ request }) => {
-    return json({
-      torrents: await torrentsManager.getSerialized()
-    });
+  return json({
+    torrents: await torrentsManager.getSerialized()
   });
-  return ft({request});
 };
 
 export default function Queue() {

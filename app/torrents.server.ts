@@ -1,6 +1,6 @@
 import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {db} from './db.server';
-import webtorrent from "~/webtorrent.server";
+import webtorrent from "./webtorrent.server";
 import {Torrent} from "webtorrent";
 class torrentsManager {
 

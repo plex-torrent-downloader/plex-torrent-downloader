@@ -6,11 +6,12 @@ import {useState} from "react";
 import { redirect } from "@remix-run/node";
 import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
-import RequireAuth from "~/middleware/RequireAuth.server";
 import jwt from "../jwt.server";
+import search from '../search.server';
 
 type LoaderData = {
   settings?: Settings;
+  searchEngines: string[];
 };
 
 export function meta(args) {
@@ -21,12 +22,8 @@ export function meta(args) {
   };
 }
 
-export const action = async ({request}) => {
-  const settings = await db.settings.findUnique({
-    where: {
-      id: 1
-    }
-  });
+export const action = async ({request, context}) => {
+  const { settings } = context;
 
   if (settings?.password) {
     const cookies = request.headers.get('Cookie') || '';
@@ -83,11 +80,10 @@ export const action = async ({request}) => {
   return null;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const ft = RequireAuth(async ({settings}) => {
-    return json({settings});
-  });
-  return ft({request});
+export const loader: LoaderFunction = async ({ context }) => {
+  const { settings } = context;
+  const searchEngines = search.getSearchEngines();
+  return json({settings, searchEngines});
 };
 
 export default function Setup() {
@@ -183,8 +179,7 @@ export default function Setup() {
                   <td>Search Engine</td>
                   <td>
                     <select name="searchEngine" className="form-control" value={searchEngine} onChange={(e) => setSearchEngine(e.target.value)}>
-                      <option>1377x.to</option>
-                      <option>nyaa.si</option>
+                      {settings.searchEngines.map((engine) => <option key={engine} value={engine}>{engine}</option>)}
                     </select>
                   </td>
                 </tr>
