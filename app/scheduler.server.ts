@@ -9,7 +9,7 @@ export default new class Scheduler {
 
     constructor() {
         console.log("Scheduler started");
-        this.interval = setInterval(this.run.bind(this), 1000 * 60 * 60);
+        this.interval = setInterval(this.run.bind(this), 1000 * 60 * 20);
         this.run();
     }
 
