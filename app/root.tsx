@@ -33,19 +33,15 @@ export function meta(args) {
   };
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const { settings, torrents } = context;
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const settings = await db.settings.findUnique({
-    where: {
-      id : 1
-    }
-  });
   return json({
     settings,
     url: request.url,
     q,
-    torrents: (await torrentsManager.getSerialized())
+    torrents
   });
 };
 

@@ -21,10 +21,9 @@ export function meta(args) {
   };
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  return json({
-    torrents: await torrentsManager.getSerialized()
-  });
+export const loader: LoaderFunction = async ({ context }) => {
+  const { torrents } = context;
+  return json({torrents});
 };
 
 export default function Queue() {
