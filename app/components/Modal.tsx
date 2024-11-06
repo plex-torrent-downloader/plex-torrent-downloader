@@ -28,7 +28,7 @@ export default function Modal(props: Props) {
                 <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={e => props.onClose()}>Close</button>
                     {props.buttons && props.buttons.map((button: Buttons) => {
-                        return <button type="button" className={button.class} disabled={props?.disabled} onClick={e => button.action()}>{button.label}</button>
+                        return <button key={button.label} type="button" className={button.class} disabled={props?.disabled} onClick={e => button.action()}>{button.label}</button>
                     })}
                 </div>
             </div>
