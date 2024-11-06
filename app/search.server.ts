@@ -1,11 +1,13 @@
 import {db} from './db.server';
 import search1377 from './search1377xto.server';
 import searchNyaaSe from './searchnyaasi.server';
+import searchTPB from './searchTPB.server';
 import {SearchResults} from '@prisma/client';
 
 export enum SearchEngine {
     X1377 = "1377x.to",
-    NYAASI = "nyaa.si"
+    NYAASI = "nyaa.si",
+    TPB = 'The Pirate Bay',
 }
 
 export interface Torrent {
@@ -41,6 +43,9 @@ class Search {
                 break;
             case SearchEngine.NYAASI:
                 results = await searchNyaaSe(q);
+                break;
+            case SearchEngine.TPB:
+                results = await searchTPB(q);
                 break;
             default:
                 throw new Error(`Invalid Search Engine: ${engine}`);

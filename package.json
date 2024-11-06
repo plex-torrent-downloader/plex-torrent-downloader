@@ -10,7 +10,7 @@
     "build": "npx sass ./app/styles/scss/torrentdownloader.scss ./app/styles/bootstrap.css && remix build",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
-    "dev": "remix dev -c 'node ./server.js'",
+    "dev": "npm run build && npm run start",
     "dev:css": "npm run generate:css -- --watch",
     "dev:remix": "cross-env NODE_ENV=development binode --require ./mocks -- @remix-run/dev:remix dev",
     "format": "prettier --write .",

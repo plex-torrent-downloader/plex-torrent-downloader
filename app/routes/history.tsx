@@ -99,10 +99,12 @@ export default function History() {
     <div className="row">
       {
           downloaded && downloaded.map((result: Downloaded) => {
-            return <DownloadHistoryTorrrent torrent={result} actions={[
-              {name: (getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download'), action() {reseed(result)}, btnClass: ' btn btn-xl w-100 btn-primary'},
-              {name: 'Delete History Item', action() {deleteHistoryItem(result)}, btnClass: ' btn btn-xl w-100 btn-danger'}
-            ]}/>;
+            return <div key={result.id}>
+              <DownloadHistoryTorrrent torrent={result} actions={[
+                {name: (getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download'), action() {reseed(result)}, btnClass: ' btn btn-xl w-100 btn-primary'},
+                {name: 'Delete History Item', action() {deleteHistoryItem(result)}, btnClass: ' btn btn-xl w-100 btn-danger'}
+              ]}/>
+            </div>;
           })
       }
       {

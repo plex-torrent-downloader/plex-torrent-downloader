@@ -1,5 +1,5 @@
 import {useLoaderData, useSearchParams} from "@remix-run/react";
-import {DataFunctionArgs, json, LoaderFunction, MetaFunction} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import SearchPanel from "~/components/SearchPanel";
 import {useEffect, useState} from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
@@ -11,7 +11,6 @@ import {Collections, SearchResults, Settings, RecentSearches} from "@prisma/clie
 import SearchTorrent from "~/components/SearchTorrent";
 import torrentStyles from  '../styles/torrent.css';
 import moment from "moment";
-import {metaV1} from "@remix-run/v1-meta";
 
 export function links() {
   return [
