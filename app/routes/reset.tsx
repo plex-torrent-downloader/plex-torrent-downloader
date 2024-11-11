@@ -8,11 +8,11 @@ import { Trash2, AlertTriangle, Database, Square, CheckSquare, Loader2 } from 'l
 
 export const action = async ({ request }) => {
   const formData = await request.json();
+  if (formData.clearSchedule) {
+    await db.$executeRaw`DROP TABLE scheduled_downloads;`;
+  }
   if (formData.clearSettings) {
     await db.$executeRaw`DROP TABLE settings;`;
-  }
-  if (formData.clearCollections) {
-    await db.$executeRaw`DROP TABLE collections;`;
   }
   if (formData.clearCache) {
     await db.$executeRaw`DROP TABLE search_results;`;
@@ -22,6 +22,9 @@ export const action = async ({ request }) => {
   }
   if (formData.clearRecentSearches) {
     await db.$executeRaw`DROP TABLE recent_searches;`;
+  }
+  if (formData.clearCollections) {
+    await db.$executeRaw`DROP TABLE collections;`;
   }
   try {
     await spawn('prisma', ['db', 'push']);
@@ -36,6 +39,7 @@ interface LoaderData {
   historyCount: number;
   searchCount: number;
   recentSearchesCount: number;
+  scheduleCount: number;
 }
 
 export const loader: LoaderFunction = async () => {
@@ -43,7 +47,8 @@ export const loader: LoaderFunction = async () => {
     collectionsCount: (await db.collections.count()),
     historyCount: (await db.downloaded.count()),
     searchCount: (await db.searchResults.count()),
-    recentSearchesCount: (await db.recentSearches.count())
+    recentSearchesCount: (await db.recentSearches.count()),
+    scheduleCount: (await db.scheduledDownloads.count())
   });
 };
 
@@ -54,6 +59,7 @@ export default function Index() {
   const [clearCollections, setClearCollections] = useState<boolean>(true);
   const [clearHistory, setClearHistory] = useState<boolean>(true);
   const [clearCache, setClearCache] = useState<boolean>(true);
+  const [clearSchedule, setClearSchedule] = useState<boolean>(true);
   const [clearRecentSearches, setClearRecentSearches] = useState<boolean>(true);
 
   async function submit(e) {
@@ -73,7 +79,8 @@ export default function Index() {
           clearCollections,
           clearHistory,
           clearCache,
-          clearRecentSearches
+          clearRecentSearches,
+          clearSchedule
         }
       });
       window.location.href = '/';
@@ -116,16 +123,16 @@ export default function Index() {
   return (
       <div className="min-h-screen p-6">
         {/* Warning Banner */}
-        <div className="rounded-md bg-yellow-50 p-4 mb-6">
+        <div className="rounded-md bg-red-600 p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+              <AlertTriangle className="h-5 w-5 text-white" aria-hidden="true" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">
+              <h3 className="text-sm font-medium text-white">
                 Danger Zone
               </h3>
-              <div className="mt-2 text-sm text-yellow-700">
+              <div className="mt-2 text-sm text-white">
                 <p>
                   You are about to perform destructive operations. This action cannot be undone.
                   Please review your selections carefully before proceeding.
@@ -191,6 +198,14 @@ export default function Index() {
                   count={loaderData.recentSearchesCount}
               >
                 Recent Searches
+              </ResetRow>
+
+              <ResetRow
+                  value={clearSchedule}
+                  setter={setClearSchedule}
+                  count={loaderData.scheduleCount}
+              >
+                Scheduled Downloads
               </ResetRow>
 
               <div className="pt-4 border-t border-gray-200">

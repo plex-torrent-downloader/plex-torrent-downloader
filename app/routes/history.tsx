@@ -33,7 +33,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function History() {
-  const { downloaded } = useLoaderData<LoaderData>();
+  const { downloaded } = useLoaderData() as unknown as LoaderData;
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();

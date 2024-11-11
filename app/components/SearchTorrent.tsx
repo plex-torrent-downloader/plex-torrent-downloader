@@ -1,8 +1,15 @@
 // SearchTorrent.tsx
-import GenericTorrent, {Props} from "~/components/GenericTorrent";
+import GenericTorrent from "~/components/GenericTorrent";
+import {SearchResults} from "@prisma/client";
 
-export default function SearchTorrent({ torrent, isDownloaded, handleDownload }: Props) {
-    //console.log('hash', torrent.hash);
+interface Props {
+    torrent: SearchResults;
+    isDownloaded: boolean;
+    handleDownload: () => void;
+}
+
+export default function SearchTorrent(props: Props) {
+    let { torrent, isDownloaded, handleDownload } = props;
     return (
         <GenericTorrent
             name={torrent.name}

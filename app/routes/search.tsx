@@ -10,20 +10,11 @@ import SearchTorrent from "~/components/SearchTorrent";
 import moment from "moment";
 import { Plus } from "lucide-react";
 
-// Change the meta export to return an object instead of an array
-export function meta(args) {
-  return {
-    charset: "utf-8",
-    title: "Search Results",
-    viewport: "width=device-width,initial-scale=1",
-  };
-}
-
 interface LoaderData {
   results: SearchResults[];
   recentSearches: RecentSearches[];
-  q: string;
-  hash: string;
+  q: string | null;
+  hash: string | null;
   collections: Collections[];
   settings: Settings;
   downloaded: string[];
@@ -41,7 +32,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     skip: 0,
     take: 10
   });
-  const downloaded:string[] = (await db.downloaded.findMany({
+  const downloaded: string[] = (await db.downloaded.findMany({
     select: { hash: true },
     where: {
       NOT: [{
@@ -62,7 +53,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 };
 
 export default function Search() {
-  const loaderData = useLoaderData<LoaderData>();
+  const loaderData = useLoaderData() as unknown as LoaderData;
   const [selection, setSelection] = useState<Torrent | null>(null);
   const [searchParams] = useSearchParams();
   const q = searchParams.get('q') || '';
@@ -109,7 +100,7 @@ export default function Search() {
             <h4 className="text-lg font-medium text-gray-900 dark:text-white">
               {loaderData.results.length
                   ? `${loaderData.results.length} Search Results`
-                  : `No results for "${q}"`}
+                  : (q.length ? `No results for "${q}"` : null)}
             </h4>
           </div>
 

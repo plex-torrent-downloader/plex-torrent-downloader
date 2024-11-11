@@ -169,7 +169,7 @@ export default function Collections() {
                   }
                 ]}
             >
-              <h5 className="text-lg font-medium text-gray-900">Collections saved successfully</h5>
+              <h5 className="text-lg font-medium text-gray-900 dark:text-white">Collections saved successfully</h5>
             </Modal>
         )}
 

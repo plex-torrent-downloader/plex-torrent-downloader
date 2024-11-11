@@ -1,6 +1,13 @@
-import GenericTorrent, {Props} from "~/components/GenericTorrent";
+import GenericTorrent from "~/components/GenericTorrent";
+import {WebTorrent} from "../contracts/WebTorrentInterface";
+interface Props {
+    torrent: WebTorrent;
+    onSoftDelete: () => Promise<void>;
+    onHardDelete: () => Promise<void>;
+}
 
-export default function WebTorrent({ torrent, onSoftDelete, onHardDelete }: Props) {
+export default function WebTorrent(props: Props) {
+    let { torrent, onSoftDelete, onHardDelete } = props;
     return (
         <GenericTorrent
             name={torrent.name}

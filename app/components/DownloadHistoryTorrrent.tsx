@@ -12,7 +12,7 @@ export default function DownloadHistoryTorrrent(props: Props) {
     return <GenericTorrent
         name={torrent.name}
         isSearchResult={true}
-        background={getRowColor(torrent)}
+        // background={getRowColor(torrent)}
         status={getStatus(torrent)}
         actions={props.actions}
         timestamp={moment(props.torrent.createdAt)}

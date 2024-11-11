@@ -27,18 +27,21 @@ export interface Props {
     actions: Action[];
 }
 
-function formatSizeUnits(bytes: number): string {
-    if ((bytes >> 30) & 0x3FF)
-        bytes = (bytes >>> 30) + '.' + (bytes & (3 * 0x3FF)) + 'GB';
-    else if ((bytes >> 20) & 0x3FF)
-        bytes = (bytes >>> 20) + '.' + (bytes & (2 * 0x3FF)) + 'MB';
-    else if ((bytes >> 10) & 0x3FF)
-        bytes = (bytes >>> 10) + '.' + (bytes & (0x3FF)) + 'KB';
-    else if ((bytes >> 1) & 0x3FF)
-        bytes = (bytes >>> 1) + 'Bytes';
-    else
-        bytes = bytes + 'Byte';
-    return bytes;
+function formatBytes(bytes: number): string {
+    if (!bytes) return '0 Byte';
+    if (bytes === 1) return '1 Byte';
+
+    if (bytes >= 0x40000000) {
+        const gb = (bytes / 0x40000000).toFixed(1);
+        return `${gb}GB`;
+    } else if (bytes >= 0x100000) {
+        const mb = (bytes / 0x100000).toFixed(1);
+        return `${mb}MB`;
+    } else if (bytes >= 0x400) {
+        const kb = (bytes / 0x400).toFixed(1);
+        return `${kb}KB`;
+    }
+    return `${bytes} Bytes`;
 }
 
 export default function GenericTorrent(props: Props) {
@@ -172,13 +175,13 @@ export default function GenericTorrent(props: Props) {
                             {downloadSpeed > 0 && (
                                 <div className="flex items-center space-x-2">
                                     <Download className="h-4 w-4 opacity-75" />
-                                    <span>{formatSizeUnits(downloadSpeed)}/s</span>
+                                    <span>{formatBytes(downloadSpeed)}/s</span>
                                 </div>
                             )}
                             {uploadSpeed > 0 && (
                                 <div className="flex items-center space-x-2">
                                     <Upload className="h-4 w-4 opacity-75" />
-                                    <span>{formatSizeUnits(uploadSpeed)}/s</span>
+                                    <span>{formatBytes(uploadSpeed)}/s</span>
                                 </div>
                             )}
                         </div>
