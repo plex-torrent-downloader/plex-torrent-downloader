@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "postinstall": "remix setup node",
-    "build": "npx sass ./app/styles/scss/torrentdownloader.scss ./app/styles/bootstrap.css && remix build",
+    "build": "remix build",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
     "dev": "nodemon --watch app --ext ts,tsx --exec \"npm run build && npm run start\"",

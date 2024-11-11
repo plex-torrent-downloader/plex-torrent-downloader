@@ -155,7 +155,7 @@ export default function History() {
 
         {/* Empty State */}
         {(!downloaded || !downloaded.length) && (
-            <div className="mt-8 rounded-lg bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="text-center">
                 <InboxIcon className="mx-auto h-12 w-12 dark:text-white text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium dark:text-white text-gray-900">No download history</h3>
