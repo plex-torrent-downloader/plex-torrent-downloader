@@ -1,7 +1,7 @@
 import express, {NextFunction, Request, Response} from 'express';
 import { createRequestHandler } from '@remix-run/express';
 import * as remixBuild from './build';
-import auth from './app/middleware/auth.server';
+import {auth, logout} from './app/middleware/auth.server';
 import addTorrents from './app/middleware/add_torrents.server';
 import torrents from './app/torrents.server';
 import cookieParser from 'cookie-parser';
@@ -13,6 +13,8 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use(auth);
 app.use(addTorrents);
+
+app.get('/logout', logout);
 
 app.post('/add', async (req: Request, res: Response, next: NextFunction) => {
     let postData = '';

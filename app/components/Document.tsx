@@ -1,155 +1,167 @@
-import {
-    Form,
-    Links,
-    Meta,
-    useLoaderData, useLocation, useSearchParams,
-} from "@remix-run/react";
-import {useState} from "react";
+import React, {useState, useEffect} from 'react';
+import {Form, Links, Meta, useLoaderData, useLocation, useSearchParams} from '@remix-run/react';
+import {Menu, X, ChevronUp, Download, Search, Settings, Grid, Calendar, PlayCircle, History} from 'lucide-react';
 
 export default function Document({children}) {
     const location = useLocation();
     const loaderData = useLoaderData();
     const [searchParams] = useSearchParams();
-    const [expanded, setExpanded] = useState<boolean>(true);
-    const [query, setQuery] = useState<string>(searchParams.get('q') || '');
+    const [isMobile, setIsMobile] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [query, setQuery] = useState(searchParams.get('q') || '');
     const currentUrl = location.pathname;
 
-    function getClassName(contains: string):string {
-        if (!loaderData?.url) {
-            return '';
-        }
-        return loaderData?.url.includes(contains) ? "nav-item" : "nav-item active";
-    }
+    // Check for mobile viewport on mount and resize
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024); // 1024px is Tailwind's 'lg' breakpoint
+            setSidebarOpen(window.innerWidth >= 1024); // Open by default on desktop
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const isActive = (path) => {
+        if (!loaderData?.url) return false;
+        return !loaderData.url.includes(path);
+    };
 
     if (currentUrl === '/login') {
-        return <html lang="en" className="h-full bg-dark">
-        <head>
-            <Meta />
-            <Links />
-        </head>
-        <body className="bg-gradient-primary">
-        {children}
-        </body>
-        </html>
+        return (
+            <html lang="en" className="h-full">
+            <head>
+                <Meta/>
+                <Links/>
+            </head>
+            <body className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800">
+            {children}
+            </body>
+            </html>
+        );
     }
 
+    const navItems = loaderData?.settings ? [
+        {path: '/queue', icon: Download, label: `Queue (${loaderData?.torrents?.length || 0})`},
+        {path: '/search', icon: Search, label: 'Search'},
+        {path: '/history', icon: History, label: 'History'},
+        {path: '/setup', icon: Settings, label: 'Settings'},
+        {path: '/collections', icon: Grid, label: 'Collections'},
+        {path: '/scheduled_downloads', icon: Calendar, label: 'Scheduled Downloads'},
+    ] : [
+        {path: '/setup', icon: PlayCircle, label: 'First Time Setup'},
+    ];
+
     return (
-        <html lang="en" className="h-full bg-dark">
+        <html lang="en" className="h-full">
         <head>
-            <Meta />
-            <Links />
+            <Meta/>
+            <Links/>
         </head>
-        <body className="sidebar-toggled">
-        <div id="wrapper">
-            <ul
-                className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion ${expanded ? 'toggled' : ''}`}
-                id="accordionSidebar"
+        <body className="h-full bg-gray-50">
+        <div className="min-h-screen flex">
+            {/* Sidebar overlay for mobile */}
+            {sidebarOpen && isMobile && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-gradient-to-b from-blue-600 to-blue-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                } ${!isMobile ? 'lg:relative' : ''}`}
             >
-                <a
-                    className="sidebar-brand d-flex align-items-center justify-content-center"
-                    href="/"
-                >
-                    <div className="sidebar-brand-icon rotate-n-15" title="Plex Torrent Downloader">
-                        <i className="fas fa-download" />
-                    </div>
-                    <div className="sidebar-brand-text mx-3">
-                        Plex Torrent Downloader
-                    </div>
-                </a>
-                <hr className="sidebar-divider my-0" />
-                {loaderData?.settings ? (
-                    <>
-                        <li className={getClassName('/queue')}>
-                            <a className="nav-link" href="/queue">
-                                <i className="fas fa-fw fa-download" />
-                                <span>Queue ({loaderData?.torrents?.length || 0})</span>
-                            </a>
-                        </li>
-                        <hr className="sidebar-divider" />
-
-                        <li className={getClassName('/search')}>
-                            <a className="nav-link" href="/search">
-                                <i className="fas fa-fw fa-search" />
-                                <span>Search</span>
-                            </a>
-                        </li>
-                        <hr className="sidebar-divider" />
-
-                        <li className={getClassName('/setup')}>
-                            <a className="nav-link" href="/setup">
-                                <i className="fas fa-fw fa-cog" />
-                                <span>Settings</span>
-                            </a>
-                        </li>
-                        <hr className="sidebar-divider" />
-
-                        <li className={getClassName('/collections')}>
-                            <a className="nav-link" href="/collections">
-                                <i className="fas fa-fw fa-th-large" />
-                                <span>Collections</span>
-                            </a>
-                        </li>
-                        <hr className="sidebar-divider" />
-                        <li className={getClassName('/scheduled_downloads')}>
-                            <a className="nav-link" href="/scheduled_downloads">
-                                <i className="fas fa-fw fa-calendar" />
-                                <span>Scheduled Downloads</span>
-                            </a>
-                        </li>
-                    </>
-                ) : (
-                    <>
-                        <li className={getClassName('/setup')}>
-                            <a className="nav-link" href="/setup">
-                                <i className="fas fa-fw fa-play-circle" />
-                                <span>First Time Setup</span>
-                            </a>
-                        </li>
-                        <hr className="sidebar-divider" />
-                    </>
-                )}
-                <hr className="sidebar-divider" />
-                <div className="text-center d-none d-md-inline">
-                    <button className="rounded-circle border-0" id="sidebarToggle" onClick={e => setExpanded(!expanded)} />
+                {/* Logo */}
+                <div className="flex h-16 items-center justify-between px-4 border-b border-blue-500/30">
+                    <a href="/" className="flex items-center space-x-3 text-white">
+                        <Download className="h-8 w-8 rotate-[-15deg]"/>
+                        <span className="text-lg font-semibold">Plex Downloader</span>
+                    </a>
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden text-white hover:text-gray-200 focus:outline-none"
+                    >
+                        <X className="h-6 w-6"/>
+                    </button>
                 </div>
-            </ul>
 
-            <div id="content-wrapper" className="d-flex flex-column">
-                <div id="content">
-                    <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                {/* Navigation */}
+                <nav className="flex-1 overflow-y-auto px-2 py-4">
+                    <div className="space-y-1">
+                        {navItems.map((item) => (
+                            <a
+                                key={item.path}
+                                href={item.path}
+                                className={`flex items-center space-x-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                                    isActive(item.path)
+                                        ? 'bg-white/10 text-white'
+                                        : 'text-gray-100 hover:bg-white/10'
+                                }`}
+                            >
+                                <item.icon className="h-5 w-5 flex-shrink-0"/>
+                                <span className="truncate">{item.label}</span>
+                            </a>
+                        ))}
+                    </div>
+                </nav>
+            </aside>
+
+            {/* Main content wrapper */}
+            <div className="flex-1 flex flex-col min-w-0">
+                {/* Top bar */}
+                <header className="sticky top-0 z-40 bg-white shadow">
+                    <div className="flex h-16 items-center gap-4 px-4">
                         <button
-                            id="sidebarToggleTop"
-                            className="btn btn-link d-md-none rounded-circle mr-3"
-                            onClick={e => setExpanded(!expanded)}
+                            onClick={() => setSidebarOpen(true)}
+                            className="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none"
                         >
-                            <i className="fa fa-bars" />
+                            <Menu className="h-6 w-6"/>
                         </button>
-                        <Form className="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET" action="/search">
-                            <div className="input-group">
+
+                        {/* Search bar */}
+                        <Form
+                            method="GET"
+                            action="/search"
+                            className="flex flex-1 max-w-2xl mx-auto"
+                        >
+                            <div className="relative w-full">
                                 <input
                                     type="text"
-                                    className="form-control bg-light border-0 small"
-                                    placeholder={`Search ${loaderData?.settings?.searchEngine}`}
-                                    aria-label="Search"
                                     name="q"
-                                    aria-describedby="basic-addon2"
                                     value={query}
-                                    onChange={e => setQuery(e.target.value)}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    placeholder={`Search ${loaderData?.settings?.searchEngine || ''}`}
+                                    className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 pl-10 pr-20 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 />
-                                <div className="input-group-append">
-                                    <button className="btn btn-primary">
-                                        <i className="fas fa-search fa-sm" />
-                                    </button>
-                                </div>
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"/>
+                                <button
+                                    type="submit"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </Form>
-                    </nav>
+                    </div>
+                </header>
+
+                {/* Main content */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 lg:p-8">
                     {children}
-                </div>
+                </main>
             </div>
         </div>
-        <a className="scroll-to-top rounded" href="#page-top">
-            <i className="fas fa-angle-up" />
+
+        {/* Scroll to top button */}
+        <a
+            href="#page-top"
+            className="fixed bottom-4 right-4 z-50 rounded-full bg-blue-600 p-2 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+            <ChevronUp className="h-6 w-6"/>
         </a>
         </body>
         </html>

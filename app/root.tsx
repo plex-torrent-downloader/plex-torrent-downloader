@@ -8,22 +8,19 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import torrentsManager from "~/torrents.server";
-import bootstrap from "./styles/bootstrap.css";
 import {json, LoaderFunction} from "@remix-run/node";
-import {db} from "~/db.server";
 import Document from "~/components/Document";
-import {metaV1} from "@remix-run/v1-meta";
+import styles from "~/styles/tailwind.css";
+
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+];
 
 // IMPORTANT TO WORK WITH EXPRESS
 if (typeof window !== "undefined") {
   const hydratedPathname = window.location.pathname;
   window.__remixContext.url = hydratedPathname;
 }
-
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: bootstrap }];
-};
 
 export function meta(args) {
   return {

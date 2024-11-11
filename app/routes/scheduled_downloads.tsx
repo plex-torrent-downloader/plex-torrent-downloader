@@ -4,6 +4,7 @@ import { json, LoaderFunction, ActionFunction } from '@remix-run/node';
 import { db } from '~/db.server';
 import Modal from '~/components/Modal';
 import search from "~/search.server";
+import { Calendar, Edit2, Trash2, Plus, Check, X, PlayCircle, Search as SearchIcon } from 'lucide-react';
 
 export const loader: LoaderFunction = async () => {
     const scheduledDownloads = await db.scheduledDownloads.findMany({
@@ -121,215 +122,267 @@ export default function ScheduledDownloads() {
                 <Modal
                     title="Success"
                     onClose={() => setShowModal(false)}
-                    buttons={[
-                        {
-                            label: 'Continue',
-                            action: () => setShowModal(false),
-                            class: 'btn btn-primary'
-                        }
-                    ]}
+                    buttons={[{
+                        label: 'Continue',
+                        action: () => setShowModal(false),
+                        variant: 'primary'
+                    }]}
                 >
-                    <h5>{modalMessage}</h5>
+                    <div className="flex items-start space-x-3">
+                        <Check className="h-5 w-5 text-green-500" />
+                        <p className="text-gray-600">{modalMessage}</p>
+                    </div>
                 </Modal>
             )}
-            <div className="container-fluid">
-                <h1 className="h3 mb-2 text-gray-800">Scheduled Downloads</h1>
-                <p className="mb-4">Manage your scheduled downloads here</p>
 
-                <div className="card shadow mb-4">
-                    <div className="card-header py-3">
-                        <h6 className="m-0 font-weight-bold text-primary">
-                            {editingId ? "Edit" : "Add"} Scheduled Download
-                        </h6>
-                    </div>
-                    <div className="card-body">
-                        <Form method="post" className="user">
-                            <input
-                                type="hidden"
-                                name="_action"
-                                value={editingId ? "update" : "create"}
-                            />
-                            {editingId && <input type="hidden" name="id" value={editingId} />}
-                            <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                    <label htmlFor="searchTerm" className="form-label">
-                                        Search Term
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="searchTerm"
-                                        name="searchTerm"
-                                        placeholder="Enter search term"
-                                        value={formData.searchTerm}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-sm-6">
-                                    <label htmlFor="engine" className="form-label">
-                                        Search Engine
-                                    </label>
-                                    <select
-                                        id="engine"
-                                        name="engine"
-                                        className="form-control"
-                                        value={formData.engine}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Select Engine</option>
-                                        {searchEngines.map((engine) => (
-                                            <option key={engine} value={engine}>
-                                                {engine}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                    <label htmlFor="seasonNumber" className="form-label">
-                                        Season Number
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="seasonNumber"
-                                        name="seasonNumber"
-                                        placeholder="Enter season number"
-                                        value={formData.seasonNumber}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-sm-6">
-                                    <label htmlFor="episodeNumber" className="form-label">
-                                        Episode Number
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="episodeNumber"
-                                        name="episodeNumber"
-                                        placeholder="Enter episode number"
-                                        value={formData.episodeNumber}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group row">
-                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                    <label htmlFor="dayOfWeek" className="form-label">
-                                        Day of Week
-                                    </label>
-                                    <select
-                                        id="dayOfWeek"
-                                        name="dayOfWeek"
-                                        className="form-control"
-                                        value={formData.dayOfWeek}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Select Day of Week</option>
-                                        {daysOfWeek.map((day, index) => (
-                                            <option key={index} value={index}>
-                                                {day}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="col-sm-6">
-                                    <label htmlFor="collectionId" className="form-label">
-                                        Collection
-                                    </label>
-                                    <select
-                                        id="collectionId"
-                                        name="collectionId"
-                                        className="form-control"
-                                        value={formData.collectionId}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Select Collection</option>
-                                        {collections.map((collection) => (
-                                            <option key={collection.id} value={collection.id}>
-                                                {collection.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="custom-control custom-checkbox small">
-                                    <input
-                                        type="checkbox"
-                                        className="custom-control-input"
-                                        id="isActive"
-                                        name="isActive"
-                                        checked={formData.isActive}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label className="custom-control-label" htmlFor="isActive">
-                                        Active
-                                    </label>
-                                </div>
-                            </div>
-                            <button type="submit" className="btn btn-primary btn-user btn-block">
-                                {editingId ? "Update" : "Add"} Scheduled Download
-                            </button>
-                        </Form>
-                    </div>
+            <div className="min-h-screen p-6 space-y-6">
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Scheduled Downloads</h1>
+                    <p className="mt-1 text-sm text-gray-500">
+                        Manage your scheduled downloads here
+                    </p>
                 </div>
 
-                <div className="card shadow mb-4">
-                    <div className="card-header py-3">
-                        <h6 className="m-0 font-weight-bold text-primary">Scheduled Downloads</h6>
+                {/* Add/Edit Form Card */}
+                <div className="bg-white rounded-lg shadow">
+                    <div className="border-b border-gray-200 px-4 py-3">
+                        <h2 className="text-lg font-medium text-blue-600">
+                            {editingId ? "Edit" : "Add"} Scheduled Download
+                        </h2>
                     </div>
-                    <div className="card-body">
-                        <div className="table-responsive">
-                            <table className="table table-bordered" id="dataTable" width="100%" cellSpacing="0">
-                                <thead>
-                                <tr>
-                                    <th>Search Term</th>
-                                    <th>Engine</th>
-                                    <th>Season</th>
-                                    <th>Episode</th>
-                                    <th>Day</th>
-                                    <th>Active</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {scheduledDownloads.map(download => (
-                                    <tr key={download.id}>
-                                        <td>{download.searchTerm}</td>
-                                        <td>{download.engine}</td>
-                                        <td>{download.seasonNumber}</td>
-                                        <td>{download.episodeNumber}</td>
-                                        <td>{daysOfWeek[download.dayOfWeek]}</td>
-                                        <td>{download.isActive ? 'Yes' : 'No'}</td>
-                                        <td>
+
+                    <Form method="post" className="p-4">
+                        <input type="hidden" name="_action" value={editingId ? "update" : "create"} />
+                        {editingId && <input type="hidden" name="id" value={editingId} />}
+
+                        <div className="grid gap-6 mb-6 md:grid-cols-2">
+                            {/* Search Term */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Search Term
+                                </label>
+                                <div className="relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <SearchIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        name="searchTerm"
+                                        value={formData.searchTerm}
+                                        onChange={handleInputChange}
+                                        className="block w-full pl-10 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="Enter search term"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Search Engine */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Search Engine
+                                </label>
+                                <select
+                                    name="engine"
+                                    value={formData.engine}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="">Select Engine</option>
+                                    {searchEngines.map((engine) => (
+                                        <option key={engine} value={engine}>{engine}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Season Number */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Season Number
+                                </label>
+                                <input
+                                    type="number"
+                                    name="seasonNumber"
+                                    value={formData.seasonNumber}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    placeholder="Enter season number"
+                                    required
+                                />
+                            </div>
+
+                            {/* Episode Number */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Episode Number
+                                </label>
+                                <input
+                                    type="number"
+                                    name="episodeNumber"
+                                    value={formData.episodeNumber}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    placeholder="Enter episode number"
+                                    required
+                                />
+                            </div>
+
+                            {/* Day of Week */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Day of Week
+                                </label>
+                                <select
+                                    name="dayOfWeek"
+                                    value={formData.dayOfWeek}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="">Select Day of Week</option>
+                                    {daysOfWeek.map((day, index) => (
+                                        <option key={index} value={index}>{day}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Collection */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Collection
+                                </label>
+                                <select
+                                    name="collectionId"
+                                    value={formData.collectionId}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                >
+                                    <option value="">Select Collection</option>
+                                    {collections.map((collection) => (
+                                        <option key={collection.id} value={collection.id}>
+                                            {collection.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Active Toggle */}
+                        <div className="relative flex items-start mb-6">
+                            <div className="flex items-center h-5">
+                                <input
+                                    type="checkbox"
+                                    name="isActive"
+                                    checked={formData.isActive}
+                                    onChange={handleInputChange}
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="ml-3 text-sm">
+                                <label className="font-medium text-gray-700">Active</label>
+                                <p className="text-gray-500">Enable or disable this scheduled download</p>
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            {editingId ? <Edit2 className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                            {editingId ? "Update" : "Add"} Scheduled Download
+                        </button>
+                    </Form>
+                </div>
+
+                {/* Downloads Table Card */}
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="border-b border-gray-200 px-4 py-3">
+                        <h2 className="text-lg font-medium text-blue-600">Scheduled Downloads</h2>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Search Term
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Engine
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Season
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Episode
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Day
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                            {scheduledDownloads.map((download) => (
+                                <tr key={download.id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {download.searchTerm}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {download.engine}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {download.seasonNumber}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {download.episodeNumber}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {daysOfWeek[download.dayOfWeek]}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        ${download.isActive
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'}`}
+                      >
+                        {download.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div className="flex space-x-2">
                                             <button
                                                 onClick={() => setEditingId(download.id)}
-                                                className="btn btn-warning btn-circle btn-sm mr-2"
+                                                className="text-amber-600 hover:text-amber-900"
                                             >
-                                                <i className="fas fa-edit"></i>
+                                                <Edit2 className="h-5 w-5" />
                                             </button>
-                                            <Form method="post" className="d-inline">
+
+                                            <Form method="post" className="inline">
                                                 <input type="hidden" name="_action" value="delete" />
                                                 <input type="hidden" name="id" value={download.id} />
-                                                <button type="submit" className="btn btn-danger btn-circle btn-sm">
-                                                    <i className="fas fa-trash"></i>
+                                                <button
+                                                    type="submit"
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
                                                 </button>
                                             </Form>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

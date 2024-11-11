@@ -63,73 +63,98 @@ export const loader = async ({request}) => {
     return null;
   }
   throw redirect('/Search');
-
 };
 
 export default function Login() {
   const [username, setUsername] = useState<string>('admin');
   const [password, setPassword] = useState<string>('');
 
-  return <div className="row justify-content-center">
-    <div className="col-xl-10 col-lg-12 col-md-9">
-      <div className="card o-hidden border-0 shadow-lg my-5">
-        <div className="card-body p-0">
-          <div className="row">
-            <div className="col-lg-6 d-none d-lg-block bg-login-image" />
-            <div className="col-lg-6">
-              <div className="p-5">
-                <div className="text-center">
-                  <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                </div>
-                <form method="post" action="/login">
-                  <div className="form-group">
-                    <input
-                        type="text"
-                        className="form-control form-control-user"
-                        placeholder="Username"
-                        name="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
+  return (
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl w-full space-y-8">
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div className="flex flex-col lg:flex-row">
+              {/* Left side - Image */}
+              <div className="hidden lg:block lg:w-1/2">
+                <div
+                    className="h-full bg-cover bg-center bg-no-repeat"
+                    style={{
+                      backgroundImage: `url('/loginimage.png')`,
+                      minHeight: '600px'
+                    }}
+                />
+              </div>
+
+              {/* Right side - Login Form */}
+              <div className="w-full lg:w-1/2">
+                <div className="p-8 sm:p-12">
+                  <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900">Welcome Back!</h1>
                   </div>
-                  <div className="form-group">
-                    <input
-                        type="password"
-                        className="form-control form-control-user"
-                        id="exampleInputPassword"
-                        placeholder="Password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <div className="custom-control custom-checkbox small">
+
+                  <form method="post" action="/login" className="space-y-6">
+                    <div>
+                      <label htmlFor="username" className="sr-only">
+                        Username
+                      </label>
                       <input
-                          type="checkbox"
-                          className="custom-control-input"
-                          id="customCheck"
+                          id="username"
+                          name="username"
+                          type="text"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="Username"
                       />
-                      <label
-                          className="custom-control-label"
-                          htmlFor="customCheck"
-                      >
-                        Remember Me
+                    </div>
+
+                    <div>
+                      <label htmlFor="password" className="sr-only">
+                        Password
+                      </label>
+                      <input
+                          id="password"
+                          name="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="Password"
+                      />
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                          id="remember-me"
+                          name="remember-me"
+                          type="checkbox"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                        Remember me
                       </label>
                     </div>
-                  </div>
-                  <input type="submit"
-                         value="Login"
-                         className="btn btn-primary btn-user btn-block"/>
-                  <hr />
-                </form>
-                <hr />
+
+                    <div>
+                      <button
+                          type="submit"
+                          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      >
+                        Login
+                      </button>
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+  );
 }
-

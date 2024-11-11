@@ -1,103 +1,180 @@
-import {useState} from "react";
-import {Torrent} from "~/search.server";
-import axios from "axios";
-import Modal from "~/components/Modal";
-import {Collections, Settings} from "@prisma/client";
+import { useState } from "react";
 
 interface Props {
-    torrent: Torrent;
-    onClose: () => any;
-    children?: any;
-    collections: Collections[],
-    settings: Settings
+    torrent: {
+        name: string;
+        hash: string;
+        fileSize: string;
+        seeders: number;
+        magnet?: string;
+    };
+    onClose: () => void;
+    children?: React.ReactNode;
+    collections: Array<{
+        name: string;
+        location: string;
+    }>;
+    settings: {
+        fileSystemRoot: string;
+    };
 }
 
 export default function AddTorrentModal(props: Props) {
-    const {torrent} = props;
-    const [collection, setCollection] = useState<any>(null);
+    const { torrent } = props;
+    const [collection, setCollection] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState<boolean>(false);
     const [hash, setHash] = useState<string>(props.torrent.hash);
-    const path: string = collection ? props.collections[collection].location.replace("[content_root]", props.settings.fileSystemRoot).replace('//', '/') : null;
 
-    async function submit():Promise<any> {
-        await axios({
+    const path: string | null = collection
+        ? props.collections[parseInt(collection)].location
+            .replace("[content_root]", props.settings.fileSystemRoot)
+            .replace('//', '/')
+        : null;
+
+    const isButtonDisabled = !path || hash.length !== 40;
+
+    async function submit() {
+        await fetch('/add', {
             method: 'POST',
-            url: '/add',
-            data: {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
                 hash,
                 path,
                 magnet: torrent?.magnet
-            }
+            }),
         });
         setShowSuccess(true);
     }
 
+    // Backdrop
+    const modalBackdrop = (
+        <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={props.onClose}
+        />
+    );
+
     if (showSuccess) {
-        return <Modal title="Success" onClose={() => props.onClose()} buttons={[
-            {
-                label: "Open Download Queue",
-                class: "btn btn-success",
-                action(){
-                    window.location.href = "/queue";
-                }
-            }
-        ]}>
-            <h5>The torrent is now downloading.</h5>
-        </Modal>
+        return (
+            <>
+                {modalBackdrop}
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-semibold">Success</h3>
+                                <button
+                                    onClick={props.onClose}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <span className="text-2xl">&times;</span>
+                                </button>
+                            </div>
+                            <h5 className="text-lg mb-6">The torrent is now downloading.</h5>
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={() => { window.location.href = "/queue"; }}
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                >
+                                    Open Download Queue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
     }
 
-    return <Modal title={"Start New Download"} onClose={() => props.onClose()} disabled={!path || hash.length !== 40} buttons={[
-        {
-            label: 'Start Download',
-            action: async () => {
-                await submit();
-            },
-            class: 'btn btn-success'
-        }
-    ]}>
-        <h5>Please Review the following torrent download:</h5>
-        <table className="table">
-            <tbody>
-            <tr>
-                <td>Name</td>
-                <td>{torrent.name.substring(0, 30)}...</td>
-            </tr>
-            <tr>
-                <td>Size</td>
-                <td>{torrent.fileSize}</td>
-            </tr>
-            <tr>
-                <td>Seeders</td>
-                <td>{torrent.seeders}</td>
-            </tr>
-            <tr>
-                <td>Infohash</td>
-                <td>
-                    <input className="w-50" type="text" value={hash} onChange={e => setHash(e.target.value)} />
-                </td>
-            </tr>
-            <tr>
-                <td>Destination:</td>
-                <td>
-                    <select className="w-50" value={collection ?? undefined} onChange={e => setCollection(e.target.value)}>
-                        <option selected={true} disabled={true}>Select an Option</option>
-                        {props.collections && props.collections.map((collection, index) => <option key={index} value={index}>{collection.name}</option>)}
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Path:</td>
-                <td>
-                    {path}
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <pre className="w-100" style={{
-            inlineSize: '100px',
-            overflowWrap: 'break-word'
-        }}>
-            {torrent.name}
-        </pre>
-    </Modal>;
+    return (
+        <>
+            {modalBackdrop}
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-semibold">Start New Download</h3>
+                            <button
+                                onClick={props.onClose}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <span className="text-2xl">&times;</span>
+                            </button>
+                        </div>
+
+                        <h5 className="text-lg mb-4">Please Review the following torrent download:</h5>
+
+                        <table className="w-full mb-4">
+                            <tbody className="divide-y">
+                            <tr>
+                                <td className="py-2 font-medium">Name</td>
+                                <td className="py-2">{torrent.name.substring(0, 30)}...</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-medium">Size</td>
+                                <td className="py-2">{torrent.fileSize}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-medium">Seeders</td>
+                                <td className="py-2">{torrent.seeders}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-medium">Infohash</td>
+                                <td className="py-2">
+                                    <input
+                                        type="text"
+                                        value={hash}
+                                        onChange={(e) => setHash(e.target.value)}
+                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-medium">Destination:</td>
+                                <td className="py-2">
+                                    <select
+                                        value={collection ?? ''}
+                                        onChange={(e) => setCollection(e.target.value)}
+                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="" disabled>Select an Option</option>
+                                        {props.collections?.map((collection, index) => (
+                                            <option key={index} value={index}>
+                                                {collection.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-medium">Path:</td>
+                                <td className="py-2">{path}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <pre className="w-full break-words whitespace-pre-wrap border rounded p-4 bg-gray-50 mb-6">
+                          {torrent.name}
+                        </pre>
+
+                        <div className="flex justify-end">
+                            <button
+                                onClick={submit}
+                                disabled={isButtonDisabled}
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    isButtonDisabled
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-green-600 hover:bg-green-700 text-white'
+                                }`}
+                            >
+                                Start Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }

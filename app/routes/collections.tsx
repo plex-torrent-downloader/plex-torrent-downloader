@@ -5,7 +5,7 @@ import {useState} from "react";
 import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
-import {metaV1} from "@remix-run/v1-meta";
+import { Plus, Trash2, Save, FolderOpen } from 'lucide-react';
 
 export function meta(args) {
   return {
@@ -92,12 +92,13 @@ interface Collection {
 }
 
 export default function Collections() {
-  const {loader} = useLoaderData();
+  const { loader } = useLoaderData();
   const initData = loader && loader.length ? loader.map(c => ({
     id: c.id,
     name: c.name,
     location: c.location
-  })) : [{name: 'Movies', location: '[content_root]/movies'}];
+  })) : [{ name: 'Movies', location: '[content_root]/movies' }];
+
   const [collections, setCollections] = useState<Collection[]>(initData);
   const [error, setError] = useState<string>(null);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -108,9 +109,7 @@ export default function Collections() {
       await axios({
         method: 'POST',
         url: '/collections',
-        data: {
-          collections
-        }
+        data: { collections }
       });
       setShowSuccess(true);
     } catch(e) {
@@ -131,10 +130,9 @@ export default function Collections() {
 
   function setDelete(e, index: number) {
     e.preventDefault();
-    collections.splice(index, 1);
-    setCollections([
-      ...collections
-    ]);
+    const newCollections = [...collections];
+    newCollections.splice(index, 1);
+    setCollections(newCollections);
   }
 
   function setNameUpdate(e, index: number) {
@@ -157,78 +155,118 @@ export default function Collections() {
     setCollections(updatedCollections);
   }
 
-  return <>
-      {showSuccess && <Modal title="Collections Updated" onClose={() => {setShowSuccess(false)}} buttons={[
-        {
-          label: 'Continue',
-          action() {
-            window.location.href = '/';
-          },
-          class: 'btn btn-primary'
-        }
-      ]}>
-        <h5>Collections saved successfully</h5>
-      </Modal>}
-      <Form method="post" onSubmit={submit}>
-      {error && <Modal title="Error" onClose={() => {setError(null)}}>
-        <h5>An Error happened:</h5>
-        <span>{error}</span>
-        <br />
-        <span>Are you sure that all paths are correct?</span>
-      </Modal>}
-      <div className="container-fluid">
-        <h1 className="h3 mb-1 text-gray-800">Collections</h1>
-        <p className="mb-4">Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'</p>
-      </div>
+  return (
+      <>
+        {showSuccess && (
+            <Modal
+                title="Collections Updated"
+                onClose={() => setShowSuccess(false)}
+                buttons={[
+                  {
+                    label: 'Continue',
+                    action: () => { window.location.href = '/'; },
+                    class: 'inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                  }
+                ]}
+            >
+              <h5 className="text-lg font-medium text-gray-900">Collections saved successfully</h5>
+            </Modal>
+        )}
 
-      <div className="row">
-        <div className="col-lg-6">
-          <div className="card position-relative">
-            <div className="card-header py-3">
-              <h6 className="m-0 font-weight-bold text-primary">Collections</h6>
+        {error && (
+            <Modal title="Error" onClose={() => setError(null)}>
+              <div className="space-y-4">
+                <h5 className="text-lg font-medium text-gray-900">An Error occurred:</h5>
+                <p className="text-red-600">{error}</p>
+                <p className="text-sm text-gray-500">Are you sure that all paths are correct?</p>
+              </div>
+            </Modal>
+        )}
+
+        <Form method="post" onSubmit={submit} className="p-6 max-w-7xl mx-auto">
+          <div className="space-y-6">
+            {/* Header */}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Collections</h1>
+              <p className="mt-1 text-sm text-gray-500">
+                Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'
+              </p>
             </div>
-            <div className="card-body text-right">
-              <table className="table">
-                {collections.map((collection: Collection, index: number) => {
-                  return <tr key={index.toString()}>
-                    <td>
-                      <input type="text" className="w-100" value={collection.name} placeholder="Collection Name" onChange={(e) => setNameUpdate(e, index)} />
-                    </td>
-                    <td>
-                      <input type="text" className="w-100" value={collection.location} placeholder="Filesystem Path" onChange={(e) => setLocationUpdate(e, index)} />
-                    </td>
-                    <td>
-                      {collections.length > 1 && <a href="#" className="btn btn-danger btn-circle" onClick={e => setDelete(e, index)} title="Remove Collection">
-                        <i className="fas fa-trash"></i>
-                      </a>}
-                    </td>
-                  </tr>;
-                })}
-              </table>
-              <a onClick={addCollection} className="btn btn-success btn-circle btn-lg" title="Add collection">
-                <i className="fas fa-plus"></i>
-              </a>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Collections Card */}
+              <div className="bg-white rounded-lg shadow">
+                <div className="border-b border-gray-200 px-4 py-3">
+                  <h2 className="text-lg font-medium text-blue-600">Collections</h2>
+                </div>
+                <div className="p-4">
+                  <div className="space-y-4">
+                    {collections.map((collection: Collection, index: number) => (
+                        <div key={index} className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <input
+                                type="text"
+                                value={collection.name}
+                                placeholder="Collection Name"
+                                onChange={(e) => setNameUpdate(e, index)}
+                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="relative">
+                              <FolderOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                              <input
+                                  type="text"
+                                  value={collection.location}
+                                  placeholder="Filesystem Path"
+                                  onChange={(e) => setLocationUpdate(e, index)}
+                                  className="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                          </div>
+                          {collections.length > 1 && (
+                              <button
+                                  type="button"
+                                  onClick={(e) => setDelete(e, index)}
+                                  className="rounded-full p-2 text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </button>
+                          )}
+                        </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex justify-center">
+                    <button
+                        type="button"
+                        onClick={addCollection}
+                        className="inline-flex items-center rounded-full bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      <Plus className="h-6 w-6" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tools Card */}
+              <div className="bg-white rounded-lg shadow">
+                <div className="border-b border-gray-200 px-4 py-3">
+                  <h2 className="text-lg font-medium text-blue-600">Tools</h2>
+                </div>
+                <div className="p-4">
+                  <button
+                      type="submit"
+                      className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Collections
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="col-lg-6">
-          <div className="card position-relative">
-            <div className="card-header py-3">
-              <h6 className="m-0 font-weight-bold text-primary">Tools</h6>
-            </div>
-            <div className="card-body">
-              <button type="submit" className="btn btn-primary btn-icon-split">
-                  <span className="icon text-white-50">
-                      <i className="fas fa-save"></i>
-                  </span>
-                <span className="text">Save Collections</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </Form>
-  </>
+        </Form>
+      </>
+  );
 }

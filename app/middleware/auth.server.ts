@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.server';
 
-async function auth(req: Request, res: Response, next: NextFunction) {
+export async function auth(req: Request, res: Response, next: NextFunction) {
     const settings = await db.settings.findUnique({
         where: { id: 1 }
     });
@@ -40,8 +40,15 @@ async function auth(req: Request, res: Response, next: NextFunction) {
     });
 }
 
+export async function logout(req: Request, res: Response, next: NextFunction) {
+    res.cookie('auth', '', {
+        httpOnly: true,
+        secure: req.secure,
+        path: '/'
+    });
+    res.redirect(301, '/login');
+}
+
 function unauthorizedResponse(req: Request, res: Response) {
     return res.redirect(302, '/login');
 }
-
-export default auth;
