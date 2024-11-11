@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import Modal from "~/components/Modal";
 import axios from "axios";
 import WebTorrentComponent from '../components/WebTorrent';
-import { History } from 'lucide-react';
+import { History, Plus } from 'lucide-react';
+import AddTorrentModal from "~/components/AddTorrentModal";
+import { db } from '~/db.server';
 
 export function meta(args) {
   return {
@@ -16,12 +18,14 @@ export function meta(args) {
 }
 
 export const loader: LoaderFunction = async ({ context }) => {
-  const { torrents } = context;
-  return json({ torrents });
+  const { torrents, settings } = context;
+  const collections = await db.collections.findMany();
+  return json({ torrents, collections, settings });
 };
 
 export default function Queue() {
-  const { torrents } = useLoaderData();
+  const { torrents, collections, settings } = useLoaderData();
+  const [showTorrentModal, setShowTorrentModal] = useState<boolean>(false);
   const [error, setError] = useState<string | Error>(null);
   const navigate = useNavigate();
 
@@ -47,18 +51,32 @@ export default function Queue() {
 
   return (
       <div className="min-h-screen p-6">
-        {/* Header */}
+        {showTorrentModal ? <AddTorrentModal torrent={{
+          name: 'New Torrent',
+          hash: '',
+          fileSize: '?',
+          seeders: 0,
+        }} onClose={() => setShowTorrentModal(false)} collections={collections} settings={settings} /> : null}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
             Download Queue
           </h1>
-          <a
-              href="/history"
-              className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <History className="mr-2 h-4 w-4" />
-            Download History
-          </a>
+          <div>
+            <button
+                onClick={() => setShowTorrentModal(true)}
+                className="inline-flex items-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:hover:bg-green-500 dark:focus:ring-offset-gray-800 transition-colors mr-5"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add
+            </button>
+            <a
+                href="/history"
+                className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <History className="mr-2 h-4 w-4" />
+              Download History
+            </a>
+          </div>
         </div>
 
         {/* Error Modal */}
@@ -91,9 +109,9 @@ export default function Queue() {
 
         {/* Empty State */}
         {!torrents.length && (
-            <div className="mt-8 rounded-lg bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="text-center">
-                <div className="mx-auto h-12 w-12 text-gray-400">
+                <div className="mx-auto h-12 w-12 text-gray-400 dark:text-white">
                   <svg
                       className="h-12 w-12"
                       fill="none"
@@ -109,7 +127,7 @@ export default function Queue() {
                     />
                   </svg>
                 </div>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No Active Downloads</h3>
+                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No Active Downloads</h3>
                 <p className="mt-1 text-sm text-gray-500">
                   No torrents are downloading right now
                 </p>
@@ -118,7 +136,7 @@ export default function Queue() {
                       href="/search"
                       className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
-                    Start New Download
+                    Search for torrents
                   </a>
                 </div>
               </div>

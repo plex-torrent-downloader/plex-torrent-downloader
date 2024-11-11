@@ -138,17 +138,17 @@ export default function Index() {
         <Form method="post" onSubmit={submit} className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Hard Reset</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Hard Reset</h1>
             <p className="mt-1 text-sm text-gray-500">
               Select which settings to delete, then Prisma will re-create them
             </p>
           </div>
 
           {/* Main Card */}
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
             <div className="border-b border-gray-200 px-4 py-3">
-              <h2 className="text-lg font-medium text-gray-900 flex items-center">
-                <Database className="h-5 w-5 text-gray-400 mr-2" />
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                <Database className="h-5 w-5 text-gray-400 dark:text-white mr-2" />
                 Reset Settings
               </h2>
             </div>

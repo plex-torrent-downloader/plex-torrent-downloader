@@ -93,7 +93,7 @@ export default function History() {
             >
               <div className="flex items-start space-x-3">
                 <AlertCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                <p className="text-gray-600">{alertMessage}</p>
+                <p className="dark:text-white text-gray-600">{alertMessage}</p>
               </div>
             </Modal>
         )}
@@ -119,7 +119,7 @@ export default function History() {
 
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
+          <h1 className="text-2xl font-bold dark:text-white text-gray-900 mb-4 sm:mb-0">
             Download History
           </h1>
           <a
@@ -157,9 +157,9 @@ export default function History() {
         {(!downloaded || !downloaded.length) && (
             <div className="mt-8 rounded-lg bg-white p-6 shadow-sm">
               <div className="text-center">
-                <InboxIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No download history</h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <InboxIcon className="mx-auto h-12 w-12 dark:text-white text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium dark:text-white text-gray-900">No download history</h3>
+                <p className="mt-1 text-sm dark:text-white text-gray-500">
                   Start by downloading some torrents
                 </p>
                 <div className="mt-6">

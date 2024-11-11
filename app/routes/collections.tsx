@@ -187,15 +187,15 @@ export default function Collections() {
           <div className="space-y-6">
             {/* Header */}
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Collections</h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Collections</h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Collections Card */}
-              <div className="bg-white rounded-lg shadow">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div className="border-b border-gray-200 px-4 py-3">
                   <h2 className="text-lg font-medium text-blue-600">Collections</h2>
                 </div>
@@ -209,7 +209,7 @@ export default function Collections() {
                                 value={collection.name}
                                 placeholder="Collection Name"
                                 onChange={(e) => setNameUpdate(e, index)}
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                             />
                           </div>
                           <div className="flex-1">
@@ -220,7 +220,7 @@ export default function Collections() {
                                   value={collection.location}
                                   placeholder="Filesystem Path"
                                   onChange={(e) => setLocationUpdate(e, index)}
-                                  className="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                  className="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                               />
                             </div>
                           </div>
@@ -250,7 +250,7 @@ export default function Collections() {
               </div>
 
               {/* Tools Card */}
-              <div className="bg-white rounded-lg shadow">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
                 <div className="border-b border-gray-200 px-4 py-3">
                   <h2 className="text-lg font-medium text-blue-600">Tools</h2>
                 </div>

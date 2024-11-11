@@ -98,7 +98,7 @@ export default function Search() {
 
         <button
             onClick={() => useHash('')}
-            className="fixed bottom-6 left-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="fixed bottom-6 left-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
             aria-label="Add Infohash"
         >
           <Plus className="h-6 w-6" />
@@ -106,7 +106,7 @@ export default function Search() {
 
         <div className="w-full">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-medium text-gray-900">
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white">
               {loaderData.results.length
                   ? `${loaderData.results.length} Search Results`
                   : `No results for "${q}"`}
@@ -126,21 +126,24 @@ export default function Search() {
         </div>
 
         {/* Recent Searches Card */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="border-b border-gray-200 px-4 py-3">
-            <h6 className="text-sm font-medium text-blue-600">Recent Searches</h6>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+          <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+            <h6 className="text-sm font-medium text-blue-600 dark:text-blue-400">Recent Searches</h6>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {loaderData.recentSearches.map((rs: RecentSearches) => (
-                <div key={rs.id} className="px-4 py-3 hover:bg-gray-50">
+                <div
+                    key={rs.id}
+                    className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                >
                   <div className="flex items-center gap-3">
                     <a
                         href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                     >
                       {rs.searchTerm}
                     </a>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {moment(rs.updatedAt).fromNow()}
                     </span>
                   </div>

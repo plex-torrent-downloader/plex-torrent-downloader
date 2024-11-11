@@ -42,16 +42,16 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
     const getButtonStyles = (button: Button) => {
         if (button.class) return button.class;
 
-        const baseStyles = "inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto";
+        const baseStyles = "inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto transition-colors";
 
         switch (button.variant) {
             case 'primary':
-                return `${baseStyles} border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`;
+                return `${baseStyles} border border-transparent bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:ring-blue-500`;
             case 'danger':
-                return `${baseStyles} border border-transparent bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`;
+                return `${baseStyles} border border-transparent bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 focus:ring-red-500`;
             case 'secondary':
             default:
-                return `${baseStyles} border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500`;
+                return `${baseStyles} border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-blue-500`;
         }
     };
 
@@ -72,19 +72,19 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
                 aria-labelledby="modal-title"
             >
                 <div className="flex min-h-full items-center justify-center p-4">
-                    <div className="relative w-full transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all max-w-lg mx-auto">
+                    <div className="relative w-full transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all max-w-lg mx-auto">
                         {/* Header */}
-                        <div className="px-4 py-4 sm:px-6">
+                        <div className="px-4 py-4 sm:px-6 border-b border-gray-200 dark:border-gray-700">
                             <div className="flex items-start justify-between">
                                 <h3
-                                    className="text-lg font-medium leading-6 text-gray-900"
+                                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                                     id="modal-title"
                                 >
                                     {title}
                                 </h3>
                                 <button
                                     type="button"
-                                    className="ml-3 rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                    className="ml-3 rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
                                     onClick={onClose}
                                 >
                                     <span className="sr-only">Close</span>
@@ -94,12 +94,12 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
                         </div>
 
                         {/* Content */}
-                        <div className="px-4 py-4 sm:px-6">
+                        <div className="px-4 py-4 sm:px-6 text-gray-900 dark:text-gray-100">
                             {children}
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-4 sm:px-6">
+                        <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-4 sm:px-6 border-t border-gray-200 dark:border-gray-700">
                             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
                                 <button
                                     type="button"

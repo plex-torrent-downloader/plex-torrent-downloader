@@ -127,7 +127,7 @@ export default function AddTorrentModal(props: Props) {
                                         type="text"
                                         value={hash}
                                         onChange={(e) => setHash(e.target.value)}
-                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none dark:focus:ring-offset-gray-800 focus:ring-2 focus:ring-blue-500"
                                     />
                                 </td>
                             </tr>
@@ -137,7 +137,7 @@ export default function AddTorrentModal(props: Props) {
                                     <select
                                         value={collection ?? ''}
                                         onChange={(e) => setCollection(e.target.value)}
-                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-1/2 px-3 py-2 border rounded focus:outline-none dark:focus:ring-offset-gray-800 focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="" disabled>Select an Option</option>
                                         {props.collections?.map((collection, index) => (

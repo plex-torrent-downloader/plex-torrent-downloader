@@ -70,15 +70,15 @@ export default function GenericTorrent(props: Props) {
     const getButtonStyles = (action: Action) => {
         if (action.className) return action.className;
 
-        const baseStyles = "w-full inline-flex justify-center items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors";
+        const baseStyles = "w-full inline-flex justify-center items-center px-4 py-2 text-sm font-medium rounded-md dark:focus:ring-offset-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors";
 
         switch (action.variant) {
             case 'success':
-                return `${baseStyles} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500`;
+                return `${baseStyles} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:focus:ring-offset-gray-800`;
             case 'danger':
-                return `${baseStyles} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`;
+                return `${baseStyles} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:focus:ring-offset-gray-800`;
             default:
-                return `${baseStyles} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`;
+                return `${baseStyles} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 dark:focus:ring-offset-gray-800`;
         }
     };
 
