@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Links, Meta, useLoaderData, useLocation, useSearchParams, Link } from '@remix-run/react';
-import { Sun, Moon, ChevronUp, Menu, X, Download, Search, Settings, Grid, Calendar, PlayCircle, History } from 'lucide-react';
+import { Form, Links, Meta, useLoaderData, useLocation, useSearchParams, Link, useTransition } from '@remix-run/react';
+import { Sun, Moon, ChevronUp, Menu, X, Download, Search, Settings, Grid, Calendar, PlayCircle, History, Loader2 } from 'lucide-react';
 
 export default function Document({ children }) {
     const location = useLocation();
+    const transition = useTransition();
     const loaderData = useLoaderData();
     const [searchParams] = useSearchParams();
     const [isMobile, setIsMobile] = useState(false);
@@ -11,6 +12,11 @@ export default function Document({ children }) {
     const [query, setQuery] = useState(searchParams.get('q') || '');
     const [isDark, setIsDark] = useState(false);
     const currentUrl = location.pathname;
+
+    // Close sidebar on route change
+    useEffect(() => {
+        setSidebarOpen(false);
+    }, [location.pathname]);
 
     // Check for dark mode preference on mount
     useEffect(() => {
@@ -95,24 +101,29 @@ export default function Document({ children }) {
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 } ${!isMobile ? 'lg:relative' : ''}`}
             >
-                {/* Logo section with integrated dark mode toggle */}
                 <div className="flex h-16 items-center justify-between px-4 border-b border-blue-500/30">
                     <div className="flex items-center space-x-3">
                         <a href="/" className="flex items-center space-x-3 text-white">
                             <Download className="h-8 w-8 rotate-[-15deg]" />
-                            <span className="text-lg font-semibold">Plex Downloader</span>
                         </a>
-                        <button
-                            onClick={toggleDarkMode}
-                            className="p-1.5 rounded-lg text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
-                            aria-label="Toggle dark mode"
-                        >
-                            {isDark ? (
-                                <Sun className="h-5 w-5" />
-                            ) : (
-                                <Moon className="h-5 w-5" />
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={toggleDarkMode}
+                                className="p-1.5 rounded-lg text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
+                                aria-label="Toggle dark mode"
+                            >
+                                {isDark ? (
+                                    <Sun className="h-5 w-5" />
+                                ) : (
+                                    <Moon className="h-5 w-5" />
+                                )}
+                            </button>
+                            {transition.state !== "idle" && (
+                                <div className="text-white">
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                </div>
                             )}
-                        </button>
+                        </div>
                     </div>
                     <button
                         onClick={() => setSidebarOpen(false)}
@@ -175,7 +186,9 @@ export default function Document({ children }) {
                                     type="submit"
                                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-blue-600 dark:bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200"
                                 >
-                                    Search
+                                    {transition.state !== "idle" && transition.location.pathname === '/search' ? (
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                    ) : <>Search</>}
                                 </button>
                             </div>
                         </Form>

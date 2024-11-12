@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate, Link } from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { WebTorrent } from "~/contracts/WebTorrentInterface";
 import { useEffect, useState } from "react";
@@ -69,13 +69,13 @@ export default function Queue() {
               <Plus className="mr-2 h-4 w-4" />
               Add
             </button>
-            <a
-                href="/history"
+            <Link
+                to="/history"
                 className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               <History className="mr-2 h-4 w-4" />
               Download History
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -132,12 +132,12 @@ export default function Queue() {
                   No torrents are downloading right now
                 </p>
                 <div className="mt-6">
-                  <a
-                      href="/search"
+                  <Link
+                      to="/search"
                       className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Search for torrents
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

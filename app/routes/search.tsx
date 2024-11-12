@@ -1,4 +1,4 @@
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import {Link, useLoaderData, useSearchParams} from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
@@ -116,7 +116,6 @@ export default function Search() {
           </div>
         </div>
 
-        {/* Recent Searches Card */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
             <h6 className="text-sm font-medium text-blue-600 dark:text-blue-400">Recent Searches</h6>
@@ -128,12 +127,12 @@ export default function Search() {
                     className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
                 >
                   <div className="flex items-center gap-3">
-                    <a
-                        href={`/search?q=${encodeURIComponent(rs.searchTerm)}`}
+                    <Link
+                        to={`/search?q=${encodeURIComponent(rs.searchTerm)}`}
                         className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                     >
                       {rs.searchTerm}
-                    </a>
+                    </Link>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       {moment(rs.updatedAt).fromNow()}
                     </span>

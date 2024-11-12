@@ -1,4 +1,4 @@
-import {Form, useLoaderData} from "@remix-run/react";
+import {Form, Link, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
 import { Settings } from '@prisma/client';
 import {db} from '../db.server';
@@ -173,14 +173,15 @@ export default function Setup() {
                   </div>
 
                   {settings.settings && (
-                      <button
-                          type="button"
-                          onClick={() => window.location.href = '/reset'}
-                          className="inline-flex items-center rounded-md border border-red-600 dark:border-red-500 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                      >
-                        <PowerOff className="h-4 w-4 mr-2" />
-                        Hard Reset
-                      </button>
+                      <Link to="/reset">
+                        <button
+                            type="button"
+                            className="inline-flex items-center rounded-md border border-red-600 dark:border-red-500 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                        >
+                          <PowerOff className="h-4 w-4 mr-2" />
+                          Hard Reset
+                        </button>
+                      </Link>
                   )}
 
                   <button

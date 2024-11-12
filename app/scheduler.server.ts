@@ -32,7 +32,6 @@ export default new class Scheduler {
         });
 
         for (const result of results) {
-            console.log(result);
             const searchQuery = this.createSearchQuery(result);
             const searchResults = await search.searchThroughEngine(searchQuery, result.engine as SearchEngine);
             if (!searchResults.length) {

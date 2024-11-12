@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import {Link, useLoaderData, useNavigate} from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useState } from "react";
 import { db } from "~/db.server";
@@ -122,13 +122,13 @@ export default function History() {
           <h1 className="text-2xl font-bold dark:text-white text-gray-900 mb-4 sm:mb-0">
             Download History
           </h1>
-          <a
-              href="/queue"
+          <Link
+              to="/queue"
               className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <Download className="mr-2 h-4 w-4" />
             Download Queue
-          </a>
+          </Link>
         </div>
 
         {/* Content */}
@@ -163,12 +163,12 @@ export default function History() {
                   Start by downloading some torrents
                 </p>
                 <div className="mt-6">
-                  <a
-                      href="/search"
+                  <Link
+                      to="/search"
                       className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Start Downloading
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
