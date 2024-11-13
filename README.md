@@ -23,6 +23,7 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
 #### Torrent Search Services
  - 1377x.to
  - nyaa.si
+ - The Pirate Bay
 
 ### Screenshots
 [![Search Results](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)

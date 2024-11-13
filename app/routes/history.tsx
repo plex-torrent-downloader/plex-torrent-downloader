@@ -68,7 +68,7 @@ export default function History() {
 
   async function deleteHistoryItem(result: Downloaded) {
     try {
-      await axios.delete('/actions/delete/download-history-item/' + (result.id));
+      await axios.delete('/history/' + (result.id));
       navigate(".", { replace: true });
     } catch (e) {
       console.error(e);

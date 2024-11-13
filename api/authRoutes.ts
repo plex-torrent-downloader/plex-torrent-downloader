@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { db } from '../db.server';
+import { db } from '../app/db.server';
 
 export async function auth(req: Request, res: Response, next: NextFunction) {
     const settings = await db.settings.findUnique({

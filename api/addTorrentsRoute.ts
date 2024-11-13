@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import torrents from '../torrents.server';
+import torrents from '../app/torrents.server';
 
 async function addTorrents(req: Request, res: Response, next: NextFunction) {
     try {
