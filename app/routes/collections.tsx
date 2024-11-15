@@ -2,7 +2,6 @@ import {Form, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
 import {db} from '../db.server';
 import {useState} from "react";
-import fs from '../fs.server';
 import axios from "axios";
 import Modal from '../components/Modal';
 import { Plus, Trash2, Save, FolderOpen } from 'lucide-react';
@@ -14,69 +13,6 @@ export function meta(args) {
     viewport: "width=device-width,initial-scale=1",
   };
 }
-
-
-export const action = async ({request, context}) => {
-  const { settings } = context;
-  const formData = await request.json();
-  const { collections } = formData;
-
-  for (const collection of collections) {
-    try {
-      await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
-    } catch(e) {
-      return json({
-        error: `Invalid FS location: ${collection.location}`
-      }, 500);
-    }
-  }
-
-  const existingCollections = await db.collections.findMany();
-  const existingIds = new Set(existingCollections.map(c => c.id));
-
-  const operations = [];
-
-  for (const collection of collections) {
-    if (collection.id && existingIds.has(collection.id)) {
-      operations.push(
-          db.collections.update({
-            where: { id: collection.id },
-            data: {
-              name: collection.name,
-              location: collection.location
-            }
-          })
-      );
-      existingIds.delete(collection.id);
-    } else {
-      // Create new collection
-      operations.push(
-          db.collections.create({
-            data: {
-              name: collection.name,
-              location: collection.location
-            }
-          })
-      );
-    }
-  }
-
-  if (existingIds.size > 0) {
-    operations.push(
-        db.collections.deleteMany({
-          where: {
-            id: {
-              in: Array.from(existingIds)
-            }
-          }
-        })
-    );
-  }
-
-  await db.$transaction(operations);
-
-  return json({});
-};
 
 export const loader: LoaderFunction = async (input) => {
   const collections = await db.collections.findMany();
@@ -113,6 +49,10 @@ export default function Collections() {
       });
       setShowSuccess(true);
     } catch(e) {
+      if (e.response?.data?.error) {
+        setError(e.response.data.error);
+        return;
+      }
       setError(e.toString());
     }
   }
@@ -176,7 +116,7 @@ export default function Collections() {
         {error && (
             <Modal title="Error" onClose={() => setError(null)}>
               <div className="space-y-4">
-                <h5 className="text-lg font-medium text-gray-900">An Error occurred:</h5>
+                <h5 className="text-lg font-medium text-gray-900 dark:text-white">An Error occurred:</h5>
                 <p className="text-red-600">{error}</p>
                 <p className="text-sm text-gray-500">Are you sure that all paths are correct?</p>
               </div>

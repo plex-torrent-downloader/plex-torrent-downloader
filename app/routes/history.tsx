@@ -25,7 +25,6 @@ export function meta(args) {
 export const loader: LoaderFunction = async () => {
   const downloaded = await db.downloaded.findMany({
     orderBy: [{ id: 'desc' }],
-    take: 50
   });
   return json({
     downloaded

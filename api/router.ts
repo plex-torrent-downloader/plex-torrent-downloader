@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import {auth, logout} from "./authRoutes";
 import addTorrents from "./addTorrentsRoute";
 import torrents from "../app/torrents.server";
+import collections from './collections';
 import { db } from '../app/db.server';
 const router = Router();
 
@@ -10,6 +11,7 @@ router.use(auth);
 router.use(addTorrents);
 
 router.get('/logout', logout);
+router.use('/collections', collections);
 
 router.post('/add', async (req: Request, res: Response, next: NextFunction) => {
     let postData = '';
