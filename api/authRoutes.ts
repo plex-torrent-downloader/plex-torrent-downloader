@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from '../app/db.server';
+import {PTDRequest} from "~/contracts/PTDRequest";
 
-export async function auth(req: Request, res: Response, next: NextFunction) {
+export async function auth(req: PTDRequest, res: Response, next: NextFunction) {
     const settings = await db.settings.findUnique({
         where: { id: 1 }
     });
-    (req as any).settings = settings;
+    req.settings = settings;
 
     if (['/login', '/setup'].indexOf(req.path.toLowerCase()) !== -1) {
         return next(null);

@@ -2,6 +2,8 @@ import {WebTorrent} from "~/contracts/WebTorrentInterface";
 import {db} from './db.server';
 import webtorrent from "./webtorrent.server";
 import {Torrent} from "webtorrent";
+import {sendMessage} from "../api/socketio";
+
 class torrentsManager {
 
     trackers:string[] = [
@@ -111,6 +113,7 @@ class torrentsManager {
         }
 
         torrent.destroy();
+        sendMessage('Torrent Stopped', `${torrent?.name} has been stopped and removed from the queue.`);
     }
     async deleteTorrent(hash: string):Promise<void> {
         const torrent = (await this.torrents()).find(t => t.infoHash === hash);
@@ -120,6 +123,7 @@ class torrentsManager {
         }
 
         torrent.destroy({destroyStore: true});
+        sendMessage('Torrent Deleted', `${torrent?.name} has been deleted.`);
         try {
             await db.downloaded.update({
                 data: {
@@ -176,7 +180,10 @@ class torrentsManager {
                 }
             });
 
+            sendMessage('Download started', `Downloading ${torrent.name}`);
+
             torrent.on('done', async () => {
+                sendMessage('Download Complete', `${torrent.name} has finished downloading`);
                 await db.downloaded.update({
                     data: {
                         completedAt: new Date(),
@@ -193,7 +200,7 @@ class torrentsManager {
     async addInfohash(infoHash: string, path: string) {
         await this.addMagnet(`magnet:?xt=urn:btih:${infoHash}?` + this.trackers.map(tracker => `&tr=${encodeURIComponent(tracker)}`).join(''), path);
     }
-    async getSerialized() {
+    async getSerialized():Promise<WebTorrent[]> {
         return (await this.torrents()).map(this.serialize);
     }
 }

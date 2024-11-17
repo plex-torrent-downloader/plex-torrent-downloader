@@ -11,12 +11,12 @@ import {
 import {json, LoaderFunction} from "@remix-run/node";
 import Document from "~/components/Document";
 import styles from "~/styles/tailwind.css";
+import QueueProvider from "~/contexts/QueueContext";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
 ];
 
-// IMPORTANT TO WORK WITH EXPRESS
 if (typeof window !== "undefined") {
   const hydratedPathname = window.location.pathname;
   window.__remixContext.url = hydratedPathname;
@@ -43,23 +43,22 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 };
 
 export default function App() {
-  return <Document>
-    <Outlet />
-    <ScrollRestoration />
-    <Scripts />
-    <LiveReload />
-  </Document>;
+  return <QueueProvider>
+    <Document>
+      <Outlet />
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </Document>
+  </QueueProvider>;
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
   return (
-      <Document>
-        <div className="alert alert-danger" role="alert" style={{backgroundColor: '#dc3545', color: 'white'}}>
-          <h1 className="alert-heading">Application Error</h1>
-          <hr style={{borderTop: '1px solid white'}}/>
-          <pre className="mb-0">{error.message}</pre>
-        </div>
-      </Document>
+    <Document>
+      <h1>App Error</h1>
+      <pre>{error.message}</pre>
+    </Document>
   );
 }
 

@@ -1,13 +1,14 @@
-import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { WebTorrent } from "~/contracts/WebTorrentInterface";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Modal from "~/components/Modal";
 import axios from "axios";
 import WebTorrentComponent from '../components/WebTorrent';
 import { History, Plus } from 'lucide-react';
 import AddTorrentModal from "~/components/AddTorrentModal";
 import { db } from '~/db.server';
+import {useSocket} from "~/contexts/QueueContext";
 
 export function meta(args) {
   return {
@@ -24,18 +25,16 @@ export const loader: LoaderFunction = async ({ context }) => {
 };
 
 export default function Queue() {
-  const { torrents, collections, settings } = useLoaderData();
+  const ld = useLoaderData();
   const [showTorrentModal, setShowTorrentModal] = useState<boolean>(false);
   const [error, setError] = useState<string | Error>(null);
-  const navigate = useNavigate();
+  const { collections, settings } = ld;
+  const [torrents, setTorrents] = useState<WebTorrent[]>(ld.torrents);
+  const socketData = useSocket();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      navigate(".", { replace: true });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
+    setTorrents(socketData.torrents);
+  }, [socketData.torrents]);
 
   async function remove(torrent: WebTorrent, permaDelete: boolean) {
     try {
@@ -79,7 +78,6 @@ export default function Queue() {
           </div>
         </div>
 
-        {/* Error Modal */}
         {error && (
             <Modal
                 title="Error"
@@ -91,7 +89,6 @@ export default function Queue() {
             </Modal>
         )}
 
-        {/* Torrents Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {torrents.map((result: WebTorrent) => (
               <WebTorrentComponent
@@ -107,7 +104,6 @@ export default function Queue() {
           ))}
         </div>
 
-        {/* Empty State */}
         {!torrents.length && (
             <div className="mt-8 rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="text-center">
