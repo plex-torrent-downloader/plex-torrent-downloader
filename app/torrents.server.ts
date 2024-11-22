@@ -100,7 +100,12 @@ class torrentsManager {
         "http://bvarf.tracker.sh:2086/announce",
         "http://bittorrent-tracker.e-n-c-r-y-p-t.net:1337/announce",
         "udp://open.stealth.si:80/announce",
-        "udp://tracker.opentrackr.org:1337/announce"
+        "udp://tracker.opentrackr.org:1337/announce",
+        "udp://public.popcorn-tracker.org:6969/announce",
+        "udp://tracker.dler.org:6969/announce",
+        "udp://tracker.cyberia.is:6969/announce",
+        "udp://exodus.desync.com:6969",
+        "udp://open.demonii.com:1337/announce",
     ];
     async torrents():Promise<Torrent[]> {
         return (await webtorrent())?.torrents;

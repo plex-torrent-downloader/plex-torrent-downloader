@@ -1,8 +1,6 @@
 import axios from "axios";
-import cheerio from "cheerio";
 import {Torrent} from "~/search.server";
-import parallel from 'async/parallel';
-
+import TorrentsManager from './torrents.server';
 export interface TPBTorrent {
     id: string
     name: string
@@ -16,6 +14,12 @@ export interface TPBTorrent {
     status: string
     category: string
     imdb: string
+}
+
+function getMagnet(torrent: TPBTorrent): string {
+    return 'magnet:?xt=urn:btih:'+torrent.info_hash+'&dn='+encodeURIComponent(torrent.name) + TorrentsManager.trackers.reduce((acc, tracker) => {
+        return `&tr=${encodeURIComponent(tracker)}${acc}`;
+    }, '');
 }
 
 export default async function search(term: string):Promise<Torrent[]> {
@@ -45,9 +49,9 @@ export default async function search(term: string):Promise<Torrent[]> {
 
         return {
             fileSize: formatFileSize(+t.size),
-            hash: t.info_hash,
+            hash: t.info_hash.toUpperCase(),
             leechers: +t.leechers,
-            magnet: "",
+            magnet: getMagnet(t),
             name: t.name,
             seeders: +t.seeders
         }
