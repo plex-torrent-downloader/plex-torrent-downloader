@@ -4,7 +4,8 @@ import { json, LoaderFunction, ActionFunction } from '@remix-run/node';
 import { db } from '~/db.server';
 import Modal from '~/components/Modal';
 import search from "~/search.server";
-import { Calendar, Edit2, Trash2, Plus, Check, X, PlayCircle, Search as SearchIcon } from 'lucide-react';
+import { Edit2, Trash2, Plus, Check, Search as SearchIcon } from 'lucide-react';
+import moment from "moment";
 
 export const loader: LoaderFunction = async () => {
     const scheduledDownloads = await db.scheduledDownloads.findMany({
@@ -307,12 +308,30 @@ export default function ScheduledDownloads() {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                {/* ... (keep existing th elements but update their classes) */}
-                                {/* Example of updated th: */}
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Search Term
                                 </th>
-                                {/* ... repeat for other th elements */}
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Search Engine
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Season
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Episode
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Day of Week
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Last Download
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Active?
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Actions
+                                </th>
                             </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -332,6 +351,9 @@ export default function ScheduledDownloads() {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {daysOfWeek[download.dayOfWeek]}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        {download.lastDownloaded ? moment(download.lastDownloaded).fromNow() : 'Never'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium

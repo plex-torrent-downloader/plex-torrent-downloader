@@ -1,5 +1,5 @@
 import GenericTorrent from "~/components/GenericTorrent";
-import {WebTorrent} from "../contracts/WebTorrentInterface";
+import type { WebTorrent } from "../contracts/WebTorrentInterface";
 interface Props {
     torrent: WebTorrent;
     onSoftDelete: () => Promise<void>;

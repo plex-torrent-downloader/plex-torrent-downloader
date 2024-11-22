@@ -1,11 +1,9 @@
-// socketio.server.ts
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { parse } from 'cookie';
 import jwt from "jsonwebtoken";
 import {db} from "../app/db.server";
 import torrents from "../app/torrents.server";
-import {setIn} from "immutable";
 
 let io: Server;
 
