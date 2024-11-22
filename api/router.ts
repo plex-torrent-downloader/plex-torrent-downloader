@@ -5,7 +5,9 @@ import addTorrents from "./addTorrentsRoute";
 import torrents from "../app/torrents.server";
 import collections from './collections';
 import { db } from '../app/db.server';
+import {PTDRequest} from "~/contracts/PTDRequest";
 const router = Router();
+import {sendMessage} from "./socketio";
 
 router.use(auth);
 router.use(addTorrents);
@@ -13,7 +15,7 @@ router.use(addTorrents);
 router.get('/logout', logout);
 router.use('/collections', collections);
 
-router.post('/add', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/add', async (req: PTDRequest, res: Response, next: NextFunction) => {
     let postData = '';
     req.on('data', chunk => {
         postData += chunk.toString();
@@ -21,6 +23,13 @@ router.post('/add', async (req: Request, res: Response, next: NextFunction) => {
     req.on('end', async () => {
         try {
             const { hash, path, magnet } = JSON.parse(postData);
+            if (req.torrents.find(t => t.hash.toUpperCase() === hash.toUpperCase())) {
+                sendMessage('Error', 'This torrent is already downloading.');
+                return res.status(400).json({
+                    success: false,
+                    error: "Torrent already downloading"
+                });
+            }
             if (magnet) {
                 await torrents.addMagnet(magnet, path);
             } else {

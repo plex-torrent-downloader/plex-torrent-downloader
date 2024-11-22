@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {Link} from "@remix-run/react";
 
 interface Props {
     torrent: {
@@ -23,6 +24,7 @@ export default function AddTorrentModal(props: Props) {
     const { torrent } = props;
     const [collection, setCollection] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState<boolean>(false);
+    const [error, setError] = useState<string|null>(null);
     const [hash, setHash] = useState<string>(props.torrent.hash);
 
     const path: string | null = collection
@@ -34,18 +36,22 @@ export default function AddTorrentModal(props: Props) {
     const isButtonDisabled = !path || hash.length !== 40;
 
     async function submit() {
-        await fetch('/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                hash,
-                path,
-                magnet: torrent?.magnet
-            }),
-        });
-        setShowSuccess(true);
+        try {
+            await fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    hash,
+                    path,
+                    magnet: torrent?.magnet
+                }),
+            });
+            setShowSuccess(true);
+        } catch (e) {
+            setError(e?.response?.toString() || e.message);
+        }
     }
 
     // Backdrop
@@ -55,6 +61,36 @@ export default function AddTorrentModal(props: Props) {
             onClick={props.onClose}
         />
     );
+
+    if (error) {
+        return <>
+            {modalBackdrop}
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-semibold">Error</h3>
+                            <button
+                                onClick={props.onClose}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <span className="text-2xl">&times;</span>
+                            </button>
+                        </div>
+                        <h5 className="text-lg mb-6">There was an error processing this request: {error}</h5>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => { setError(null); }}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    }
 
     if (showSuccess) {
         return (
@@ -74,12 +110,11 @@ export default function AddTorrentModal(props: Props) {
                             </div>
                             <h5 className="text-lg mb-6">The torrent is now downloading.</h5>
                             <div className="flex justify-end">
-                                <button
-                                    onClick={() => { window.location.href = "/queue"; }}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                >
-                                    Open Download Queue
-                                </button>
+                                <Link to="/queue">
+                                    <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                                        Open Download Queue
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
