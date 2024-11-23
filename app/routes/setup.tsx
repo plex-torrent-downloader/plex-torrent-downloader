@@ -8,11 +8,24 @@ import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import jwt from "../jwt.server";
 import search from '../search.server';
-import { Save, LogOut, PowerOff } from 'lucide-react';
+import { Save, LogOut, PowerOff, Check, X } from 'lucide-react';
+import { exec as cpExec } from 'child_process';
+import { promisify } from 'util';
+
+async function checkFFmpeg(): Promise<boolean> {
+  const exec = promisify(cpExec);
+  try {
+    await exec('which ffmpeg');
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 type LoaderData = {
   settings?: Settings;
   searchEngines: string[];
+  ffmpegInstalled?: boolean;
 };
 
 export function meta(args) {
@@ -84,7 +97,8 @@ export const action = async ({request, context}) => {
 export const loader: LoaderFunction = async ({ context }) => {
   const { settings } = context;
   const searchEngines = search.getSearchEngines();
-  return json({settings, searchEngines});
+  const ffmpegInstalled = await checkFFmpeg();
+  return json({settings, searchEngines, ffmpegInstalled});
 };
 
 export default function Setup() {
@@ -127,7 +141,7 @@ export default function Setup() {
               </div>
           )}
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
               <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
                 <h2 className="text-lg font-medium text-blue-600 dark:text-blue-400">System Settings</h2>
@@ -154,7 +168,7 @@ export default function Setup() {
                           onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)}
                           className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Save Download History</span>
+                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Save Download History and enable video playback</span>
                     </label>
                   </div>
 
@@ -192,6 +206,40 @@ export default function Setup() {
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow min-h-[200px]">
+                <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                  <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                    Transcoding
+                  </h2>
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-center space-x-3">
+                    {settings?.ffmpegInstalled ? (
+                        <>
+                          <div className="flex-shrink-0">
+                            <Check className="w-5 h-5 text-green-500" />
+                          </div>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            FFmpeg is installed
+                          </p>
+                        </>
+                    ) : (
+                        <>
+                          <div className="flex-shrink-0">
+                            <X className="w-5 h-5 text-red-500" />
+                          </div>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            FFmpeg is not installed
+                          </p>
+                        </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

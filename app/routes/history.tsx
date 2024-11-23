@@ -146,6 +146,11 @@ export default function History() {
                       name: 'Delete History Item',
                       action: () => deleteHistoryItem(result),
                       className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                    },
+                    {
+                      name: 'Watch',
+                      action: () => navigate(`/watch/${result.hash}`),
+                      className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
                     }
                   ]}
               />

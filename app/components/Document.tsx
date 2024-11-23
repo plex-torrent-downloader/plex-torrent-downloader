@@ -201,7 +201,7 @@ export default function Document({ children }) {
                         </header>
 
                         {/* Main content */}
-                        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-8 transition-colors duration-200">
+                        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
                             {children}
                         </main>
                     </div>

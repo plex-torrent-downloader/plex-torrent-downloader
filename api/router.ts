@@ -1,5 +1,4 @@
-import { Router } from 'express';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, Router } from 'express';
 import {auth, logout} from "./authRoutes";
 import addTorrents from "./addTorrentsRoute";
 import torrents from "../app/torrents.server";
@@ -8,12 +7,14 @@ import { db } from '../app/db.server';
 import {PTDRequest} from "~/contracts/PTDRequest";
 const router = Router();
 import {sendMessage} from "./socketio";
+import transcode from "./transcode";
 
 router.use(auth);
 router.use(addTorrents);
 
 router.get('/logout', logout);
 router.use('/collections', collections);
+router.use('/transcode', transcode);
 
 router.post('/add', async (req: PTDRequest, res: Response, next: NextFunction) => {
     let postData = '';

@@ -12,7 +12,6 @@ export default function DownloadHistoryTorrrent(props: Props) {
     return <GenericTorrent
         name={torrent.name}
         isSearchResult={true}
-        // background={getRowColor(torrent)}
         status={getStatus(torrent)}
         actions={props.actions}
         timestamp={moment(props.torrent.createdAt)}
@@ -35,17 +34,4 @@ export function getStatus(downloaded: Downloaded): string {
         return 'Deleted';
     }
     return 'Downloading';
-}
-
-
-function getRowColor(downloaded: Downloaded): string {
-    switch(getStatus(downloaded)) {
-        case 'Completed':
-            return 'linear-gradient(90deg, rgba(13,163,8,1) 0%, rgba(13,163,8,1) 20%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 100%);';
-        case 'Deleted':
-            return 'linear-gradient(90deg, rgba(245,18,0,1) 0%, rgba(245,18,0,1) 20%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 100%);';
-        case 'Downloading':
-        default:
-            return 'linear-gradient(90deg, rgba(245,154,0,1) 0%, rgba(245,154,0,1) 20%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 100%);';
-    }
 }
