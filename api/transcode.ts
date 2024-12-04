@@ -3,10 +3,11 @@ import { Request, Response, NextFunction } from 'express';
 import { db } from '../app/db.server';
 import fs from 'fs';
 import path from 'path';
-import child_process from 'child_process';
+import child_process, {exec as cpExec} from 'child_process';
 import { randomUUID } from 'crypto';
 import os from 'os';
 import {sendMessage} from "./socketio";
+import {promisify} from "util";
 
 const router = Router();
 
@@ -37,6 +38,16 @@ const streamMP4 = (videoPath: string, req: Request, res: Response) => {
         fs.createReadStream(videoPath).pipe(res);
     }
 };
+
+async function checkFFmpeg(): Promise<boolean> {
+    const exec = promisify(cpExec);
+    try {
+        await exec('which ffmpeg');
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 
 // @ts-ignore
 router.get('/:hash', async (req: Request, res: Response, next: NextFunction) => {
@@ -75,6 +86,13 @@ router.get('/:hash', async (req: Request, res: Response, next: NextFunction) => 
             streamMP4(videoPath, req, res);
         } else {
             // Convert and stream other video formats
+            if (!await checkFFmpeg()) {
+                sendMessage("FFmpeg is not installed", "Please install FFmpeg to transcode videos.");
+                return res.status(500).json({
+                    success: false,
+                    error: "FFmpeg is not installed"
+                });
+            }
             const tempDir = os.tmpdir();
             const tempFileName = `${randomUUID()}.mp4`;
             const tempFilePath = path.join(tempDir, tempFileName);
