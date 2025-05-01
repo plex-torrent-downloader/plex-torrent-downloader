@@ -14,3 +14,6 @@
 
 ## Settings
 [![Settings](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/settings.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/settings.png)
+
+## Scheduled Downloads
+[![Scheduled Downloads](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/scheduled_downloads.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/scheduled_downloads.png.png)
