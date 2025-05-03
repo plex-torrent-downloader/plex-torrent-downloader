@@ -11,14 +11,15 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
 
 #### Unique Features
 
- - JWT / Bcrypted Password Auth built in
+ - JWT / Bcrypt Password Auth built in
  - Download History
  - Search History, including query history
  - Ability to manage download locations via collections
  - Ability to abort torrents, and either keep or delete the downloaded data
  - Will stream first episode first, second episode second and so on
  - Search History shows up in search, so you won't download the same thing twice
- - Download Scheduler (Automatic Download new episodes)
+ - Download Scheduler (Automatically Download new episodes)
+ - Full coverage cypress tests with type checking throughout the codebase
 
 #### Torrent Search Services
  - 1377x.to
@@ -47,7 +48,9 @@ curl https://raw.githubusercontent.com/plex-torrent-downloader/installers/master
 - Clone this repository: `git clone git@github.com:plex-torrent-downloader/plex-torrent-downloader.git`
 - CD Into directory `cd plex-torrent-downloader`
 - Install NPM packages `npm i`
+- Setup env file `cp .env.example .env`
 - Build the Database `npx prisma migrate deploy`
+- Generate Prisma Client `npx prisma generate`
 - To run for development, `npm run build && npm run start` HMR is temporarily unavailable
 - OR to build the app for production `npm run build`
 - then run  `npm run start`
