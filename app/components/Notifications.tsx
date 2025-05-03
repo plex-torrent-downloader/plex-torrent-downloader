@@ -52,6 +52,7 @@ export default function NotificationToasts() {
         <div className="fixed bottom-4 right-4 left-4 lg:left-auto lg:w-96 z-50 flex flex-col gap-2">
             {notifications.map((notification) => (
                 <div
+                    data-testid="notification"
                     key={notification.id}
                     className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 transform transition-all duration-300 ease-in-out animate-slide-in"
                 >

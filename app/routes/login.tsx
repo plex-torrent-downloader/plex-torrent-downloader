@@ -21,8 +21,6 @@ export const action = async ({request, context}) => {
     throw new Error("No settings defined");
   }
 
-  console.log(settings)
-
   if (!settings?.password) {
     return null;
   }

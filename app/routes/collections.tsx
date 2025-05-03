@@ -168,6 +168,7 @@ export default function Collections() {
                           </div>
                           {collections.length > 1 && (
                               <button
+                                  data-testid="deleteCollection"
                                   type="button"
                                   onClick={(e) => setDelete(e, index)}
                                   className="rounded-full p-2 text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"

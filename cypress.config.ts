@@ -14,6 +14,23 @@ const tasks = {
         return null;
     },
 
+    async clearScheduledDownloads(): Promise<null> {
+        await db.scheduledDownloads.deleteMany();
+        await db.collections.deleteMany();
+        await db.collections.create({
+            data: {
+                name: "Movies",
+                location: "[content_root]/tmp"
+            }
+        });
+        return null;
+    },
+
+    async clearHistory(): Promise<null> {
+        await db.downloaded.deleteMany();
+        return null;
+    },
+
     async setSettings(password) {
         await db.settings.deleteMany();
         await db.settings.create({
@@ -43,12 +60,18 @@ const tasks = {
         return downloaded;
     },
 
-    async clearScheduledDownloads(): Promise<null> {
+    async stageCollectionsForDelete(): Promise<null> {
         await db.scheduledDownloads.deleteMany();
         await db.collections.deleteMany();
         await db.collections.create({
             data: {
                 name: "Movies",
+                location: "[content_root]/tmp"
+            }
+        });
+        await db.collections.create({
+            data: {
+                name: "Collection 2",
                 location: "[content_root]/tmp"
             }
         });
@@ -58,6 +81,11 @@ const tasks = {
     async getSettings():Promise<Settings> {
         const settings = await db.settings.findFirst()
         return settings;
+    },
+
+    async getDownloadHistory():Promise<Downloaded[]> {
+        const downloaded = await db.downloaded.findMany();
+        return downloaded;
     },
 
     async getAllCollections(): Promise<Collections[]> {

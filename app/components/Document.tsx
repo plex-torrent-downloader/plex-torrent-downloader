@@ -143,6 +143,7 @@ export default function Document({ children }) {
                             <div className="space-y-1">
                                 {navItems.map((item) => (
                                     <Link
+                                        data-testid={`sidebar-${item.label.replace(/\s+/g, '')}`}
                                         key={item.path}
                                         to={item.path}
                                         className={`flex items-center space-x-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
@@ -165,6 +166,7 @@ export default function Document({ children }) {
                         <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 shadow-sm transition-colors duration-200">
                             <div className="flex h-16 items-center gap-4 px-4">
                                 <button
+                                    data-testid="sidebarToggle"
                                     onClick={() => setSidebarOpen(true)}
                                     className="lg:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"
                                 >

@@ -114,6 +114,7 @@ export default function GenericTorrent(props: Props) {
                         <div className="space-y-2">
                             {actions.map((action, index) => (
                                 <button
+                                    data-testid={"torrent-action" + action.name}
                                     key={index}
                                     onClick={() => {
                                         action.action();

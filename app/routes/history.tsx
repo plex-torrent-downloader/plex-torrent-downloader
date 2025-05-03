@@ -49,7 +49,7 @@ export default function History() {
       });
       torrent.completedAt = null;
       torrent.deletedAt = null;
-      setAlertMessage("The torrent is queued to download or reseed. It may take some time before the torrent shows up in your download manager.");
+      setAlertMessage("The torrent is queued to download or reseed.");
     } catch (e) {
       setError(e.toString());
     }

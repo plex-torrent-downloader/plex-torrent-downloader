@@ -159,45 +159,39 @@ class torrentsManager {
         }
     }
 
-    async addMagnet(magnet: string, path: string) {
-        const wt = await webtorrent();
-        wt.add(magnet, { path }, (async (torrent) => {
-            const {saveDownloadHistory} = await db.settings.findFirst();
-            if (!saveDownloadHistory) {
-                return;
-            }
-            const {id} = await db.downloaded.upsert({
-                where: {
-                    hash: torrent.infoHash
-                },
-                create: {
-                    name: torrent.name,
-                    hash: torrent.infoHash,
-                    pathOnDisk: path
-                },
-                update: {
-                    deletedAt: null,
-                    completedAt: torrent.progress ? new Date() : null,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }
-            });
-
-            sendMessage('Download started', `Downloading ${torrent.name}`);
-
-            torrent.on('done', async () => {
-                sendMessage('Download Complete', `${torrent.name} has finished downloading`);
-                await db.downloaded.update({
-                    data: {
-                        completedAt: new Date(),
-                        deletedAt: null
-                    },
-                    where: {
-                        id
+    async addMagnet(magnet: string, path: string): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            const wt = await webtorrent();
+            wt.add(magnet, { path }, (async (torrent) => {
+                try {
+                    const {saveDownloadHistory} = await db.settings.findFirst();
+                    sendMessage('Download started', `Downloading ${torrent.name}`);
+                    if (!saveDownloadHistory) {
+                        resolve();
+                        return;
                     }
-                })
-            });
-        }).bind(this));
+                    const {id} = await db.downloaded.upsert({
+                        where: {
+                            hash: torrent.infoHash
+                        },
+                        create: {
+                            name: torrent.name,
+                            hash: torrent.infoHash,
+                            pathOnDisk: path
+                        },
+                        update: {
+                            deletedAt: null,
+                            completedAt: torrent.progress ? new Date() : null,
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        }
+                    });
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            }).bind(this));
+        });
     }
 
     async addInfohash(infoHash: string, path: string) {

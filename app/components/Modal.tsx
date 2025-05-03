@@ -85,6 +85,7 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
                                     {title}
                                 </h3>
                                 <button
+                                    data-testid="modal-close"
                                     type="button"
                                     className="ml-3 rounded-md bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
                                     onClick={onClose}
