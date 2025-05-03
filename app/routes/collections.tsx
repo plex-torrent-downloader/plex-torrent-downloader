@@ -145,6 +145,7 @@ export default function Collections() {
                         <div key={index} className="flex items-center gap-4">
                           <div className="flex-1">
                             <input
+                                data-testid="collectionName"
                                 type="text"
                                 value={collection.name}
                                 placeholder="Collection Name"
@@ -156,6 +157,7 @@ export default function Collections() {
                             <div className="relative">
                               <FolderOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                               <input
+                                  data-testid="collectionLocation"
                                   type="text"
                                   value={collection.location}
                                   placeholder="Filesystem Path"
@@ -179,6 +181,7 @@ export default function Collections() {
 
                   <div className="mt-6 flex justify-center">
                     <button
+                        data-testid="addCollection"
                         type="button"
                         onClick={addCollection}
                         className="inline-flex items-center rounded-full bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -196,6 +199,7 @@ export default function Collections() {
                 </div>
                 <div className="p-4">
                   <button
+                      data-testid="saveCollections"
                       type="submit"
                       className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >

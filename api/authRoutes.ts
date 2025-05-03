@@ -4,9 +4,7 @@ import { db } from '../app/db.server';
 import {PTDRequest} from "~/contracts/PTDRequest";
 
 export async function auth(req: PTDRequest, res: Response, next: NextFunction) {
-    const settings = await db.settings.findUnique({
-        where: { id: 1 }
-    });
+    const settings = await db.settings.findFirst();
     req.settings = settings;
 
     if (['/login', '/setup'].indexOf(req.path.toLowerCase()) !== -1) {

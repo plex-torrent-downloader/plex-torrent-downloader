@@ -151,6 +151,7 @@ export default function Setup() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Plex Content Root</label>
                     <input
+                        data-testid="plexContentRoot"
                         type="text"
                         name="fileSystemRoot"
                         value={fileSystemRoot}
@@ -162,6 +163,7 @@ export default function Setup() {
                   <div className="flex items-center">
                     <label className="flex items-center">
                       <input
+                          data-testid="saveDownloadHistory"
                           type="checkbox"
                           name="saveDownloadHistory"
                           checked={saveDownloadHistory}
@@ -178,6 +180,7 @@ export default function Setup() {
                     </label>
                     <input type="hidden" value="admin" name="username" />
                     <input
+                        data-testid="password"
                         type="password"
                         name="password"
                         value={password}
@@ -255,6 +258,7 @@ export default function Setup() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Search Engine</label>
                     <select
+                        data-testid="searchEngine"
                         name="searchEngine"
                         value={searchEngine}
                         onChange={(e) => setSearchEngine(e.target.value)}
@@ -288,6 +292,7 @@ export default function Setup() {
                 </div>
                 <div className="p-4">
                   <button
+                      data-testid="saveSettings"
                       type="submit"
                       className="inline-flex w-full justify-center items-center rounded-md border border-transparent bg-blue-600 dark:bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                   >

@@ -59,6 +59,7 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
         <>
             {/* Backdrop */}
             <div
+                data-testid="modal-backdrop"
                 className="fixed inset-0 bg-black/50 transition-opacity z-40"
                 onClick={onClose}
                 aria-hidden="true"
@@ -66,6 +67,7 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
 
             {/* Modal */}
             <div
+                data-testid="modal"
                 className="fixed inset-0 z-50 overflow-y-auto"
                 role="dialog"
                 aria-modal="true"

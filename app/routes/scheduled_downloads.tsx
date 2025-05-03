@@ -167,6 +167,7 @@ export default function ScheduledDownloads() {
                                         <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                                     </div>
                                     <input
+                                        data-testid="searchTerm"
                                         type="text"
                                         name="searchTerm"
                                         value={formData.searchTerm}
@@ -184,6 +185,7 @@ export default function ScheduledDownloads() {
                                     Search Engine
                                 </label>
                                 <select
+                                    data-testid="engine"
                                     name="engine"
                                     value={formData.engine}
                                     onChange={handleInputChange}
@@ -203,6 +205,7 @@ export default function ScheduledDownloads() {
                                     Season Number
                                 </label>
                                 <input
+                                    data-testid="seasonNumber"
                                     type="number"
                                     name="seasonNumber"
                                     value={formData.seasonNumber}
@@ -219,6 +222,7 @@ export default function ScheduledDownloads() {
                                     Episode Number
                                 </label>
                                 <input
+                                    data-testid="episodeNumber"
                                     type="number"
                                     name="episodeNumber"
                                     value={formData.episodeNumber}
@@ -235,6 +239,7 @@ export default function ScheduledDownloads() {
                                     Day of Week
                                 </label>
                                 <select
+                                    data-testid="dayOfWeek"
                                     name="dayOfWeek"
                                     value={formData.dayOfWeek}
                                     onChange={handleInputChange}
@@ -254,6 +259,7 @@ export default function ScheduledDownloads() {
                                     Collection
                                 </label>
                                 <select
+                                    data-testid="collection"
                                     name="collectionId"
                                     value={formData.collectionId}
                                     onChange={handleInputChange}
@@ -274,6 +280,7 @@ export default function ScheduledDownloads() {
                         <div className="relative flex items-start mb-6">
                             <div className="flex items-center h-5">
                                 <input
+                                    data-testid="isActive"
                                     type="checkbox"
                                     name="isActive"
                                     checked={formData.isActive}
@@ -289,6 +296,7 @@ export default function ScheduledDownloads() {
 
                         {/* Submit Button */}
                         <button
+                            data-testid="submit"
                             type="submit"
                             className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800"
                         >

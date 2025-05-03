@@ -130,6 +130,7 @@ export default function GenericTorrent(props: Props) {
             )}
 
             <div
+                data-testid="torrent"
                 className={`${getVariantStyles()} cursor-pointer group hover:scale-[1.01]`}
                 onClick={click}
             >

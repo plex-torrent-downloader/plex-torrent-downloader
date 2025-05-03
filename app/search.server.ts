@@ -23,7 +23,7 @@ export interface Torrent {
 class Search {
     public async search(q: string): Promise<SearchResults[]> {
         await this.saveSearch(q);
-        const {cacheSearchResults, searchEngine} = await db.settings.findUnique({where: {id : 1}});
+        const {cacheSearchResults, searchEngine} = await db.settings.findFirst();
         if (cacheSearchResults) {
             let findInDb = await this.findInDb(q, searchEngine as SearchEngine);
             if (findInDb) {

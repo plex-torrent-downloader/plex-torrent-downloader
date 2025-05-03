@@ -162,9 +162,7 @@ class torrentsManager {
     async addMagnet(magnet: string, path: string) {
         const wt = await webtorrent();
         wt.add(magnet, { path }, (async (torrent) => {
-            const {saveDownloadHistory} = await db.settings.findUnique({
-                where: {id: 1}
-            });
+            const {saveDownloadHistory} = await db.settings.findFirst();
             if (!saveDownloadHistory) {
                 return;
             }

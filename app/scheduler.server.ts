@@ -42,7 +42,7 @@ export default new class Scheduler {
                 continue;
             }
             const magnet:string = searchResults[0].magnet;
-            const Settings = await db.settings.findUnique({where: {id: 1}});
+            const Settings = await db.settings.findFirst();
             const pathOnDisk = collection.location.replace('[content_root]', Settings.fileSystemRoot);
             torrents.addMagnet(magnet, pathOnDisk);
             await db.scheduledDownloads.update({

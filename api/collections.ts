@@ -18,7 +18,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
                 try {
                     await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
                 } catch(e) {
-                    throw new Error(`Invalid FS location: ${collection.location}`);
+                    throw new Error(`Invalid FS location: ${collection.location}: ${e.message}`);
                 }
             }
 
