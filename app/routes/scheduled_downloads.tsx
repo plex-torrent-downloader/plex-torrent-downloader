@@ -375,6 +375,7 @@ export default function ScheduledDownloads() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         <div className="flex space-x-2">
                                             <button
+                                                data-testid="edit"
                                                 onClick={() => setEditingId(download.id)}
                                                 className="text-amber-600 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400"
                                             >
@@ -385,6 +386,7 @@ export default function ScheduledDownloads() {
                                                 <input type="hidden" name="_action" value="delete" />
                                                 <input type="hidden" name="id" value={download.id} />
                                                 <button
+                                                    data-testid="delete"
                                                     type="submit"
                                                     className="text-red-600 dark:text-red-500 hover:text-red-900 dark:hover:text-red-400"
                                                 >

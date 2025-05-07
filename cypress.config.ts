@@ -49,15 +49,64 @@ const tasks = {
         await db.downloaded.deleteMany();
         await db.downloaded.create({
             data: {
-                name: 'Mulan',
-                hash: '1234567890',
-                pathOnDisk: '/downloads/mulan.torrent',
+                name: 'edubuntu-24.04.2-desktop-amd64.iso',
+                hash: '8f082230ceac2695b11b5617a574ea76f4f2d411',
+                pathOnDisk: '/tmp',
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                completedAt: new Date(),
             }
         });
         const downloaded = await db.downloaded.findMany()
         return downloaded;
+    },
+
+    async setCache(): Promise<null> {
+        await db.searchResults.deleteMany();
+        await db.searchResults.create({
+            data: {
+                searchTerm: 'Ubuntu',
+                searchEngine: 'The Pirate Bay',
+                name: 'edubuntu-24.04.2-desktop-amd64.iso',
+                hash: '8f082230ceac2695b11b5617a574ea76f4f2d411',
+                magnet: 'magnet:?xt=urn:btih:8f082230ceac2695b11b5617a574ea76f4f2d411&dn=edubuntu-24.04.2-desktop-amd64.iso',
+                seeders: 100,
+                leechers: 10,
+                fileSize: "1000000000",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }
+        });
+        await db.collections.deleteMany();
+        await db.collections.create({
+            data: {
+                name: "Movies",
+                location: "[content_root]/tmp"
+            }
+        });
+        return null;
+    },
+
+    async setScheduledDownloads(): Promise<null> {
+        await db.scheduledDownloads.deleteMany();
+        await db.collections.deleteMany();
+        const collection = await db.collections.create({
+            data: {
+                name: "Movies",
+                location: "[content_root]/tmp"
+            }
+        });
+        await db.scheduledDownloads.create({
+            data: {
+                searchTerm: 'Mulan',
+                engine: '1377x.to',
+                seasonNumber: 1,
+                episodeNumber: 1,
+                dayOfWeek: 1,
+                collectionId: collection.id
+            }
+        });
+        return null;
     },
 
     async stageCollectionsForDelete(): Promise<null> {
@@ -91,6 +140,11 @@ const tasks = {
     async getAllCollections(): Promise<Collections[]> {
         const collections = await db.collections.findMany()
         return collections;
+    },
+
+    async getAllScheduledDownloads(): Promise<ScheduledDownloads[]> {
+        const scheduledDownloads = await db.scheduledDownloads.findMany()
+        return scheduledDownloads;
     },
 };
 
