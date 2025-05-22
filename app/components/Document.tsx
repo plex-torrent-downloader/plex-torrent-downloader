@@ -17,6 +17,10 @@ export default function Document({ children }) {
     const currentUrl = location.pathname;
 
     const { torrents } = useSocket();
+    const totalPercent = torrents.reduce((acc, torrent) => {
+        return acc + torrent.percent;
+    }, 0);
+    const percent = totalPercent / torrents.length;
 
     useEffect(() => {
         setQueueCount(torrents.length);
@@ -100,7 +104,6 @@ export default function Document({ children }) {
                     />
                 )}
 
-                    {/* Sidebar */}
                     <aside
                         className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-900 dark:to-blue-950 transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
                             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -141,28 +144,51 @@ export default function Document({ children }) {
                         {/* Navigation */}
                         <nav className="flex-1 overflow-y-auto px-2 py-4">
                             <div className="space-y-1">
-                                {navItems.map((item) => (
-                                    <Link
-                                        data-testid={`sidebar-${item.label.replace(/\s+/g, '')}`}
-                                        key={item.path}
-                                        to={item.path}
-                                        className={`flex items-center space-x-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-                                            isActive(item.path)
-                                                ? 'bg-white/10 text-white'
-                                                : 'text-gray-100 hover:bg-white/10'
-                                        }`}
-                                    >
-                                        <item.icon className="h-5 w-5 flex-shrink-0" />
-                                        <span className="truncate">{item.label}</span>
-                                    </Link>
-                                ))}
+                                {navItems.map((item) => {
+                                    if (item.path === '/queue' && percent > 0) {
+                                        return (
+                                            <Link
+                                                data-testid={`sidebar-${item.label.replace(/\s+/g, '')}`}
+                                                key={item.path}
+                                                to={item.path}
+                                                className={`relative flex items-center space-x-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors overflow-hidden ${
+                                                    isActive(item.path)
+                                                        ? 'text-white'
+                                                        : 'text-gray-100 hover:bg-white/10'
+                                                }`}
+                                                style={{
+                                                    background: isActive(item.path)
+                                                        ? `linear-gradient(to right, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.15) ${percent}%, rgba(255,255,255,0.05) ${percent}%, rgba(255,255,255,0.05) 100%)`
+                                                        : `linear-gradient(to right, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) ${percent}%, transparent ${percent}%, transparent 100%)`
+                                                }}
+                                            >
+                                                <item.icon className="h-5 w-5 flex-shrink-0 relative z-10" />
+                                                <span className="truncate relative z-10">{item.label}</span>
+                                            </Link>
+                                        );
+                                    }
+
+                                    return (
+                                        <Link
+                                            data-testid={`sidebar-${item.label.replace(/\s+/g, '')}`}
+                                            key={item.path}
+                                            to={item.path}
+                                            className={`flex items-center space-x-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                isActive(item.path)
+                                                    ? 'bg-white/10 text-white'
+                                                    : 'text-gray-100 hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <item.icon className="h-5 w-5 flex-shrink-0" />
+                                            <span className="truncate">{item.label}</span>
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         </nav>
                     </aside>
 
-                    {/* Main content wrapper */}
                     <div className="flex-1 flex flex-col min-w-0">
-                        {/* Top bar */}
                         <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 shadow-sm transition-colors duration-200">
                             <div className="flex h-16 items-center gap-4 px-4">
                                 <button
@@ -173,7 +199,6 @@ export default function Document({ children }) {
                                     <Menu className="h-6 w-6" />
                                 </button>
 
-                                {/* Search bar */}
                                 <Form
                                     method="GET"
                                     action="/search"
@@ -204,7 +229,6 @@ export default function Document({ children }) {
                             </div>
                         </header>
 
-                        {/* Main content */}
                         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
                             {children}
                         </main>
