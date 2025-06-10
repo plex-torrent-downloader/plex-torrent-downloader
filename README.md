@@ -19,10 +19,10 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
  - Will stream first episode first, second episode second and so on
  - Search History shows up in search, so you won't download the same thing twice
  - Download Scheduler (Automatically Download new episodes)
- - Full coverage cypress tests with type checking throughout the codebase
+ - Full coverage cypress tests with type checking throughout the codebase``
 
 #### Torrent Search Services
- - 1377x.to
+ - 1377x.to``
  - nyaa.si
  - The Pirate Bay
 
@@ -64,6 +64,33 @@ Click on the "Add torrent" button and enter the magnet URL or the path to the to
 Wait for the download to finish. The downloaded files should appear in the specified directory.
 
 Click on the "Add to Plex" button to add the downloaded files to a Plex library.
+
+# Docker Setup
+
+## Quick Start
+
+1. **Update paths in `docker-compose.yml`**
+
+   Edit the volume paths to match your media directories:
+   ```yaml
+   volumes:
+     - "/path/to/your/movies:/mount"
+   ```
+
+2. **Run the application**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the app**
+
+   Open `http://localhost:3000`
+
+## Configuration
+
+- **Different port**: Change `"3000:3000"` to `"8080:3000"` in docker-compose.yml
+- **View logs**: `docker-compose logs -f`
+- **Stop**: `docker-compose down`
 
 ### License
 This project is licensed under the terms of the MIT license. See the LICENSE file for details.
