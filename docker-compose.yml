@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  plex-torrent:
+    build: .
+    ports:
+      - "3001:3000"  # external:internal
+    volumes:
+      - "/mnt/external:/mount"
