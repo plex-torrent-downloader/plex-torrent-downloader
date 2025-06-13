@@ -188,6 +188,18 @@ class torrentsManager {
                             updatedAt: new Date()
                         }
                     });
+                    torrent.on('done', async () => {
+                        sendMessage('Download Complete', `${torrent.name} has finished downloading`);
+                        await db.downloaded.update({
+                            data: {
+                                completedAt: new Date(),
+                                deletedAt: null
+                            },
+                            where: {
+                                id
+                            }
+                        })
+                    });
                     resolve();
                 } catch (error) {
                     reject(error);
