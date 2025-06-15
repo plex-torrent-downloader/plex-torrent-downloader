@@ -18,6 +18,7 @@ interface LoaderData {
   collections: Collections[];
   settings: Settings;
   downloaded: string[];
+  searchEngine: string;
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -25,7 +26,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
   const hash = url.searchParams.get('hash');
-  const results = q ? await searchServer.search(q) : [];
+  const searchEngine = url.searchParams.get('engine') || settings?.searchEngine || 'The Pirate Bay';
+  const results = q ? await searchServer.search(q, searchEngine) : [];
   const collections = await db.collections.findMany();
   const recentSearches: RecentSearches[] = await db.recentSearches.findMany({
     orderBy: { updatedAt: 'desc' },
@@ -48,7 +50,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     hash,
     collections,
     settings,
-    downloaded
+    downloaded,
+    searchEngine
   });
 };
 
@@ -96,12 +99,15 @@ export default function Search() {
         </button>
 
         <div className="w-full">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col space-y-2 mb-4">
             <h4 className="text-lg font-medium text-gray-900 dark:text-white">
               {loaderData.results.length
                   ? `${loaderData.results.length} Search Results`
                   : (q.length ? `No results for "${q}"` : null)}
             </h4>
+            <h5 className="text-lg font-medium text-gray-900 dark:text-white">
+              Searching {loaderData.searchEngine}
+            </h5>
           </div>
 
           <div className="space-y-4">

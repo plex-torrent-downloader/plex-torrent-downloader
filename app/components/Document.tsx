@@ -10,10 +10,27 @@ export default function Document({ children }) {
     const loaderData = useLoaderData();
     const [queueCount, setQueueCount] = useState<number>(loaderData?.torrents?.length || 0);
     const [searchParams] = useSearchParams();
-    const [isMobile, setIsMobile] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [query, setQuery] = useState(searchParams.get('q') || '');
-    const [isDark, setIsDark] = useState(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
+    const [query, setQuery] = useState<string>(searchParams.get('q') || '');
+    const [isDark, setIsDark] = useState<boolean>(false);
+    const [searchEngineSelectOpen, setSearchEngineSelectOpen] = useState<boolean>(false);
+    const [currentEngine, setCurrentEngine] = useState<{ id: string, name: string } | null>(() => {
+        const searchEngineName = loaderData?.settings?.searchEngine;
+        if (searchEngineName) {
+            const id = Object.keys(loaderData?.searchEngines || {}).find(key => loaderData.searchEngines[key] === searchEngineName);
+            return {
+                id,
+                name: searchEngineName
+            };
+        }
+        const firstEngineId = Object.keys(loaderData?.searchEngines || {})[0];
+        return firstEngineId ? {
+            id: firstEngineId,
+            name: loaderData.searchEngines[firstEngineId]
+        } : null;
+    });
     const currentUrl = location.pathname;
 
     const { torrents } = useSocket();
@@ -21,6 +38,8 @@ export default function Document({ children }) {
         return acc + torrent.percent;
     }, 0);
     const percent = totalPercent / torrents.length;
+
+    const searchEngines = loaderData.searchEngines
 
     useEffect(() => {
         setQueueCount(torrents.length);
@@ -50,6 +69,23 @@ export default function Document({ children }) {
             return () => mediaQuery.removeEventListener('change', handler);
         }
     }, []);
+
+    const handleEngineSelect = (engineId: string) => {
+        const engineName = searchEngines[engineId];
+        setCurrentEngine({ id: engineId, name: engineName });
+        setSearchEngineSelectOpen(false);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchEngineSelectOpen && !(event.target as Element).closest('.search-dropdown')) {
+                setSearchEngineSelectOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [searchEngineSelectOpen]);
 
     // Update localStorage when dark mode changes
     const toggleDarkMode = () => {
@@ -204,26 +240,63 @@ export default function Document({ children }) {
                                     action="/search"
                                     className="flex flex-1 max-w-2xl mx-auto"
                                 >
-                                    <div className="relative w-full">
+                                    <div className="relative w-full search-dropdown">
                                         <input
                                             data-testid="searchInput"
                                             type="text"
                                             name="q"
                                             value={query}
                                             onChange={(e) => setQuery(e.target.value)}
-                                            placeholder={`Search ${loaderData?.settings?.searchEngine || ''}`}
-                                            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2 pl-10 pr-20 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
+                                            placeholder={`Search ${currentEngine?.name || 'torrents'}`}
+                                            className="w-full rounded-l-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2 pl-10 pr-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                                         />
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                                        <button
-                                            data-testid="searchButton"
-                                            type="submit"
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-blue-600 dark:bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-200"
-                                        >
-                                            {transition.state !== "idle" && transition.location.pathname === '/search' ? (
-                                                <Loader2 className="h-5 w-5 animate-spin" />
-                                            ) : <>Search</>}
-                                        </button>
+
+                                        <input type="hidden" name="engine" value={currentEngine?.name || ''} />
+
+                                        <div className="absolute right-0 top-0 h-full flex">
+                                            <button
+                                                data-testid="searchButton"
+                                                type="submit"
+                                                className="rounded-none bg-blue-600 dark:bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 border-r border-blue-500 dark:border-blue-400"
+                                            >
+                                                {transition.state !== "idle" && transition.location.pathname === '/search' ? (
+                                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                                ) : (
+                                                    <>Search <span className="hidden sm:inline">{currentEngine.name}</span> </>
+                                                )}
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setSearchEngineSelectOpen(!searchEngineSelectOpen)}
+                                                className="rounded-r-lg bg-blue-600 dark:bg-blue-500 px-3 py-2 text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
+                                            >
+                                                <ChevronUp className={`h-4 w-4 transition-transform duration-200 ${!searchEngineSelectOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                        </div>
+
+                                        {searchEngineSelectOpen && (
+                                            <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50">
+                                                {Object.entries(searchEngines).map(([engineId, engineName]) => (
+                                                    <button
+                                                        key={engineId}
+                                                        type="button"
+                                                        onClick={() => handleEngineSelect(engineId)}
+                                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg transition-colors ${
+                                                            engineId === currentEngine?.id
+                                                                ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                                                                : 'text-gray-700 dark:text-gray-300'
+                                                        }`}
+                                                    >
+                                                        {engineName}
+                                                        {engineId === currentEngine?.id && (
+                                                            <span className="float-right text-blue-600 dark:text-blue-400">✓</span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </Form>
                             </div>

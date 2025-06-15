@@ -1,6 +1,5 @@
 import type {
   LinksFunction,
-  MetaFunction,
 } from "@remix-run/node";
 import {
   LiveReload,
@@ -12,7 +11,7 @@ import {json, LoaderFunction} from "@remix-run/node";
 import Document from "~/components/Document";
 import styles from "~/styles/tailwind.css";
 import QueueProvider from "~/contexts/QueueContext";
-import { XCircle } from 'lucide-react';
+import { SearchEngine } from "~/search.server";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -39,7 +38,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     settings,
     url: request.url,
     q,
-    torrents
+    torrents,
+    searchEngines: SearchEngine
   });
 };
 

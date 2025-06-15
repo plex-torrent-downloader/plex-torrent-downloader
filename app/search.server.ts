@@ -21,18 +21,18 @@ export interface Torrent {
 }
 
 class Search {
-    public async search(q: string): Promise<SearchResults[]> {
+    public async search(q: string, searchEngine: SearchEngine): Promise<SearchResults[]> {
         await this.saveSearch(q);
-        const {cacheSearchResults, searchEngine} = await db.settings.findFirst();
+        const {cacheSearchResults} = await db.settings.findFirst();
         if (cacheSearchResults) {
-            let findInDb = await this.findInDb(q, searchEngine as SearchEngine);
+            let findInDb = await this.findInDb(q, searchEngine);
             if (findInDb) {
                 return findInDb;
             }
-            const results = await this.searchThroughEngine(q, searchEngine as SearchEngine);
-            return await this.saveResults(q, results, searchEngine as SearchEngine);
+            const results = await this.searchThroughEngine(q, searchEngine);
+            return await this.saveResults(q, results, searchEngine);
         }
-        return await this.searchThroughEngine(q, searchEngine as SearchEngine);
+        return await this.searchThroughEngine(q, searchEngine);
     }
 
     public async searchThroughEngine(q: string, engine: SearchEngine): Promise<SearchResults[]> {
