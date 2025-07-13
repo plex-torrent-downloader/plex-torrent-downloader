@@ -2,7 +2,7 @@ import {Link, useLoaderData, useSearchParams} from "@remix-run/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import AddTorrentModal from "~/components/AddTorrentModal";
-import { Torrent } from "../search.server";
+import {SearchEngine, Torrent} from "../search.server";
 import { db } from "~/db.server";
 import searchServer from "~/search.server";
 import { Collections, SearchResults, Settings, RecentSearches } from "@prisma/client";
@@ -26,8 +26,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
   const hash = url.searchParams.get('hash');
-  const searchEngine = url.searchParams.get('engine') || settings?.searchEngine || 'The Pirate Bay';
-  const results = q ? await searchServer.search(q, searchEngine) : [];
+  const searchEngine = url.searchParams.get('engine') || (settings as Settings)?.searchEngine || 'The Pirate Bay';
+  const results = q ? await searchServer.search(q, searchEngine as SearchEngine) : [];
   const collections = await db.collections.findMany();
   const recentSearches: RecentSearches[] = await db.recentSearches.findMany({
     orderBy: { updatedAt: 'desc' },
