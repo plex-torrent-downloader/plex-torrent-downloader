@@ -32,26 +32,31 @@ export default new class Scheduler {
         });
 
         for (const result of results) {
-            const searchQuery = this.createSearchQuery(result);
-            const searchResults = await search.searchThroughEngine(searchQuery, result.engine as SearchEngine);
-            if (!searchResults.length) {
-                continue;
-            }
-            const collection = await db.collections.findUnique({where: {id: result.collectionId}});
-            if (!collection) {
-                continue;
-            }
-            const magnet:string = searchResults[0].magnet;
-            const Settings = await db.settings.findFirst();
-            const pathOnDisk = collection.location.replace('[content_root]', Settings.fileSystemRoot);
-            torrents.addMagnet(magnet, pathOnDisk);
-            await db.scheduledDownloads.update({
-                where: {id: result.id},
-                data: {
-                    lastDownloaded: new Date(),
-                    episodeNumber: result.episodeNumber + 1
-                }
-            });
+            await this.searchForEpisode(result);
         }
+    }
+
+    async searchForEpisode(download: ScheduledDownloads): Promise<boolean> {
+        const searchQuery = this.createSearchQuery(download);
+        const searchResults = await search.searchThroughEngine(searchQuery, download.engine as SearchEngine);
+        if (!searchResults.length) {
+            return false;
+        }
+        const collection = await db.collections.findUnique({where: {id: download.collectionId}});
+        if (!collection) {
+            return false;
+        }
+        const magnet:string = searchResults[0].magnet;
+        const Settings = await db.settings.findFirst();
+        const pathOnDisk = collection.location.replace('[content_root]', Settings.fileSystemRoot);
+        await torrents.addMagnet(magnet, pathOnDisk);
+        await db.scheduledDownloads.update({
+            where: {id: download.id},
+            data: {
+                lastDownloaded: new Date(),
+                episodeNumber: download.episodeNumber + 1
+            }
+        });
+        return true;
     }
 }

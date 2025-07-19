@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useLoaderData, useActionData, Form } from '@remix-run/react';
+import {useLoaderData, useActionData, Form, useNavigate} from '@remix-run/react';
 import { json, LoaderFunction, ActionFunction } from '@remix-run/node';
 import { db } from '~/db.server';
 import Modal from '~/components/Modal';
 import search from "~/search.server";
-import { Edit2, Trash2, Plus, Check, Search as SearchIcon } from 'lucide-react';
+import { Edit2, Trash2, Plus, Check, Search as SearchIcon, Download, Loader } from 'lucide-react';
 import moment from "moment";
+import axios from "axios";
+import type { ScheduledDownloads } from '@prisma/client';
 
 export const loader: LoaderFunction = async () => {
     const scheduledDownloads = await db.scheduledDownloads.findMany({
@@ -49,9 +51,11 @@ export const action: ActionFunction = async ({ request }) => {
 export default function ScheduledDownloads() {
     const { scheduledDownloads, collections, searchEngines } = useLoaderData();
     const actionData = useActionData();
+    const navigate = useNavigate();
     const [editingId, setEditingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
+    const [downloadModal, setDownloadModal] = useState<[ScheduledDownloads, "loading"|"found"|"notfound"|"error"|null]>([null, null]);
 
     const [formData, setFormData] = useState({
         searchTerm: "",
@@ -107,6 +111,23 @@ export default function ScheduledDownloads() {
         }));
     };
 
+    async function downloadNextEpisode(download: ScheduledDownloads) {
+        const {id} = download;
+        setDownloadModal([download, 'loading']);
+        try {
+            const { data } = await axios.post(`/scheduled_downloads/download_next_episode/${id}`, {});
+            if (data.didDownloadEpisode) {
+                setDownloadModal([download, 'found']);
+                navigate(".", { replace: true });
+            } else {
+                setDownloadModal([download, 'notfound']);
+            }
+        } catch (error) {
+            console.error("Error downloading next episode:", error);
+            setDownloadModal([download, 'error']);
+        }
+    }
+
     const daysOfWeek = [
         "Sunday",
         "Monday",
@@ -116,6 +137,8 @@ export default function ScheduledDownloads() {
         "Friday",
         "Saturday",
     ];
+
+    const [downloading, downloadStatus] = downloadModal;
 
     return (
         <>
@@ -132,6 +155,26 @@ export default function ScheduledDownloads() {
                     <div className="flex items-start space-x-3">
                         <Check className="h-5 w-5 text-green-500" />
                         <p className="text-gray-600 dark:text-gray-300">{modalMessage}</p>
+                    </div>
+                </Modal>
+            )}
+
+            {downloadStatus && (
+                <Modal
+                    title="Download Next Episiode"
+                    onClose={() => setDownloadModal([null, null])}
+                >
+                    <div className="flex items-start space-x-3">
+                        {downloadStatus === 'loading' && <p className="text-gray-600 dark:text-gray-300">
+                          Searching for <i>{downloading.searchTerm}</i> Episode Season {downloading.seasonNumber} Episode {downloading.episodeNumber}...
+                          <Loader className="inline-block ml-2 h-5 w-5 text-blue-500 animate-spin" />
+                        </p>}
+                        {downloadStatus === 'found' && <>
+                            <Check className="h-5 w-5 text-green-500" />
+                            <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was found and is downloading right now.</p>
+                        </>}
+                        {downloadStatus === 'notfound' && <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was not found</p>}
+                        {downloadStatus === 'error' && <p className="text-red-600 dark:text-red-400">An error occurred while searching for episode {downloading.episodeNumber}.</p>}
                     </div>
                 </Modal>
             )}
@@ -378,6 +421,7 @@ export default function ScheduledDownloads() {
                                                 data-testid="edit"
                                                 onClick={() => setEditingId(download.id)}
                                                 className="text-amber-600 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400"
+                                                title="Edit Scheduled Download"
                                             >
                                                 <Edit2 className="h-5 w-5" />
                                             </button>
@@ -389,10 +433,20 @@ export default function ScheduledDownloads() {
                                                     data-testid="delete"
                                                     type="submit"
                                                     className="text-red-600 dark:text-red-500 hover:text-red-900 dark:hover:text-red-400"
+                                                    title="Delete Scheduled Download"
                                                 >
                                                     <Trash2 className="h-5 w-5" />
                                                 </button>
                                             </Form>
+
+                                            <button
+                                                data-testid="edit"
+                                                onClick={() => downloadNextEpisode(download)}
+                                                className="text-amber-600 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400"
+                                                title="Download Next Episode"
+                                            >
+                                                <Download className="h-5 w-5" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

@@ -39,7 +39,7 @@ export default function Document({ children }) {
     }, 0);
     const percent = totalPercent / torrents.length;
 
-    const searchEngines = loaderData.searchEngines
+    const searchEngines = loaderData?.searchEngines
 
     useEffect(() => {
         setQueueCount(torrents.length);
@@ -263,7 +263,7 @@ export default function Document({ children }) {
                                                 {transition.state !== "idle" && transition.location.pathname === '/search' ? (
                                                     <Loader2 className="h-5 w-5 animate-spin" />
                                                 ) : (
-                                                    <>Search <span className="hidden sm:inline">{currentEngine.name}</span> </>
+                                                    <>Search <span className="hidden sm:inline">{currentEngine?.name}</span> </>
                                                 )}
                                             </button>
 

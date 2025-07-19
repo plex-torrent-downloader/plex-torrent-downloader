@@ -5,9 +5,11 @@ import torrents from "../app/torrents.server";
 import collections from './collections';
 import { db } from '../app/db.server';
 import {PTDRequest} from "~/contracts/PTDRequest";
-const router = Router();
 import {sendMessage} from "./socketio";
 import transcode from "./transcode";
+import scheduledDownloadsRoutes from "./scheduledDownloads";
+
+const router = Router();
 
 router.use(auth);
 router.use(addTorrents);
@@ -15,6 +17,7 @@ router.use(addTorrents);
 router.get('/logout', logout);
 router.use('/collections', collections);
 router.use('/transcode', transcode);
+router.use('/scheduled_downloads', scheduledDownloadsRoutes);
 
 router.post('/add', async (req: PTDRequest, res: Response, next: NextFunction) => {
     let postData = '';
