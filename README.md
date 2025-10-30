@@ -34,7 +34,7 @@ This is a Node.js application that enables downloading torrent files and adding 
 [See More Screenshots](https://github.com/plex-torrent-downloader/plex-torrent-downloader/blob/master/screenshots.md)
 
 ### Technical Documentation
-[Technical Docs](hhttps://github.com/plex-torrent-downloader/plex-torrent-downloader/blob/master/TECHNICAL.md)
+[Technical Docs](https://github.com/plex-torrent-downloader/plex-torrent-downloader/blob/master/TECHNICAL.md)
 ### Installer Scripts
 
 We currently have an installer script for ubuntu. You can install this on ubuntu by running this command
