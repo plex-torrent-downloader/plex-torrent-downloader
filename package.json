@@ -15,23 +15,15 @@
     "dev:remix": "cross-env NODE_ENV=development binode --require ./mocks -- @remix-run/dev:remix dev",
     "format": "prettier --write .",
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "prisma migrate dev && prisma db seed",
     "start": "ts-node server.ts",
     "start:mocks": "binode --require ./mocks -- @remix-run/serve:remix-serve build",
-    "test": "vitest",
     "test:e2e:dev": "start-server-and-test dev http://localhost:3000 \"cypress open\"",
     "pretest:e2e:run": "npm run build",
     "test:e2e:run": "cross-env PORT=8811 start-server-and-test start:mocks http://localhost:8811 \"cypress run\"",
     "typecheck": "tsc -b && tsc -b cypress",
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
   },
-  "prettier": {},
-  "eslintIgnore": [
-    "/node_modules",
-    "/build",
-    "/public/build"
-  ],
   "dependencies": {
     "@prisma/client": "^4.16.2",
     "@remix-run/express": "^2.12.1",
@@ -78,8 +70,6 @@
     "msw": "^0.39.2",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.47",
-    "prettier": "2.6.1",
-    "prettier-plugin-tailwindcss": "^0.1.8",
     "prisma": "^4.16.2",
     "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.4.14",
@@ -90,7 +80,7 @@
     "vite-tsconfig-paths": "^3.4.1"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "prisma": {
     "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"

@@ -1,7 +1,20 @@
 # Plex Torrent Downloader
 
-This is a Node.js application that enables downloading torrent files and adding them to a Plex library. 
-The application uses Prisma as an ORM, Remix.js for server-side rendering, and WebTorrent for downloading torrents.
+This is a Node.js application that enables downloading torrent files and adding them to a Plex/Jellyfin library. 
+
+
+
+#### Unique Features
+
+- Supports Plex/Jellyfin or ANY media server that can read from a directory
+- Download Scheduler (Automatically Download new episodes)
+- Built in search for torrents
+- Slick UI (Tailwind) and mature codebase
+- Download or stream downloaded content directly from the webui (as a backup)
+- Search History, including query history
+- Search History shows up in search, so you won't download the same thing twice
+- Easy to secure webui with basic auth
+- Easy to modify the app for typescript developers
 
 #### Why Should I use this?
 
@@ -9,27 +22,19 @@ The application uses Prisma as an ORM, Remix.js for server-side rendering, and W
  - Keep your NAS organized (if you use collections!)
  - Designed for binge-watchers
 
-#### Unique Features
-
- - JWT / Bcrypt Password Auth built in
- - Download History
- - Search History, including query history
- - Ability to manage download locations via collections
- - Ability to abort torrents, and either keep or delete the downloaded data
- - Will stream first episode first, second episode second and so on
- - Search History shows up in search, so you won't download the same thing twice
- - Download Scheduler (Automatically Download new episodes)
- - Full coverage cypress tests with type checking throughout the codebase``
-
 #### Torrent Search Services
- - 1377x.to``
+ - 1377x.to
  - nyaa.si
  - The Pirate Bay
 
 ### Screenshots
 [![Search Results](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/search_results.png)
 
+
 [See More Screenshots](https://github.com/plex-torrent-downloader/plex-torrent-downloader/blob/master/screenshots.md)
+
+### Technical Documentation
+[Technical Docs](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/TECHNICAL.md)
 
 ### Installer Scripts
 
