@@ -19,15 +19,25 @@ describe('Download Queue', () => {
     cy.get('[data-testid="success-modal"]').should('exist')
         .contains('The torrent is now downloading.');
 
-    cy.task('getDownloadHistory').then((history) => {
-      const downloaded = history[0];
-      expect(history.length).to.equal(1);
-      expect(downloaded.name).to.equal('edubuntu-24.04.2-desktop-amd64.iso');
-      expect(downloaded.hash).to.equal('8f082230ceac2695b11b5617a574ea76f4f2d411');
-      expect(downloaded.pathOnDisk).to.equal('/tmp');
-      expect(downloaded.createdAt).to.exist;
-      expect(downloaded.updatedAt).to.exist;
-    });
+    // Wait for the torrent to be processed and added to download history
+    // Retry until history is populated (handles async processing)
+    const checkHistory = (retries = 0, maxRetries = 20) => {
+      cy.task('getDownloadHistory').then((history) => {
+        if (history.length === 0 && retries < maxRetries) {
+          cy.wait(500);
+          checkHistory(retries + 1, maxRetries);
+        } else {
+          const downloaded = history[0];
+          expect(history.length).to.equal(1);
+          expect(downloaded.name).to.equal('edubuntu-24.04.2-desktop-amd64.iso');
+          expect(downloaded.hash).to.equal('8f082230ceac2695b11b5617a574ea76f4f2d411');
+          expect(downloaded.pathOnDisk).to.equal('/tmp');
+          expect(downloaded.createdAt).to.exist;
+          expect(downloaded.updatedAt).to.exist;
+        }
+      });
+    };
+    checkHistory();
 
     cy.get('[data-testid="notification"]').should('exist')
         .contains('Downloading edubuntu-24.04.2-desktop-amd64.iso');

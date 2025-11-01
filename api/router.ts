@@ -35,9 +35,9 @@ router.post('/add', async (req: PTDRequest, res: Response, next: NextFunction) =
                 });
             }
             if (magnet) {
-                await torrents.addMagnet(magnet, path);
+                torrents.addMagnet(magnet, path);
             } else {
-                await torrents.addInfohash(hash, path);
+                torrents.addInfohash(hash, path);
             }
             res.json({ success: true });
         } catch (e) {
