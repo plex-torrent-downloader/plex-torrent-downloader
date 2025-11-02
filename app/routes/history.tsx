@@ -9,6 +9,7 @@ import axios from "axios";
 import DownloadHistoryTorrrent from "~/components/DownloadHistoryTorrrent";
 import { getStatus } from "~/components/DownloadHistoryTorrrent";
 import { Download, AlertCircle, InboxIcon } from 'lucide-react';
+import {useSocket} from "~/contexts/QueueContext";
 
 interface LoaderData {
   downloaded: Downloaded[];
@@ -35,6 +36,7 @@ export default function History() {
   const { downloaded } = useLoaderData() as unknown as LoaderData;
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { socket } = useSocket();
   const navigate = useNavigate();
 
   async function reseed(torrent: Downloaded) {
@@ -132,29 +134,39 @@ export default function History() {
 
         {/* Content */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {downloaded?.map((result: Downloaded) => (
-              <DownloadHistoryTorrrent
-                  key={result.id}
-                  torrent={result}
-                  actions={[
-                    {
+          {downloaded?.map((result: Downloaded) => {
+              const actions = [
+                  {
                       name: getStatus(result) === 'Completed' ? 'Re-Seed' : 'Restart Download',
                       action: () => reseed(result),
                       className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                    },
-                    {
+                  },
+                  {
                       name: 'Delete History Item',
                       action: () => deleteHistoryItem(result),
                       className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
-                    },
-                    {
+                  },
+                  {
                       name: 'Watch',
                       action: () => navigate(`/watch/${result.hash}`),
                       className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
-                    }
-                  ]}
+                  }
+              ];
+              if (result?.completedAt) {
+                  actions.push({
+                      name: 'Transcode to MKV',
+                      action: () => {
+                          socket.emit('transcodeToMkv', result);
+                      },
+                      className: 'w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                  })
+              }
+              return <DownloadHistoryTorrrent
+                  key={result.id}
+                  torrent={result}
+                  actions={actions}
               />
-          ))}
+          })}
         </div>
 
         {/* Empty State */}
