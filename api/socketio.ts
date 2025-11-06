@@ -4,6 +4,9 @@ import { parse } from 'cookie';
 import jwt from "jsonwebtoken";
 import {db} from "../app/db.server";
 import torrents from "../app/torrents.server";
+import {WebTorrent} from "~/contracts/WebTorrentInterface";
+import {transcodeToMkv} from "./transcodeToMkv";
+import {Downloaded} from "@prisma/client";
 
 let io: Server;
 
@@ -50,12 +53,19 @@ export function startSocketIo(server: HttpServer) {
         }
     });
 
+    io.on('connection', (socket) => {
+        socket.on('transcodeToMkv', async (torrent: WebTorrent|Downloaded) => {
+            transcodeToMkv(torrent, io);
+        });
+    });
+
     setInterval(async () => {
         io.emit('queue:update', await torrents.getSerialized());
     }, 1000);
 
     return io;
 }
+
 export function sendMessage(title: string, message: string):void {
     io?.emit('message', { title, message });
 }

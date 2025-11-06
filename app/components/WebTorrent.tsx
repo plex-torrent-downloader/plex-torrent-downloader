@@ -1,6 +1,8 @@
 import GenericTorrent, {Action} from "~/components/GenericTorrent";
 import type { WebTorrent } from "../contracts/WebTorrentInterface";
 import {useLoaderData, useNavigate} from "@remix-run/react";
+import { useSocket } from "~/contexts/QueueContext";
+
 interface Props {
     torrent: WebTorrent;
     onSoftDelete: () => Promise<void>;
@@ -11,6 +13,7 @@ export default function WebTorrent(props: Props) {
     let { torrent, onSoftDelete, onHardDelete } = props;
     const {settings} = useLoaderData();
     const navigate = useNavigate();
+    const { socket } = useSocket();
 
     const actions:Action[] = [
         {
@@ -22,21 +25,27 @@ export default function WebTorrent(props: Props) {
             name: 'Delete all Files',
             variant: 'danger',
             action: onHardDelete
-        },
-        {
-            name: 'Continue Downloading',
-            variant: 'success',
-            action: () => {}
-        },
+        }
     ];
 
-    if (settings?.saveDownloadHistory) {
+    if (torrent?.percent === 100) {
         actions.push({
-            name: 'Watch',
+            name: 'Transcode to MKV',
             variant: 'primary',
-            action: () => navigate(`/watch/${torrent.hash}`),
+            action: () => {
+                socket.emit('transcodeToMkv', torrent);
+            }
         });
+
+        if (settings?.saveDownloadHistory) {
+            actions.push({
+                name: 'Watch',
+                variant: 'primary',
+                action: () => navigate(`/watch/${torrent.hash}`),
+            });
+        }
     }
+
 
     return (
         <GenericTorrent

@@ -8,6 +8,7 @@ This is a Node.js application that enables downloading torrent files and adding 
 
 - Supports Plex/Jellyfin or ANY media server that can read from a directory
 - Download Scheduler (Automatically Download new episodes)
+- Transcoding features if ffmpeg is installed (with hardware acceleration support in beta)
 - Built in search for torrents
 - Slick UI (Tailwind) and mature codebase
 - Download or stream downloaded content directly from the webui (as a backup)
