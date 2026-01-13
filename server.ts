@@ -1,11 +1,18 @@
 import express from 'express';
 import { createRequestHandler } from '@remix-run/express';
-import * as remixBuild from './public/build/index.js';
+import type { ServerBuild } from '@remix-run/node';
+import * as remixBuildExports from './public/build/index.js';
 import cookieParser from 'cookie-parser';
 import router from './api/router';
 import { createServer } from 'http';
 import {startSocketIo} from "./api/socketio";
 import './app/scheduler.server';
+
+const remixBuild = {
+    ...remixBuildExports,
+    mode: process.env.NODE_ENV || 'production',
+    isSpaMode: false
+} as unknown as ServerBuild;
 
 const app = express();
 const httpServer = createServer(app);
@@ -18,7 +25,6 @@ startSocketIo(httpServer);
 
 app.all('*', createRequestHandler({
     build: remixBuild,
-    mode: process.env.NODE_ENV,
     getLoadContext(req) {
         return {
             settings: (req as any).settings,
