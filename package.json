@@ -1,7 +1,7 @@
 {
   "name": "remix-dl-94d4",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "description": "",
   "license": "",
   "sideEffects": false,
@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
     "setup": "prisma migrate dev && prisma db seed",
-    "start": "ts-node server.ts",
+    "start": "tsx server.ts",
     "start:mocks": "binode --require ./mocks -- @remix-run/serve:remix-serve build",
     "test:e2e:dev": "start-server-and-test dev http://localhost:3000 \"cypress open\"",
     "pretest:e2e:run": "npm run build",
@@ -51,7 +51,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "tiny-invariant": "^1.2.0",
-    "webtorrent": "^1.8.16"
+    "webtorrent": "^2.8.5"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.1.1",
@@ -75,6 +75,7 @@
     "tailwindcss": "^3.4.14",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^3.14.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.6.2",
     "vite": "^2.9.1",
     "vite-tsconfig-paths": "^3.4.1"
@@ -83,6 +84,6 @@
     "node": ">=18"
   },
   "prisma": {
-    "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   }
 }

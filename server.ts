@@ -1,6 +1,6 @@
 import express from 'express';
 import { createRequestHandler } from '@remix-run/express';
-import * as remixBuild from './build/index';
+import * as remixBuild from './public/build/index.js';
 import cookieParser from 'cookie-parser';
 import router from './api/router';
 import { createServer } from 'http';
