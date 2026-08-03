@@ -4,7 +4,7 @@ import {db} from '../db.server';
 import {useState} from "react";
 import axios from "axios";
 import Modal from '../components/Modal';
-import { Plus, Trash2, Save, FolderOpen } from 'lucide-react';
+import { Plus, Trash2, Save, FolderOpen, FolderPlus } from 'lucide-react';
 
 export function meta(args) {
   return {
@@ -38,23 +38,25 @@ export default function Collections() {
   const [collections, setCollections] = useState<Collection[]>(initData);
   const [error, setError] = useState<string>(null);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [missingPaths, setMissingPaths] = useState<string[]>([]);
 
-  async function submit(e) {
-    e.preventDefault();
+  async function saveCollections(createMissing = false) {
     try {
-      await axios({
-        method: 'POST',
-        url: '/collections',
-        data: { collections }
-      });
+      await axios.post('/collections', { collections, createMissing });
       setShowSuccess(true);
-    } catch(e) {
-      if (e.response?.data?.error) {
-        setError(e.response.data.error);
+    } catch(e: any) {
+      const missing = e.response?.data?.missingPaths;
+      if (missing?.length) {
+        setMissingPaths(missing);
         return;
       }
-      setError(e.toString());
+      setError(e.response?.data?.error ?? e.toString());
     }
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    await saveCollections(false);
   }
 
   function addCollection(e) {
@@ -104,6 +106,35 @@ export default function Collections() {
           <div className="space-y-2">
             <p className="text-red-600 dark:text-red-400">{error}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Are all paths correct?</p>
+          </div>
+        </Modal>
+      )}
+
+      {missingPaths.length > 0 && (
+        <Modal
+          title="Create Missing Directories?"
+          onClose={() => setMissingPaths([])}
+          buttons={[{
+            label: 'Create Directories',
+            variant: 'primary',
+            action: () => {
+              setMissingPaths([]);
+              void saveCollections(true);
+            }
+          }]}
+        >
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              The following directories do not exist on the server. Would you like to create them?
+            </p>
+            <ul className="space-y-1">
+              {missingPaths.map(path => (
+                <li key={path} className="flex items-center space-x-2 text-sm font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-md">
+                  <FolderPlus className="h-4 w-4 shrink-0 text-blue-500" />
+                  <span>{path}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </Modal>
       )}

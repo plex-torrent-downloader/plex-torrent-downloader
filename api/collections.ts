@@ -13,12 +13,26 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
             //@ts-ignore
             const settings = req.settings as Settings;
             const formData = JSON.parse(body);
-            const { collections } = formData;
+            const { collections, createMissing } = formData;
+
+            const missingPaths: string[] = [];
             for (const collection of collections) {
+                const resolved = collection.location.replace('[content_root]', settings.fileSystemRoot);
                 try {
-                    await fs.access(collection.location.replace('[content_root]', settings.fileSystemRoot));
-                } catch(e) {
-                    throw new Error(`Invalid FS location: ${collection.location}: ${e.message}`);
+                    await fs.access(resolved);
+                } catch {
+                    missingPaths.push(collection.location);
+                }
+            }
+
+            if (missingPaths.length > 0 && !createMissing) {
+                return res.status(422).json({ missingPaths });
+            }
+
+            if (missingPaths.length > 0 && createMissing) {
+                for (const location of missingPaths) {
+                    const resolved = location.replace('[content_root]', settings.fileSystemRoot);
+                    await fs.mkdir(resolved, { recursive: true });
                 }
             }
 
