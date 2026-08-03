@@ -1,5 +1,5 @@
 import {Form, useLoaderData} from "@remix-run/react";
-import {json, LoaderFunction, MetaFunction} from "@remix-run/node";
+import {json, LoaderFunction} from "@remix-run/node";
 import {db} from '../db.server';
 import {useState} from "react";
 import axios from "axios";
@@ -59,13 +59,7 @@ export default function Collections() {
 
   function addCollection(e) {
     e.preventDefault();
-    setCollections([
-      ...collections,
-      {
-        name: '',
-        location: ''
-      }
-    ]);
+    setCollections([...collections, { name: '', location: '' }]);
   }
 
   function setDelete(e, index: number) {
@@ -77,141 +71,128 @@ export default function Collections() {
 
   function setNameUpdate(e, index: number) {
     e.preventDefault();
-    const updatedCollections = [...collections];
-    updatedCollections[index] = {
-      ...updatedCollections[index],
-      name: e.target.value
-    };
-    setCollections(updatedCollections);
+    const updated = [...collections];
+    updated[index] = { ...updated[index], name: e.target.value };
+    setCollections(updated);
   }
 
   function setLocationUpdate(e, index: number) {
     e.preventDefault();
-    const updatedCollections = [...collections];
-    updatedCollections[index] = {
-      ...updatedCollections[index],
-      location: e.target.value
-    };
-    setCollections(updatedCollections);
+    const updated = [...collections];
+    updated[index] = { ...updated[index], location: e.target.value };
+    setCollections(updated);
   }
 
   return (
-      <>
-        {showSuccess && (
-            <Modal
-                title="Collections Updated"
-                onClose={() => setShowSuccess(false)}
-                buttons={[
-                  {
-                    label: 'Continue',
-                    action: () => { window.location.href = '/'; },
-                    class: 'inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-                  }
-                ]}
-            >
-              <h5 className="text-lg font-medium text-gray-900 dark:text-white">Collections saved successfully</h5>
-            </Modal>
-        )}
+    <>
+      {showSuccess && (
+        <Modal
+          title="Collections Updated"
+          onClose={() => setShowSuccess(false)}
+          buttons={[{
+            label: 'Continue',
+            action: () => { window.location.href = '/'; },
+            variant: 'primary'
+          }]}
+        >
+          <p className="text-gray-600 dark:text-gray-300">Collections saved successfully.</p>
+        </Modal>
+      )}
 
-        {error && (
-            <Modal title="Error" onClose={() => setError(null)}>
-              <div className="space-y-4">
-                <h5 className="text-lg font-medium text-gray-900 dark:text-white">An Error occurred:</h5>
-                <p className="text-red-600">{error}</p>
-                <p className="text-sm text-gray-500">Are you sure that all paths are correct?</p>
-              </div>
-            </Modal>
-        )}
+      {error && (
+        <Modal title="Error" onClose={() => setError(null)}>
+          <div className="space-y-2">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Are all paths correct?</p>
+          </div>
+        </Modal>
+      )}
 
-        <Form method="post" onSubmit={submit} className="p-6 max-w-7xl mx-auto">
-          <div className="space-y-6">
-            {/* Header */}
+      <Form method="post" onSubmit={submit} className="min-h-screen p-6">
+        <div className="space-y-6">
+
+          {/* Header */}
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Collections</h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Collections are places where you can quickly save content. For example: 'Movies' or 'TV Shows'
+                Collections are folders where downloaded content is saved, e.g. Movies or TV Shows.
               </p>
             </div>
+            <button
+              data-testid="saveCollections"
+              type="submit"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Collections
+            </button>
+          </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {/* Collections Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div className="border-b border-gray-200 px-4 py-3">
-                  <h2 className="text-lg font-medium text-blue-600">Collections</h2>
-                </div>
-                <div className="p-4">
-                  <div className="space-y-4">
-                    {collections.map((collection: Collection, index: number) => (
-                        <div key={index} className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <input
-                                data-testid="collectionName"
-                                type="text"
-                                value={collection.name}
-                                placeholder="Collection Name"
-                                onChange={(e) => setNameUpdate(e, index)}
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="relative">
-                              <FolderOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                              <input
-                                  data-testid="collectionLocation"
-                                  type="text"
-                                  value={collection.location}
-                                  placeholder="Filesystem Path"
-                                  onChange={(e) => setLocationUpdate(e, index)}
-                                  className="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                              />
-                            </div>
-                          </div>
-                          {collections.length > 1 && (
-                              <button
-                                  data-testid="deleteCollection"
-                                  type="button"
-                                  onClick={(e) => setDelete(e, index)}
-                                  className="rounded-full p-2 text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                              >
-                                <Trash2 className="h-5 w-5" />
-                              </button>
-                          )}
-                        </div>
-                    ))}
+          {/* Collections list */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Column labels */}
+            <div className="grid grid-cols-[1fr_1fr_2.5rem] gap-4 px-5 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Name</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Path</span>
+              <span />
+            </div>
+
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {collections.map((collection: Collection, index: number) => (
+                <div key={index} className="grid grid-cols-[1fr_1fr_2.5rem] gap-4 items-center px-5 py-3">
+                  <input
+                    data-testid="collectionName"
+                    type="text"
+                    value={collection.name}
+                    placeholder="e.g. Movies"
+                    onChange={(e) => setNameUpdate(e, index)}
+                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                  />
+                  <div className="relative">
+                    <FolderOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                    <input
+                      data-testid="collectionLocation"
+                      type="text"
+                      value={collection.location}
+                      placeholder="[content_root]/movies"
+                      onChange={(e) => setLocationUpdate(e, index)}
+                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400 pl-9"
+                    />
                   </div>
-
-                  <div className="mt-6 flex justify-center">
+                  {collections.length > 1 ? (
                     <button
-                        data-testid="addCollection"
-                        type="button"
-                        onClick={addCollection}
-                        className="inline-flex items-center rounded-full bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      data-testid="deleteCollection"
+                      type="button"
+                      onClick={(e) => setDelete(e, index)}
+                      className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      title="Remove collection"
                     >
-                      <Plus className="h-6 w-6" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
-                  </div>
+                  ) : (
+                    <div className="w-9" />
+                  )}
                 </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Tools Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div className="border-b border-gray-200 px-4 py-3">
-                  <h2 className="text-lg font-medium text-blue-600">Tools</h2>
-                </div>
-                <div className="p-4">
-                  <button
-                      data-testid="saveCollections"
-                      type="submit"
-                      className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Collections
-                  </button>
-                </div>
-              </div>
+            {/* Add row */}
+            <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+              <button
+                data-testid="addCollection"
+                type="button"
+                onClick={addCollection}
+                className="inline-flex items-center space-x-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add collection</span>
+              </button>
             </div>
           </div>
-        </Form>
-      </>
+
+        </div>
+      </Form>
+    </>
   );
 }

@@ -4,7 +4,7 @@ import { json, LoaderFunction, ActionFunction } from '@remix-run/node';
 import { db } from '~/db.server';
 import Modal from '~/components/Modal';
 import search from "~/search.server";
-import { Edit2, Trash2, Plus, Check, Search as SearchIcon, Download, Loader } from 'lucide-react';
+import { Edit2, Trash2, Plus, Check, Search as SearchIcon, Download, Loader, Info, Clock, Calendar, ChevronRight } from 'lucide-react';
 import moment from "moment";
 import axios from "axios";
 import type { ScheduledDownloads } from '@prisma/client';
@@ -53,7 +53,9 @@ export default function ScheduledDownloads() {
     const actionData = useActionData();
     const navigate = useNavigate();
     const [editingId, setEditingId] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showFormModal, setShowFormModal] = useState(false);
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [downloadModal, setDownloadModal] = useState<[ScheduledDownloads, "loading"|"found"|"notfound"|"error"|null]>([null, null]);
 
@@ -70,8 +72,9 @@ export default function ScheduledDownloads() {
     useEffect(() => {
         if (actionData?.success) {
             setEditingId(null);
+            setShowFormModal(false);
             setModalMessage(actionData.message);
-            setShowModal(true);
+            setShowSuccessModal(true);
         }
     }, [actionData]);
 
@@ -111,6 +114,21 @@ export default function ScheduledDownloads() {
         }));
     };
 
+    function openAddModal() {
+        setEditingId(null);
+        setShowFormModal(true);
+    }
+
+    function openEditModal(id: number) {
+        setEditingId(id);
+        setShowFormModal(true);
+    }
+
+    function closeFormModal() {
+        setEditingId(null);
+        setShowFormModal(false);
+    }
+
     async function downloadNextEpisode(download: ScheduledDownloads) {
         const {id} = download;
         setDownloadModal([download, 'loading']);
@@ -142,13 +160,13 @@ export default function ScheduledDownloads() {
 
     return (
         <>
-            {showModal && (
+            {showSuccessModal && (
                 <Modal
                     title="Success"
-                    onClose={() => setShowModal(false)}
+                    onClose={() => setShowSuccessModal(false)}
                     buttons={[{
                         label: 'Continue',
-                        action: () => setShowModal(false),
+                        action: () => setShowSuccessModal(false),
                         variant: 'primary'
                     }]}
                 >
@@ -159,55 +177,69 @@ export default function ScheduledDownloads() {
                 </Modal>
             )}
 
-            {downloadStatus && (
+            {showInfoModal && (
                 <Modal
-                    title="Download Next Episiode"
-                    onClose={() => setDownloadModal([null, null])}
+                    title="How the Scheduler Works"
+                    onClose={() => setShowInfoModal(false)}
                 >
-                    <div className="flex items-start space-x-3">
-                        {downloadStatus === 'loading' && <p className="text-gray-600 dark:text-gray-300">
-                          Searching for <i>{downloading.searchTerm}</i> Episode Season {downloading.seasonNumber} Episode {downloading.episodeNumber}...
-                          <Loader className="inline-block ml-2 h-5 w-5 text-blue-500 animate-spin" />
-                        </p>}
-                        {downloadStatus === 'found' && <>
-                            <Check className="h-5 w-5 text-green-500" />
-                            <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was found and is downloading right now.</p>
-                        </>}
-                        {downloadStatus === 'notfound' && <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was not found</p>}
-                        {downloadStatus === 'error' && <p className="text-red-600 dark:text-red-400">An error occurred while searching for episode {downloading.episodeNumber}.</p>}
-                    </div>
+                    <ul className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+                        <li className="flex items-start space-x-3">
+                            <Clock className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">Runs every 20 minutes</p>
+                                <p className="mt-0.5 text-gray-500 dark:text-gray-400">Each cycle checks which active schedules match today's day of the week.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start space-x-3">
+                            <Calendar className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">Day-of-week matching</p>
+                                <p className="mt-0.5 text-gray-500 dark:text-gray-400">A schedule only fires on its configured day — e.g. a Thursday schedule is skipped on all other days.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start space-x-3">
+                            <SearchIcon className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">Auto-formatted search query</p>
+                                <p className="mt-0.5 text-gray-500 dark:text-gray-400">The search term and episode info are combined into a standard format, e.g. <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">The Bear S03E01</code>.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start space-x-3">
+                            <Download className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">First result wins</p>
+                                <p className="mt-0.5 text-gray-500 dark:text-gray-400">The top result from the selected search engine is downloaded to the configured collection's folder.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start space-x-3">
+                            <ChevronRight className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">Auto-increments episode number</p>
+                                <p className="mt-0.5 text-gray-500 dark:text-gray-400">After a successful download, the episode number advances by 1 so the next run picks up the following episode automatically.</p>
+                            </div>
+                        </li>
+                    </ul>
                 </Modal>
             )}
 
-            <div className="min-h-screen p-6 space-y-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Scheduled Downloads</h1>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Manage your scheduled downloads here
-                    </p>
-                </div>
-
-                {/* Add/Edit Form Card */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                    <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-                        <h2 className="text-lg font-medium text-blue-600 dark:text-blue-400">
-                            {editingId ? "Edit" : "Add"} Scheduled Download
-                        </h2>
-                    </div>
-
-                    <Form method="post" className="p-4">
+            {showFormModal && (
+                <Modal
+                    title={editingId ? "Edit Scheduled Download" : "Add Scheduled Download"}
+                    onClose={closeFormModal}
+                    className="max-w-2xl"
+                >
+                    <Form method="post" className="space-y-4">
                         <input type="hidden" name="_action" value={editingId ? "update" : "create"} />
                         {editingId && <input type="hidden" name="id" value={editingId} />}
 
-                        <div className="grid gap-6 mb-6 md:grid-cols-2">
-                            {/* Search Term */}
+                        <div className="grid gap-4 md:grid-cols-2">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Search Term
                                 </label>
                                 <div className="relative rounded-md shadow-sm">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                        <SearchIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                     </div>
                                     <input
                                         data-testid="searchTerm"
@@ -215,16 +247,15 @@ export default function ScheduledDownloads() {
                                         name="searchTerm"
                                         value={formData.searchTerm}
                                         onChange={handleInputChange}
-                                        className="block w-full pl-10 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                        placeholder="Enter search term"
+                                        className="block w-full pl-9 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                        placeholder="e.g. The Bear"
                                         required
                                     />
                                 </div>
                             </div>
 
-                            {/* Search Engine */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Search Engine
                                 </label>
                                 <select
@@ -232,7 +263,7 @@ export default function ScheduledDownloads() {
                                     name="engine"
                                     value={formData.engine}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                                     required
                                 >
                                     <option value="">Select Engine</option>
@@ -242,9 +273,8 @@ export default function ScheduledDownloads() {
                                 </select>
                             </div>
 
-                            {/* Season Number */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Season Number
                                 </label>
                                 <input
@@ -253,15 +283,14 @@ export default function ScheduledDownloads() {
                                     name="seasonNumber"
                                     value={formData.seasonNumber}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                    placeholder="Enter season number"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                    placeholder="1"
                                     required
                                 />
                             </div>
 
-                            {/* Episode Number */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Episode Number
                                 </label>
                                 <input
@@ -270,15 +299,14 @@ export default function ScheduledDownloads() {
                                     name="episodeNumber"
                                     value={formData.episodeNumber}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                    placeholder="Enter episode number"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                    placeholder="1"
                                     required
                                 />
                             </div>
 
-                            {/* Day of Week */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Day of Week
                                 </label>
                                 <select
@@ -286,19 +314,18 @@ export default function ScheduledDownloads() {
                                     name="dayOfWeek"
                                     value={formData.dayOfWeek}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                                     required
                                 >
-                                    <option value="">Select Day of Week</option>
+                                    <option value="">Select Day</option>
                                     {daysOfWeek.map((day, index) => (
                                         <option key={index} value={index}>{day}</option>
                                     ))}
                                 </select>
                             </div>
 
-                            {/* Collection */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Collection
                                 </label>
                                 <select
@@ -306,7 +333,7 @@ export default function ScheduledDownloads() {
                                     name="collectionId"
                                     value={formData.collectionId}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                                     required
                                 >
                                     <option value="">Select Collection</option>
@@ -319,34 +346,80 @@ export default function ScheduledDownloads() {
                             </div>
                         </div>
 
-                        {/* Active Toggle */}
-                        <div className="relative flex items-start mb-6">
-                            <div className="flex items-center h-5">
-                                <input
-                                    data-testid="isActive"
-                                    type="checkbox"
-                                    name="isActive"
-                                    checked={formData.isActive}
-                                    onChange={handleInputChange}
-                                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                />
-                            </div>
-                            <div className="ml-3 text-sm">
-                                <label className="font-medium text-gray-700 dark:text-gray-300">Active</label>
-                                <p className="text-gray-500 dark:text-gray-400">Enable or disable this scheduled download</p>
-                            </div>
+                        <div className="flex items-center space-x-3 pt-1">
+                            <input
+                                data-testid="isActive"
+                                type="checkbox"
+                                name="isActive"
+                                id="isActive"
+                                checked={formData.isActive}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
+                            />
+                            <label htmlFor="isActive" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Active
+                            </label>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">— enable or disable this schedule</span>
                         </div>
 
-                        {/* Submit Button */}
                         <button
                             data-testid="submit"
                             type="submit"
-                            className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800"
+                            className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
                         >
                             {editingId ? <Edit2 className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                             {editingId ? "Update" : "Add"} Scheduled Download
                         </button>
                     </Form>
+                </Modal>
+            )}
+
+            {downloadStatus && (
+                <Modal
+                    title="Download Next Episode"
+                    onClose={() => setDownloadModal([null, null])}
+                >
+                    <div className="flex items-start space-x-3">
+                        {downloadStatus === 'loading' && <p className="text-gray-600 dark:text-gray-300">
+                          Searching for <i>{downloading.searchTerm}</i> Season {downloading.seasonNumber} Episode {downloading.episodeNumber}...
+                          <Loader className="inline-block ml-2 h-5 w-5 text-blue-500 animate-spin" />
+                        </p>}
+                        {downloadStatus === 'found' && <>
+                            <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                            <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was found and is downloading now.</p>
+                        </>}
+                        {downloadStatus === 'notfound' && <p className="text-gray-600 dark:text-gray-300">Episode {downloading.episodeNumber} was not found.</p>}
+                        {downloadStatus === 'error' && <p className="text-red-600 dark:text-red-400">An error occurred while searching for episode {downloading.episodeNumber}.</p>}
+                    </div>
+                </Modal>
+            )}
+
+            <div className="min-h-screen p-6 space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Scheduled Downloads</h1>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Automatically download new episodes on a weekly schedule
+                        </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() => setShowInfoModal(true)}
+                            className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+                            title="How the scheduler works"
+                        >
+                            <Info className="h-4 w-4 mr-1.5" />
+                            How it works
+                        </button>
+                        <button
+                            onClick={openAddModal}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Schedule
+                        </button>
+                    </div>
                 </div>
 
                 {/* Downloads Table Card */}
@@ -419,7 +492,7 @@ export default function ScheduledDownloads() {
                                         <div className="flex space-x-2">
                                             <button
                                                 data-testid="edit"
-                                                onClick={() => setEditingId(download.id)}
+                                                onClick={() => openEditModal(download.id)}
                                                 className="text-amber-600 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400"
                                                 title="Edit Scheduled Download"
                                             >
@@ -440,10 +513,10 @@ export default function ScheduledDownloads() {
                                             </Form>
 
                                             <button
-                                                data-testid="edit"
+                                                data-testid="download"
                                                 onClick={() => downloadNextEpisode(download)}
-                                                className="text-amber-600 dark:text-amber-500 hover:text-amber-900 dark:hover:text-amber-400"
-                                                title="Download Next Episode"
+                                                className="text-blue-600 dark:text-blue-500 hover:text-blue-900 dark:hover:text-blue-400"
+                                                title="Download Next Episode Now"
                                             >
                                                 <Download className="h-5 w-5" />
                                             </button>
@@ -451,6 +524,13 @@ export default function ScheduledDownloads() {
                                     </td>
                                 </tr>
                             ))}
+                            {scheduledDownloads.length === 0 && (
+                                <tr>
+                                    <td colSpan={8} className="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        No scheduled downloads yet. Click <strong>Add Schedule</strong> to get started.
+                                    </td>
+                                </tr>
+                            )}
                             </tbody>
                         </table>
                     </div>

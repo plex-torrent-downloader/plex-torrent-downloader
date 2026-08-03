@@ -8,7 +8,7 @@ import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import jwt from "../jwt.server";
 import search from '../search.server';
-import { Save, LogOut, PowerOff, Check, X } from 'lucide-react';
+import { Save, LogOut, PowerOff, Check, X, HardDrive, Shield, Search as SearchIcon, Cpu, User } from 'lucide-react';
 import { exec as cpExec } from 'child_process';
 import { promisify } from 'util';
 
@@ -113,197 +113,203 @@ export default function Setup() {
   const isRecentlyUpdated = +new Date(settings.settings?.updatedAt) > (+new Date) - 1000;
 
   return (
-      <Form method="post" className="p-6 max-w-7xl mx-auto">
-        <div className="space-y-6">
-          {/* Header */}
+    <Form method="post" className="min-h-screen p-6">
+      <div className="max-w-2xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {settings?.settings ? "Settings" : "Initial Setup"}
             </h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Please select the location of your content root, for example, the filesystem path to your external HDD.
+              Configure your content root, search engine, and security options.
             </p>
           </div>
+          <button
+            data-testid="saveSettings"
+            type="submit"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save Settings
+          </button>
+        </div>
 
-          {/* Success Alert */}
-          {isRecentlyUpdated && (
-              <div className="rounded-md bg-green-50 dark:bg-green-900 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-green-400 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-green-800 dark:text-green-200">Settings Updated!</p>
-                  </div>
-                </div>
-              </div>
-          )}
+        {/* Success Alert */}
+        {isRecentlyUpdated && (
+          <div className="flex items-center space-x-3 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 px-4 py-3">
+            <Check className="h-5 w-5 text-green-500 shrink-0" />
+            <p className="text-sm font-medium text-green-800 dark:text-green-300">Settings saved successfully.</p>
+          </div>
+        )}
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-              <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-                <h2 className="text-lg font-medium text-blue-600 dark:text-blue-400">System Settings</h2>
-              </div>
-              <div className="p-4 space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Plex Content Root</label>
-                    <input
-                        data-testid="plexContentRoot"
-                        type="text"
-                        name="fileSystemRoot"
-                        value={fileSystemRoot}
-                        onChange={(e) => setFileSystemRoot(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-                    />
-                  </div>
-
-                  <div className="flex items-center">
-                    <label className="flex items-center">
-                      <input
-                          data-testid="saveDownloadHistory"
-                          type="checkbox"
-                          name="saveDownloadHistory"
-                          checked={saveDownloadHistory}
-                          onChange={(e) => setSaveDownloadHistory(!saveDownloadHistory)}
-                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Save Download History and enable video playback</span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {updatePassword ? "Update password" : "Set a password (optional but recommended)"}
-                    </label>
-                    <input type="hidden" value="admin" name="username" />
-                    <input
-                        data-testid="password"
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-                    />
-                  </div>
-
-                  {settings.settings && (
-                      <Link to="/reset">
-                        <button
-                            type="button"
-                            className="inline-flex items-center rounded-md border border-red-600 dark:border-red-500 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                        >
-                          <PowerOff className="h-4 w-4 mr-2" />
-                          Hard Reset
-                        </button>
-                      </Link>
-                  )}
-
-                  <button
-                      type="button"
-                      onClick={() => window.location.href = '/logout'}
-                      className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </button>
-                </div>
-              </div>
+        {/* General */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="flex items-center space-x-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <HardDrive className="h-5 w-5 text-blue-500" />
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">General</h2>
+          </div>
+          <div className="px-5 py-4 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Plex Content Root
+              </label>
+              <input
+                data-testid="plexContentRoot"
+                type="text"
+                name="fileSystemRoot"
+                value={fileSystemRoot}
+                onChange={(e) => setFileSystemRoot(e.target.value)}
+                placeholder="/mnt/media"
+                className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              />
+              <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                The filesystem path to your Plex media root, e.g. the path to your external HDD.
+              </p>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow min-h-[200px]">
-                <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                  <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                    Transcoding
-                  </h2>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center space-x-3">
-                    {settings?.ffmpegInstalled ? (
-                        <>
-                          <div className="flex-shrink-0">
-                            <Check className="w-5 h-5 text-green-500" />
-                          </div>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            FFmpeg is installed
-                          </p>
-                        </>
-                    ) : (
-                        <>
-                          <div className="flex-shrink-0">
-                            <X className="w-5 h-5 text-red-500" />
-                          </div>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            FFmpeg is not installed
-                          </p>
-                        </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Search Settings and Save Button Cards */}
-            <div className="space-y-6">
-              {/* Search Settings Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-                  <h2 className="text-lg font-medium text-blue-600 dark:text-blue-400">Search Settings</h2>
-                </div>
-                <div className="p-4 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Search Engine</label>
-                    <select
-                        data-testid="searchEngine"
-                        name="searchEngine"
-                        value={searchEngine}
-                        onChange={(e) => setSearchEngine(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-                    >
-                      {settings.searchEngines.map((engine) => (
-                          <option key={engine} value={engine}>{engine}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center">
-                    <label className="flex items-center">
-                      <input
-                          type="checkbox"
-                          name="cacheSearchResults"
-                          checked={cacheSearchResults}
-                          onChange={(e) => setCacheSearchResults(!cacheSearchResults)}
-                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Cache Search Results</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Save Button Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-                  <h2 className="text-lg font-medium text-blue-600 dark:text-blue-400">Save Settings</h2>
-                </div>
-                <div className="p-4">
-                  <button
-                      data-testid="saveSettings"
-                      type="submit"
-                      className="inline-flex w-full justify-center items-center rounded-md border border-transparent bg-blue-600 dark:bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Settings
-                  </button>
-                </div>
-              </div>
+            <div className="flex items-start space-x-3 pt-1">
+              <input
+                data-testid="saveDownloadHistory"
+                type="checkbox"
+                id="saveDownloadHistory"
+                name="saveDownloadHistory"
+                checked={saveDownloadHistory}
+                onChange={() => setSaveDownloadHistory(!saveDownloadHistory)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
+              />
+              <label htmlFor="saveDownloadHistory" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <span className="font-medium">Save download history</span>
+                <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">Enables video playback from the history page.</span>
+              </label>
             </div>
           </div>
         </div>
-      </Form>
+
+        {/* Search */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="flex items-center space-x-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <SearchIcon className="h-5 w-5 text-blue-500" />
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Search</h2>
+          </div>
+          <div className="px-5 py-4 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Search Engine
+              </label>
+              <select
+                data-testid="searchEngine"
+                name="searchEngine"
+                value={searchEngine}
+                onChange={(e) => setSearchEngine(e.target.value)}
+                className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              >
+                {settings.searchEngines.map((engine) => (
+                  <option key={engine} value={engine}>{engine}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="cacheSearchResults"
+                name="cacheSearchResults"
+                checked={cacheSearchResults}
+                onChange={() => setCacheSearchResults(!cacheSearchResults)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400"
+              />
+              <label htmlFor="cacheSearchResults" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <span className="font-medium">Cache search results</span>
+                <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">Speeds up repeated searches by storing results temporarily.</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Security */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="flex items-center space-x-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <Shield className="h-5 w-5 text-blue-500" />
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Security</h2>
+          </div>
+          <div className="px-5 py-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {updatePassword ? "Update password" : "Password"}
+              {!updatePassword && <span className="ml-1.5 text-xs font-normal text-gray-400 dark:text-gray-500">(optional but recommended)</span>}
+            </label>
+            <input type="hidden" value="admin" name="username" />
+            <input
+              data-testid="password"
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={updatePassword ? "Enter new password to change" : "Set a password"}
+              className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            />
+          </div>
+        </div>
+
+        {/* System */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="flex items-center space-x-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <Cpu className="h-5 w-5 text-blue-500" />
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">System</h2>
+          </div>
+          <div className="px-5 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">FFmpeg</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Required for hardware-accelerated video transcoding.</p>
+              </div>
+              {settings?.ffmpegInstalled ? (
+                <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Installed</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">
+                  <X className="h-3.5 w-3.5" />
+                  <span>Not installed</span>
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Account actions */}
+        {settings.settings && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="flex items-center space-x-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+              <User className="h-5 w-5 text-blue-500" />
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Account</h2>
+            </div>
+            <div className="px-5 py-4 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => window.location.href = '/logout'}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Log out
+              </button>
+
+              <Link to="/reset">
+                <button
+                  type="button"
+                  className="inline-flex items-center px-3 py-2 border border-red-300 dark:border-red-700 text-sm font-medium rounded-lg text-red-600 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800"
+                >
+                  <PowerOff className="h-4 w-4 mr-2" />
+                  Hard Reset
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </Form>
   );
 }

@@ -14,9 +14,10 @@ interface Props {
     onClose: () => any;
     buttons?: Button[];
     children?: React.ReactNode;
+    className?: string;
 }
 
-export default function Modal({ title, disabled, onClose, buttons, children }: Props) {
+export default function Modal({ title, disabled, onClose, buttons, children, className }: Props) {
     // Handle escape key press
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
@@ -74,7 +75,7 @@ export default function Modal({ title, disabled, onClose, buttons, children }: P
                 aria-labelledby="modal-title"
             >
                 <div className="flex min-h-full items-center justify-center p-4">
-                    <div className="relative w-full transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all max-w-lg mx-auto">
+                    <div className={`relative w-full transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all mx-auto ${className ?? 'max-w-lg'}`}>
                         {/* Header */}
                         <div className="px-4 py-4 sm:px-6 border-b border-gray-200 dark:border-gray-700">
                             <div className="flex items-start justify-between">
