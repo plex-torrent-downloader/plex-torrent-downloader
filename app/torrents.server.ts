@@ -3,6 +3,8 @@ import {db} from './db.server';
 import webtorrent from "./webtorrent.server";
 import {Torrent} from "webtorrent";
 import {sendMessage} from "../api/socketio";
+import notifyJellyfin from "./jellyfin.server";
+import nodePath from "path";
 
 class torrentsManager {
 
@@ -191,14 +193,10 @@ class torrentsManager {
                     torrent.on('done', async () => {
                         sendMessage('Download Complete', `${torrent.name} has finished downloading`);
                         await db.downloaded.update({
-                            data: {
-                                completedAt: new Date(),
-                                deletedAt: null
-                            },
-                            where: {
-                                id
-                            }
-                        })
+                            data: { completedAt: new Date(), deletedAt: null },
+                            where: { id }
+                        });
+                        notifyJellyfin(torrent.files.map(f => nodePath.join(torrent.path, f.path))).catch(console.warn);
                     });
                     resolve();
                 } catch (error) {

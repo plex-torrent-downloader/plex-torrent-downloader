@@ -8,6 +8,7 @@ import {PTDRequest} from "~/contracts/PTDRequest";
 import {sendMessage} from "./socketio";
 import transcode from "./transcode";
 import scheduledDownloadsRoutes from "./scheduledDownloads";
+import jellyfinServersRoutes from "./jellyfinServers";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.get('/logout', logout);
 router.use('/collections', collections);
 router.use('/transcode', transcode);
 router.use('/scheduled_downloads', scheduledDownloadsRoutes);
+router.use('/jellyfin_servers', jellyfinServersRoutes);
 
 router.post('/add', async (req: PTDRequest, res: Response, next: NextFunction) => {
     let postData = '';
