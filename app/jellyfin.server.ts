@@ -8,7 +8,7 @@ async function notifyJellyfin(filePaths: string[]): Promise<void> {
         return;
     }
 
-    const updates = filePaths.map(path => ({ Path: path, UpdateType: 'Created' }));
+    const updates = { Updates: filePaths.map(path => ({ Path: path, UpdateType: 'Created' })) };
 
     await Promise.allSettled(
         servers.map(server =>
