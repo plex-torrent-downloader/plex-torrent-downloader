@@ -1,6 +1,6 @@
 import { defineConfig } from "cypress";
 import {db} from './app/db.server';
-import {Collections, Downloaded, ScheduledDownloads, Settings} from "@prisma/client";
+import {Collections, Downloaded, JellyfinServer, ScheduledDownloads, Settings} from "@prisma/client";
 
 const tasks = {
     async clearSettings() {
@@ -145,6 +145,28 @@ const tasks = {
     async getAllScheduledDownloads(): Promise<ScheduledDownloads[]> {
         const scheduledDownloads = await db.scheduledDownloads.findMany()
         return scheduledDownloads;
+    },
+
+    async clearJellyfinServers(): Promise<null> {
+        await db.jellyfinServer.deleteMany();
+        return null;
+    },
+
+    async setJellyfinServers(): Promise<null> {
+        await db.jellyfinServer.deleteMany();
+        await db.jellyfinServer.create({
+            data: {
+                name: 'Test Server',
+                url: 'http://localhost:8096',
+                apiKey: 'testapikey123',
+                isActive: true,
+            }
+        });
+        return null;
+    },
+
+    async getAllJellyfinServers(): Promise<JellyfinServer[]> {
+        return db.jellyfinServer.findMany();
     },
 };
 

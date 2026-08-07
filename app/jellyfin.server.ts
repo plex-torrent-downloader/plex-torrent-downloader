@@ -2,7 +2,6 @@ import { db } from './db.server';
 import axios from 'axios';
 
 async function notifyJellyfin(filePaths: string[]): Promise<void> {
-    console.log('notifyJellyin', filePaths);
     const servers = await db.jellyfinServer.findMany({ where: { isActive: true } });
     if (!servers.length) {
         return;

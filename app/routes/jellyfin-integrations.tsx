@@ -137,6 +137,7 @@ export default function Integrations() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                             <input
+                                data-testid="serverName"
                                 type="text"
                                 name="name"
                                 value={formData.name}
@@ -150,6 +151,7 @@ export default function Integrations() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
                             <input
+                                data-testid="serverUrl"
                                 type="url"
                                 name="url"
                                 value={formData.url}
@@ -163,6 +165,7 @@ export default function Integrations() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Key</label>
                             <input
+                                data-testid="serverApiKey"
                                 type="password"
                                 name="apiKey"
                                 value={formData.apiKey}
@@ -186,6 +189,7 @@ export default function Integrations() {
                         </div>
 
                         <button
+                            data-testid="submitServer"
                             type="submit"
                             className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
                         >
@@ -204,6 +208,7 @@ export default function Integrations() {
                         </p>
                     </div>
                     <button
+                        data-testid="addServer"
                         onClick={openAdd}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
                     >
@@ -251,6 +256,7 @@ export default function Integrations() {
                                     )}
 
                                     <button
+                                        data-testid="testServer"
                                         onClick={() => testConnection(server)}
                                         className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         title="Test connection"
@@ -260,6 +266,7 @@ export default function Integrations() {
                                     </button>
 
                                     <button
+                                        data-testid="editServer"
                                         onClick={() => openEdit(server.id)}
                                         className="text-amber-600 dark:text-amber-500 hover:text-amber-800 dark:hover:text-amber-400"
                                         title="Edit"
@@ -271,6 +278,7 @@ export default function Integrations() {
                                         <input type="hidden" name="_action" value="delete" />
                                         <input type="hidden" name="id" value={server.id} />
                                         <button
+                                            data-testid="deleteServer"
                                             type="submit"
                                             className="text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                                             title="Remove"
