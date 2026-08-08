@@ -17,3 +17,6 @@
 
 ## Scheduled Downloads
 [![Scheduled Downloads](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/scheduled_downloads.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/scheduled_downloads.png)
+
+## Jellyfin Integration
+[![Scheduled Downloads](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/jellyfin.png)](https://raw.githubusercontent.com/plex-torrent-downloader/plex-torrent-downloader/master/screenshots/jellyfin.png)
