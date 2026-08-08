@@ -9,6 +9,8 @@ describe('Scheduled Downloads', () => {
 
     cy.visit('http://localhost:3000/scheduled_downloads');
 
+    cy.get('button[data-testid="addTorrent"').click();
+
     cy.get('[data-testid="searchTerm"]').type('Mulan');
     cy.get('[data-testid="engine"]').select('1377x.to');
     cy.get('[data-testid="seasonNumber"]').type('1');

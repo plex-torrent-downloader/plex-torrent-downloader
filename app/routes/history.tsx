@@ -78,7 +78,7 @@ export default function History() {
   }
 
   return (
-      <div className="min-h-screen p-6">
+      <div className="min-h-screen p-6" data-testid="notification">
         {/* Modals */}
         {alertMessage && (
             <Modal

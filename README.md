@@ -7,6 +7,7 @@ This is a Node.js application that enables downloading torrent files and adding 
 #### Unique Features
 
 - Supports Plex/Jellyfin or ANY media server that can read from a directory
+- **Jellyfin Integration** — automatically notifies Jellyfin servers when a download completes so new files are indexed immediately (supports multiple servers)
 - Download Scheduler (Automatically Download new episodes)
 - Transcoding features if ffmpeg is installed (with hardware acceleration support in beta)
 - Built in search for torrents
@@ -68,7 +69,16 @@ Click on the "Add torrent" button and enter the magnet URL or the path to the to
 
 Wait for the download to finish. The downloaded files should appear in the specified directory.
 
-Click on the "Add to Plex" button to add the downloaded files to a Plex library.
+#### Jellyfin Integration
+
+To have Jellyfin automatically index new downloads:
+
+1. Go to **Settings → Jellyfin** and click **Add Jellyfin Server**
+2. Enter your server's name, URL (e.g. `http://192.168.1.100:8096`), and an API key
+3. Generate an API key in Jellyfin under **Dashboard → API Keys**
+4. Use the **Test** button to verify the connection
+
+Once configured, Jellyfin will be notified automatically whenever a torrent finishes downloading. Multiple servers are supported.
 
 # Docker Setup
 

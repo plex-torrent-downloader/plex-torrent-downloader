@@ -1,6 +1,6 @@
 import {Form, Link, useLoaderData} from "@remix-run/react";
 import {json, LoaderFunction} from "@remix-run/node";
-import { Settings } from '@prisma/client';
+import { Settings, JellyfinServer } from '@prisma/client';
 import {db} from '../db.server';
 import {useState} from "react";
 import { redirect } from "@remix-run/node";
@@ -8,7 +8,7 @@ import fs from '../fs.server';
 import Bcrypt from '../bcrypt.server';
 import jwt from "../jwt.server";
 import search from '../search.server';
-import { Save, LogOut, PowerOff, Check, X, HardDrive, Shield, Search as SearchIcon, Cpu, User } from 'lucide-react';
+import { Save, LogOut, PowerOff, Check, X, HardDrive, Shield, Search as SearchIcon, Cpu, User, Tv, ChevronRight, Plus } from 'lucide-react';
 import { exec as cpExec } from 'child_process';
 import { promisify } from 'util';
 
@@ -26,6 +26,7 @@ type LoaderData = {
   settings?: Settings;
   searchEngines: string[];
   ffmpegInstalled?: boolean;
+  jellyfinServers: Partial<JellyfinServer>[];
 };
 
 export function meta(args) {
@@ -98,11 +99,16 @@ export const loader: LoaderFunction = async ({ context }) => {
   const { settings } = context;
   const searchEngines = search.getSearchEngines();
   const ffmpegInstalled = await checkFFmpeg();
-  return json({settings, searchEngines, ffmpegInstalled});
+  const jellyfinServers = await db.jellyfinServer.findMany({
+    select: { id: true, name: true, url: true, isActive: true },
+    orderBy: { createdAt: 'asc' }
+  });
+  return json({settings, searchEngines, ffmpegInstalled, jellyfinServers});
 };
 
 export default function Setup() {
   const settings = useLoaderData<LoaderData>();
+  const { jellyfinServers } = settings;
   const [fileSystemRoot, setFileSystemRoot] = useState<string>(settings.settings?.fileSystemRoot ?? '');
   const [cacheSearchResults, setCacheSearchResults] = useState<boolean>(settings.settings?.cacheSearchResults ?? true);
   const [saveDownloadHistory, setSaveDownloadHistory] = useState<boolean>(settings.settings?.saveDownloadHistory ?? true);
@@ -277,6 +283,56 @@ export default function Setup() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Jellyfin Integrations */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center space-x-3">
+              <Tv className="h-5 w-5 text-blue-500" />
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Jellyfin Integrations</h2>
+            </div>
+            <Link
+              to="/jellyfin-integrations"
+              className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Manage
+              <ChevronRight className="h-4 w-4 ml-0.5" />
+            </Link>
+          </div>
+
+          {jellyfinServers.length === 0 ? (
+            <div className="px-5 py-6 flex flex-col items-center text-center space-y-3">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                No Jellyfin servers configured. Connect one to automatically notify Jellyfin when downloads complete.
+              </p>
+              <Link
+                to="/jellyfin-integrations"
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                Add Jellyfin Server
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {jellyfinServers.map(server => (
+                <div key={server.id} className="flex items-center justify-between px-5 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{server.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{server.url}</p>
+                  </div>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    server.isActive
+                      ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                  }`}>
+                    {server.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Account actions */}
