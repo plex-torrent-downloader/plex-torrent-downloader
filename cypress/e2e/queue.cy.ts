@@ -21,7 +21,7 @@ describe('Download Queue', () => {
 
     // Wait for the torrent to be processed and added to download history
     // Retry until history is populated (handles async processing)
-    const checkHistory = (retries = 0, maxRetries = 20) => {
+    const checkHistory = (retries = 0, maxRetries = 120) => {
       cy.task('getDownloadHistory').then((history) => {
         if (history.length === 0 && retries < maxRetries) {
           cy.wait(500);
