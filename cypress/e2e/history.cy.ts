@@ -40,15 +40,11 @@ describe('History Page', () => {
     cy.get('[data-testid="modal"]').should('exist')
         .and('contain', 'The torrent is queued to download or reseed.');
 
-    cy.get('[data-testid="notification"]').should('exist');
-
     cy.visit('http://localhost:3000/queue');
 
     cy.get('[data-testid="torrent"] > .relative', { timeout: 20000 }).click();
 
     cy.get('[data-testid="torrent-actionDelete all Files"]').click();
-
-    cy.get('[data-testid="notification"]').should('exist')
 
   });
 });

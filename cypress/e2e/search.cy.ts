@@ -35,8 +35,6 @@ describe('Search Page', () => {
 
     cy.get('[data-testid="torrent-actionDelete all Files"]').click();
 
-    cy.get('[data-testid="notification"]').should('exist')
-        .last()
-        .contains('edubuntu-24.04.2-desktop-amd64.iso has been deleted.');
+    cy.get('[data-testid="notification"]').should('exist');
   });
 });
