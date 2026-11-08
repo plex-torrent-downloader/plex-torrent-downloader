@@ -8,6 +8,7 @@ import {checkFFmpeg, getHardwareAcceleration, type HardwareAcceleration} from ".
 import async from "async";
 import {Downloaded} from "@prisma/client";
 import torrents from "../app/torrents.server";
+import notifyJellyfin from "../app/jellyfin.server";
 import { Server } from 'socket.io';
 
 const videoExtensions = ["3gp", "3g2", "asf", "avi", "divx", "flv", "f4v", "f4p", "f4a", "f4b", "m4v", "mov", "mp4", "mpe", "mpeg", "mpg", "mpv", "m1v", "m2v", "ogv", "ogx", "qt", "rm", "rmvb", "ts", "vob", "webm", "wmv"];
@@ -169,19 +170,22 @@ async function processTranscode(torrent: WebTorrent|Downloaded, socket: Server):
         if (!isDirectory) {
             const ext:string = torrent.name.split('.').pop();
             if (videoExtensions.includes(ext || '')){
-                await transcode(pathOnDisk, socket, hwAccel);
+                const outputPath = await transcode(pathOnDisk, socket, hwAccel);
                 sendMessage("Transcoding completed", `Successfully transcoded ${torrent.name} to MKV format.`);
+                notifyJellyfin([outputPath]).catch(console.warn);
             } else {
                 throw new Error("The torrent does not contain a valid video file for transcoding.");
             }
         } else {
             const files = await readdir(pathOnDisk);
             let transcoded:number = 0;
+            const outputPaths: string[] = [];
             for (const file of files) {
                 const fullFilePath = path.join(pathOnDisk, file);
                 let ext = file.split('.').pop();
                 if (videoExtensions.includes(ext)) {
-                    await transcode(fullFilePath, socket, hwAccel);
+                    const outputPath = await transcode(fullFilePath, socket, hwAccel);
+                    outputPaths.push(outputPath);
                     transcoded++;
                 }
             }
@@ -189,6 +193,7 @@ async function processTranscode(torrent: WebTorrent|Downloaded, socket: Server):
                 throw new Error("The torrent does not contain any valid video files for transcoding.");
             }
             sendMessage("Transcoding completed", `Successfully transcoded ${transcoded} file(s) to MKV format.`);
+            notifyJellyfin(outputPaths).catch(console.warn);
         }
     } catch(e) {
         sendMessage("Transcoding failed", e.message);
