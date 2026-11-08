@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm ci
@@ -40,5 +40,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: npm run start
-          wait-on: 'http://localhost:3000'
+          wait-on: 'http://127.0.0.1:3000'
           wait-on-timeout: 120
